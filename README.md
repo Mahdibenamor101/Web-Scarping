@@ -14,7 +14,7 @@ Setup and Installation
 Clone the repository:
 bash
 Copy code
-git clone https://github.com/yourusername/yourproject.git
+git clone https://github.com/Mahdibenamor101/Web-Scarping/
 Navigate to the project directory:
 bash
 Copy code
