@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { friendlyErrorMessage } from "@/lib/client-errors";
 
 function LoginForm() {
   const router = useRouter();
@@ -22,6 +23,7 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {
+        if (res.status === 429) throw new Error(await friendlyErrorMessage(res, "Trop de tentatives."));
         throw new Error("Email ou mot de passe incorrect");
       }
       router.push(searchParams.get("next") ?? "/dashboard");

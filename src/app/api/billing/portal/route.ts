@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withTenant } from "@/lib/db";
 import { getStripeClient } from "@/lib/stripe";
-import { requireSession, requireRole, handleApiError, ApiError } from "@/lib/api";
+import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit } from "@/lib/api";
 import { BILLING_MANAGEMENT_ROLES } from "@/lib/rbac";
 
 // Stripe's hosted Billing Portal: lets an owner update payment details,
@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
     requireRole(session, BILLING_MANAGEMENT_ROLES);
+    requireRateLimit(`billing-portal:org:${session.organizationId}`, { limit: 20, windowMs: 60 * 60 * 1000 });
 
     const stripe = getStripeClient();
     if (!stripe) {

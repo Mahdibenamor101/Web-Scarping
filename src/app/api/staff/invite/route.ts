@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { withTenant } from "@/lib/db";
-import { requireSession, requireRole, handleApiError, ApiError } from "@/lib/api";
+import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit } from "@/lib/api";
 import { STAFF_MANAGEMENT_ROLES, canInviteRole } from "@/lib/rbac";
 import { inviteStaffSchema } from "@/lib/validation";
 
@@ -11,6 +11,12 @@ export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
     requireRole(session, STAFF_MANAGEMENT_ROLES);
+
+    // Per-organization, not per-caller: an owner and a manager sending
+    // invites at the same time share the same budget on purpose -- what's
+    // being bounded is "how many invite links can this restaurant generate
+    // per hour," not one person's activity.
+    requireRateLimit(`staff-invite:org:${session.organizationId}`, { limit: 20, windowMs: 60 * 60 * 1000 });
 
     const body = inviteStaffSchema.parse(await req.json());
 

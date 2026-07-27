@@ -1,7 +1,7 @@
 # CONTEXT.md — [nom à trancher]
 
 > Fichier de mémoire du projet. À coller en début de chaque session de travail (chat ou Claude Code) et à tenir à jour après chaque décision importante.
-> Dernière mise à jour : 27 juillet 2026 — Phase 0 complète : étapes 1 à 5 (fondations + multi-tenant, menu, QR + commande client, dashboard temps réel, Stripe) implémentées, décisions d'architecture consignées en §12. Stripe non vérifié contre un vrai compte — voir §12.7 et §13.
+> Dernière mise à jour : 27 juillet 2026 — Phase 0 complète : étapes 1 à 5 (fondations + multi-tenant, menu, QR + commande client, dashboard temps réel, Stripe) implémentées, plus un durcissement limitation de débit (§12.8), décisions d'architecture consignées en §12. Stripe non vérifié contre un vrai compte — voir §12.7 et §13.
 
 ## 1. Vision
 
@@ -201,6 +201,8 @@ Le nom n'est pas bloquant : coder avec un placeholder, trancher le nom en parall
 
 **Phase 0 terminée en ce sens** : les cinq étapes prévues sont codées. Ce qui reste avant un pilote réel n'est plus architectural — c'est de la vérification avec de vrais identifiants (Stripe), du contenu (mentions légales, CGV — §10), et les points listés en §13.
 
+**Durcissement post-Phase 0 — limitation de débit : FAITE.** Signup, connexion (par IP et par email), acceptation d'invitation, commande client (par table et par IP), invitations envoyées (par organisation), et les actions de facturation sont maintenant limitées en fréquence — c'était le point le plus concret listé en §13 après l'étape 5. Voir §12.8 pour le mécanisme et sa même limite de processus unique que le temps réel (§12.6).
+
 ### Phase A — Pilotes (3-4 semaines)
 5-8 restos du réseau, **gratuits 3 mois**. Ce n'est pas de la générosité : c'est l'achat d'actifs publicitaires. À exiger explicitement dès le départ :
 - vidéos du produit en service réel (scan client → commande en cuisine)
@@ -313,13 +315,26 @@ C'est cohérent avec le reste de l'architecture : la base est déjà la source d
 
 **Design** : un seul plan (~400 €/an, §8), pas de sélecteur de tarif. `organization_id` transite dans les métadonnées de la session Checkout et de l'abonnement Stripe créés par cette app elle-même ; le webhook, une fois la signature Stripe vérifiée, peut donc faire confiance à cette métadonnée et écrire via `withTenant()` normal — **aucune sixième fonction `SECURITY DEFINER` n'a été nécessaire**, contrairement à l'intuition initiale (le webhook n'a de session ni de compte, comme signup/login/QR, mais contrairement à eux il n'a pas besoin de *résoudre* un tenant depuis une donnée non fiable : il le relit depuis une donnée que l'app a écrite elle-même et que Stripe se contente de renvoyer). Bonne confirmation que le modèle en §12.3 tient sans multiplier les contournements.
 
-## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5)
+### 12.8 Limitation de débit (durcissement post-Phase 0)
+
+**Mécanisme** : compteur en mémoire, fenêtre fixe, par clé (`src/lib/rate-limit.ts`). Même limite de conception que le temps réel (§12.6) : un seul processus Node, pas de magasin partagé — un déploiement multi-instances appliquerait la limite séparément sur chaque instance, ce qui la multiplie de fait par le nombre d'instances plutôt que de la faire respecter globalement. À remplacer par un magasin partagé (Redis) si l'hébergement final est multi-instances ; à trancher avec le reste de l'hébergement (§12.4), pas avant.
+
+**Où c'est appliqué, et pourquoi ces clés précises :**
+- **Connexion** : par IP (10/15 min) *et* par email (5/15 min) — une seule source qui teste beaucoup de comptes est bloquée par la première, beaucoup de sources qui testent un seul compte sont bloquées par la seconde. Vérifié en conditions réelles au-delà de 5 tentatives sur un même email.
+- **Inscription** : par IP (5/heure) — contre la création automatisée d'organisations bidon. Vérifié : la 6ᵉ tentative en une heure depuis la même IP est rejetée avec un `Retry-After` correct (~3600s).
+- **Commande client** (`/menu/[qrToken]`) : par table (20/5 min) *et* par IP (30/heure) — la table protège contre un script qui spamme une seule table, l'IP contre un script qui teste plusieurs tables. Vérifié : exactement 20 commandes passent sur une même table, la 21ᵉ est rejetée.
+- **Acceptation et lecture d'invitation** : par IP, limites larges (20–30/heure) — les jetons (32 octets aléatoires) rendent le brute-force impraticable de toute façon ; c'est une assurance bon marché contre le sondage automatisé, pas la vraie défense.
+- **Invitation de staff** : par organisation (20/heure), pas par personne qui invite — ce qui est borné, c'est "combien de liens d'invitation ce restaurant peut générer par heure", pas l'activité d'un individu.
+- **Facturation** (Checkout, Portail) : par organisation, limites larges — même logique que les invitations, protection de dernier recours plutôt que contrainte pensée pour l'usage normal.
+
+**Ce qui n'est délibérément pas limité** : les lectures authentifiées du tableau de bord (`/api/orders`, `/api/menu/*`, `/api/staff`) — un membre du staff qui recharge sa page ne doit jamais se heurter à une limite pensée pour du trafic public non authentifié.
 
 - **Pas d'envoi d'email réel.** L'invitation de staff génère un lien qu'il faut transmettre à la main (affiché dans le dashboard, loggé côté serveur). Premier vrai manque à combler dès que des restaurateurs pilotes utilisent le produit.
 - **Email globalement unique pour les comptes staff** (voir §12.2.3) : une personne travaillant dans deux restaurants ne peut pas avoir le même email des deux côtés. Non bloquant pour le MVP, mais à concevoir explicitement si le besoin apparaît (compte multi-organisation) plutôt que de le découvrir en production.
 - **`DIRECT_DATABASE_URL` (rôle `app_migrator`) ne doit jamais être utilisé par le code applicatif.** Prisma Client ne s'en sert qu'au moment des migrations, jamais à l'exécution — mais c'est une convention à faire respecter en revue de code, pas quelque chose que la base empêche mécaniquement si quelqu'un l'utilisait par erreur dans une future route API.
 - **Les cinq fonctions `SECURITY DEFINER`** (`create_organization_and_owner`, `auth_lookup_user`, `accept_invitation`, `invitation_lookup_by_token`, `resolve_table_by_qr_token`) sont la seule surface qui contourne RLS — toujours cinq après l'étape Stripe, voir §12.7. Elles sont volontairement étroites, mais toute nouvelle fonction de ce type doit être traitée avec la même rigueur : elle est par construction en dehors de la garantie décrite en §12.3.
-- **Pas de vérification d'email ni de limitation de débit (rate limiting)** sur signup/login/invitation/commande — rien n'empêche aujourd'hui un client (ou un script) de spammer des commandes sur une table via `/menu/[qrToken]`, ni quelqu'un de forcer un mot de passe par essais répétés. À traiter avant le premier pilote réel : c'est un service ouvert au public dès l'étape 3, pas seulement "avant l'exposition publique générale".
+- **Pas de vérification d'email.** N'importe quelle adresse peut créer un compte sans jamais prouver qu'elle existe. La limitation de débit (voir §12.8) réduit l'abus automatisé mais ne remplace pas une vérification d'identité — à traiter avant le premier pilote réel si le spam de comptes devient un problème concret, pas avant.
+- **Le magasin de limitation de débit est en mémoire, un seul processus** (§12.8) — comme le temps réel (§12.6), à revoir ensemble si l'hébergement final est multi-instances.
 - **Pas d'upload de photo pour les plats.** Le champ `photoUrl` attend une URL déjà hébergée ailleurs — pas de stockage S3-compatible branché (Supabase Storage / R2, prévu §6). À faire avant que des restaurateurs pilotes alimentent vraiment leur menu.
 - **Le temps réel suppose un processus Node long-vivant** (voir §12.6) — pas compatible tel quel avec un hébergement serverless par défaut (Vercel Functions). À trancher avec le choix d'hébergement définitif (§12.4), pas avant.
 - **N'importe quel membre du staff peut faire passer n'importe quelle commande à n'importe quel statut**, y compris l'annuler. Volontaire pour cette étape (server et kitchen doivent pouvoir agir vite, sans se heurter à une permission trop fine) mais pas de piste d'audit : impossible de savoir qui a annulé quoi. À revoir si des restaurateurs pilotes signalent un problème réel de coordination interne — pas avant.

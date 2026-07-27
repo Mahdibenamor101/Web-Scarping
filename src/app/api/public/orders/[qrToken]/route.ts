@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withTenant } from "@/lib/db";
 import { resolveTableByQrToken } from "@/lib/qr-resolve";
-import { ApiError, handleApiError } from "@/lib/api";
+import { ApiError, handleApiError, requireRateLimit } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
 import { createOrderSchema } from "@/lib/validation";
 
 // Public: no session required (same reasoning as the menu route). Prices
@@ -10,7 +11,15 @@ import { createOrderSchema } from "@/lib/validation";
 // what gets billed is always what the menu actually says right now.
 export async function POST(req: NextRequest, { params }: { params: { qrToken: string } }) {
   try {
+    // By IP first (covers invalid/guessed tokens too, before any DB
+    // lookup), then by table once resolved -- one customer mashing
+    // "commander" doesn't get blocked, a script hammering one table does.
+    requireRateLimit(`order:ip:${getClientIp(req)}`, { limit: 30, windowMs: 60 * 60 * 1000 });
+
     const table = await resolveTableByQrToken(params.qrToken);
+
+    requireRateLimit(`order:table:${table.tableId}`, { limit: 20, windowMs: 5 * 60 * 1000 });
+
     const body = createOrderSchema.parse(await req.json());
 
     const order = await withTenant(table.organizationId, async (tx) => {

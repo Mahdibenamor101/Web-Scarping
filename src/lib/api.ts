@@ -2,12 +2,27 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { Prisma, type StaffRole } from "@prisma/client";
 import { getSession, type SessionPayload } from "./session";
+import { rateLimit } from "./rate-limit";
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  headers?: Record<string, string>;
+  constructor(status: number, message: string, headers?: Record<string, string>) {
     super(message);
     this.status = status;
+    this.headers = headers;
+  }
+}
+
+/**
+ * Throws a 429 (with a Retry-After header) once `key` has been called
+ * `limit` times within `windowMs`. See src/lib/rate-limit.ts for the
+ * mechanism and its single-process caveat.
+ */
+export function requireRateLimit(key: string, opts: { limit: number; windowMs: number }) {
+  const result = rateLimit(key, opts);
+  if (!result.allowed) {
+    throw new ApiError(429, "rate_limited", { "Retry-After": String(result.retryAfterSeconds) });
   }
 }
 
@@ -25,7 +40,7 @@ export function requireRole(session: SessionPayload, allowed: StaffRole[]) {
 
 export function handleApiError(error: unknown) {
   if (error instanceof ApiError) {
-    return NextResponse.json({ error: error.message }, { status: error.status });
+    return NextResponse.json({ error: error.message }, { status: error.status, headers: error.headers });
   }
   if (error instanceof ZodError) {
     return NextResponse.json({ error: "invalid_input", issues: error.issues }, { status: 400 });

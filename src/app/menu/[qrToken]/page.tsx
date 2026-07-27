@@ -25,8 +25,32 @@ type MenuData = {
 type Lang = "it" | "en";
 
 const T = {
-  it: { title: "Menu", table: "Tavolo", cart: "Ordine", total: "Totale", order: "Ordina", empty: "Il carrello è vuoto.", confirmed: "Ordine inviato!", confirmedBody: "La cucina l'ha ricevuto.", back: "Torna al menu", loadError: "QR non valido o table introuvable." },
-  en: { title: "Menu", table: "Table", cart: "Order", total: "Total", order: "Place order", empty: "Your cart is empty.", confirmed: "Order sent!", confirmedBody: "The kitchen has received it.", back: "Back to menu", loadError: "Invalid QR code or table not found." },
+  it: {
+    title: "Menu",
+    table: "Tavolo",
+    cart: "Ordine",
+    total: "Totale",
+    order: "Ordina",
+    empty: "Il carrello è vuoto.",
+    confirmed: "Ordine inviato!",
+    confirmedBody: "La cucina l'ha ricevuto.",
+    back: "Torna al menu",
+    loadError: "QR non valido o tavolo non trovato.",
+    rateLimited: "Troppi tentativi, riprova tra qualche minuto.",
+  },
+  en: {
+    title: "Menu",
+    table: "Table",
+    cart: "Order",
+    total: "Total",
+    order: "Place order",
+    empty: "Your cart is empty.",
+    confirmed: "Order sent!",
+    confirmedBody: "The kitchen has received it.",
+    back: "Back to menu",
+    loadError: "Invalid QR code or table not found.",
+    rateLimited: "Too many attempts, please try again in a few minutes.",
+  },
 };
 
 export default function PublicMenuPage() {
@@ -74,6 +98,7 @@ export default function PublicMenuPage() {
           items: cartLines.map(([menuItemId, quantity]) => ({ menuItemId, quantity })),
         }),
       });
+      if (res.status === 429) throw new Error(T[lang].rateLimited);
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "error");
       setConfirmedOrderId(body.orderId);

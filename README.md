@@ -39,7 +39,7 @@ npm run db:up          # démarre juste Postgres
 npm run db:down        # arrête Postgres
 npm run db:migrate:dev # nouvelle migration en dev
 npm run db:seed        # rejoue le seed (no-op si déjà présent)
-npm test               # tests d'isolation multi-tenant (Row-Level Security)
+npm test               # tests d'isolation multi-tenant (Row-Level Security) + limitation de débit
 npm run typecheck
 npm run build
 ```
@@ -69,3 +69,7 @@ Chaque table métier porte un `organization_id`, et une policy Postgres (`Row-Le
 **Sans configuration Stripe (`STRIPE_SECRET_KEY` / `STRIPE_PRICE_ID` / `STRIPE_WEBHOOK_SECRET` absentes de `.env`), tout le reste de l'app fonctionne normalement** — les routes de facturation renvoient un 501 propre, la page billing affiche un avertissement. `npm run setup` ne nécessite donc pas de compte Stripe.
 
 **Non vérifié : un vrai paiement de bout en bout.** Le webhook a été testé avec des événements Stripe signés localement (voir `CONTEXT.md` §12.7), mais aucun appel n'a été fait contre un vrai compte Stripe. Avant le premier pilote payant : créer un compte Stripe (mode test), renseigner les trois variables d'environnement, et dérouler le parcours Checkout une fois pour de vrai.
+
+## Limitation de débit
+
+Compteur en mémoire par clé (`src/lib/rate-limit.ts`), même limite de conception que le temps réel (un seul processus Node — voir `CONTEXT.md` §12.8 pour le détail et ce qu'il faudrait pour un déploiement multi-instances). Appliqué à la connexion (par IP et par email), l'inscription, la commande client (par table et par IP), l'acceptation/lecture d'invitation, l'envoi d'invitations (par organisation) et les actions de facturation. Les lectures authentifiées du dashboard ne sont volontairement pas limitées.

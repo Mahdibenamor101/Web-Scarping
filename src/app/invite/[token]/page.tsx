@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { friendlyErrorMessage } from "@/lib/client-errors";
 
 type InvitationPreview = { organizationName: string; email: string; role: string };
 
@@ -39,8 +40,7 @@ export default function AcceptInvitePage() {
         body: JSON.stringify({ token: params.token, name, password }),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Erreur inconnue");
+        throw new Error(await friendlyErrorMessage(res, "Erreur inconnue"));
       }
       router.push("/dashboard");
       router.refresh();

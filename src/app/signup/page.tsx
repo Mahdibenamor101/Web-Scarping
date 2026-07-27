@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { friendlyErrorMessage } from "@/lib/client-errors";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -23,8 +24,7 @@ export default function SignupPage() {
         body: JSON.stringify({ organizationName, ownerName, email, password }),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Erreur inconnue");
+        throw new Error(await friendlyErrorMessage(res, "Erreur inconnue"));
       }
       router.push("/dashboard/staff");
       router.refresh();

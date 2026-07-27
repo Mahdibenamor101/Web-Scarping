@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withTenant } from "@/lib/db";
 import { getStripeClient, getStripePriceId } from "@/lib/stripe";
-import { requireSession, requireRole, handleApiError, ApiError } from "@/lib/api";
+import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit } from "@/lib/api";
 import { BILLING_MANAGEMENT_ROLES } from "@/lib/rbac";
 
 // Creates (or reuses) a Stripe Customer for the organization, then a
@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
     requireRole(session, BILLING_MANAGEMENT_ROLES);
+    requireRateLimit(`billing-checkout:org:${session.organizationId}`, { limit: 10, windowMs: 60 * 60 * 1000 });
 
     const stripe = getStripeClient();
     const priceId = getStripePriceId();

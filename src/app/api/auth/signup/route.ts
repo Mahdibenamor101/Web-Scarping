@@ -4,7 +4,8 @@ import { hashPassword } from "@/lib/password";
 import { setSessionCookie } from "@/lib/session";
 import { signupSchema } from "@/lib/validation";
 import { uniqueSlug } from "@/lib/slug";
-import { handleApiError } from "@/lib/api";
+import { handleApiError, requireRateLimit } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
 
 const TRIAL_DAYS = 14;
 
@@ -16,6 +17,8 @@ const TRIAL_DAYS = 14;
 // bypasses Row-Level Security, narrowly and on the database's terms.
 export async function POST(req: NextRequest) {
   try {
+    requireRateLimit(`signup:ip:${getClientIp(req)}`, { limit: 5, windowMs: 60 * 60 * 1000 });
+
     const body = signupSchema.parse(await req.json());
     const passwordHash = await hashPassword(body.password);
     const slug = uniqueSlug(body.organizationName);

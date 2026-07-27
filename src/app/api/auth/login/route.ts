@@ -4,7 +4,8 @@ import { prisma, withTenant } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 import { setSessionCookie } from "@/lib/session";
 import { loginSchema } from "@/lib/validation";
-import { ApiError, handleApiError } from "@/lib/api";
+import { ApiError, handleApiError, requireRateLimit } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
 
 type AuthLookupRow = {
   id: string;
@@ -22,7 +23,15 @@ type AuthLookupRow = {
 // else (see prisma/migrations/*_row_level_security).
 export async function POST(req: NextRequest) {
   try {
+    // Two independent limits: by IP (one source hammering many accounts)
+    // and by email (many sources -- or one persistent one -- hammering a
+    // single account). Checked before the bcrypt compare below, which is
+    // deliberately slow and shouldn't be what a brute-force loop pays for.
+    requireRateLimit(`login:ip:${getClientIp(req)}`, { limit: 10, windowMs: 15 * 60 * 1000 });
+
     const body = loginSchema.parse(await req.json());
+
+    requireRateLimit(`login:email:${body.email}`, { limit: 5, windowMs: 15 * 60 * 1000 });
 
     const [user] = await prisma.$queryRaw<AuthLookupRow[]>`
       SELECT * FROM auth_lookup_user(${body.email})

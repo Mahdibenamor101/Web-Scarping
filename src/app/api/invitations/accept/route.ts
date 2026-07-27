@@ -4,7 +4,8 @@ import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { setSessionCookie } from "@/lib/session";
 import { acceptInvitationSchema } from "@/lib/validation";
-import { handleApiError } from "@/lib/api";
+import { handleApiError, requireRateLimit } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
 
 type AcceptInvitationRow = {
   user_id: string;
@@ -19,6 +20,8 @@ type AcceptInvitationRow = {
 // `invitation_invalid_or_expired`, mapped to a 410 by handleApiError.
 export async function POST(req: NextRequest) {
   try {
+    requireRateLimit(`invite-accept:ip:${getClientIp(req)}`, { limit: 20, windowMs: 60 * 60 * 1000 });
+
     const body = acceptInvitationSchema.parse(await req.json());
     const passwordHash = await hashPassword(body.password);
 

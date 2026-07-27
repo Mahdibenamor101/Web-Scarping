@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { StaffRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { ApiError, handleApiError } from "@/lib/api";
+import { ApiError, handleApiError, requireRateLimit } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
 
 type InvitationLookupRow = {
   organization_name: string;
@@ -14,8 +15,14 @@ type InvitationLookupRow = {
 // Public route: the invitee has a token but no account yet, so this can't
 // be a normal RLS-scoped read. See invitation_lookup_by_token in
 // prisma/migrations/*_invitation_lookup.
-export async function GET(_req: NextRequest, { params }: { params: { token: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { token: string } }) {
   try {
+    // Tokens are 32 random bytes (see POST /api/staff/invite) -- guessing
+    // one is computationally infeasible regardless of rate limiting. This
+    // is cheap insurance against casual scripted probing, not the actual
+    // defense against enumeration.
+    requireRateLimit(`invite-lookup:ip:${getClientIp(req)}`, { limit: 30, windowMs: 60 * 60 * 1000 });
+
     const [invitation] = await prisma.$queryRaw<InvitationLookupRow[]>`
       SELECT * FROM invitation_lookup_by_token(${params.token})
     `;
