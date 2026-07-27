@@ -74,3 +74,9 @@ export const createOrderItemSchema = z.object({
 export const createOrderSchema = z.object({
   items: z.array(createOrderItemSchema).min(1).max(50),
 });
+
+export const orderStatusSchema = z.enum(["PENDING", "IN_PROGRESS", "READY", "SERVED", "CANCELLED"]);
+
+export const updateOrderStatusSchema = z.object({
+  status: orderStatusSchema,
+});

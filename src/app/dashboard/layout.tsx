@@ -28,11 +28,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </header>
       <div className="flex">
         <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-4">
+          <NavLink href="/dashboard/orders">Commandes</NavLink>
           {canManageStaff(session.role) && <NavLink href="/dashboard/staff">Staff</NavLink>}
           {MENU_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/menu">Menu</NavLink>}
           {TABLE_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/tables">Tables</NavLink>}
-          {session.role === "SERVER" && <NavLink href="/dashboard/floor">Salle</NavLink>}
-          {session.role === "KITCHEN" && <NavLink href="/dashboard/kitchen">Cuisine</NavLink>}
         </nav>
         <main className="flex-1 p-6">{children}</main>
       </div>

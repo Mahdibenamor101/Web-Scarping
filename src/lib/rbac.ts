@@ -4,8 +4,8 @@ import type { StaffRole } from "@prisma/client";
 export const ROLE_HOME: Record<StaffRole, string> = {
   OWNER: "/dashboard/staff",
   MANAGER: "/dashboard/staff",
-  SERVER: "/dashboard/floor",
-  KITCHEN: "/dashboard/kitchen",
+  SERVER: "/dashboard/orders",
+  KITCHEN: "/dashboard/orders",
 };
 
 /** Roles allowed to view/manage staff and organization settings. */

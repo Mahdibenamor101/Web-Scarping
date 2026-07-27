@@ -40,7 +40,7 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
         };
       });
 
-      return tx.order.create({
+      const created = await tx.order.create({
         data: {
           organizationId: table.organizationId,
           tableId: table.tableId,
@@ -50,6 +50,12 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
         },
         include: { items: true },
       });
+
+      // A table with a live order is occupied; freed back up once its last
+      // active order reaches a terminal status -- see PATCH /api/orders/[id].
+      await tx.restaurantTable.update({ where: { id: table.tableId }, data: { status: "OCCUPIED" } });
+
+      return created;
     });
 
     return NextResponse.json(

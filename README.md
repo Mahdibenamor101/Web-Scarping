@@ -2,7 +2,7 @@
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0. Étapes 1 à 3 faites (fondations + isolation multi-tenant, gestion du menu, QR + commande client). Reste : dashboard temps réel cuisine/salle, Stripe.
+**Où on en est** : Phase 0. Étapes 1 à 4 faites (fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel). Reste : Stripe.
 
 ## Stack
 
@@ -58,4 +58,6 @@ Chaque table métier porte un `organization_id`, et une policy Postgres (`Row-Le
 
 `/dashboard/tables` (owner/manager) : ajouter une table génère un QR code pointant vers `/menu/[qrToken]` — page publique, sans compte, mobile-first, bascule IT/EN, panier, envoi de commande. Le client n'a jamais de session ; la résolution QR → organisation passe par une fonction Postgres dédiée (`resolve_table_by_qr_token`, voir `prisma/migrations/*_public_ordering`), et tout le reste (lecture du menu, création de la commande) passe par les mêmes policies RLS que le reste de l'app. Le prix facturé est toujours recalculé côté serveur.
 
-Pas encore d'UI staff pour voir les commandes reçues (prochaine étape : dashboard temps réel cuisine/salle) — vérifié par requête SQL directe pendant le développement.
+## Dashboard commandes temps réel
+
+`/dashboard/orders` (les quatre rôles) : colonnes à faire / en cours / prêt, mise à jour en direct sans recharger la page. Le mécanisme est Postgres `LISTEN`/`NOTIFY` (un trigger sur `orders`, voir `prisma/migrations/*_order_realtime_notify`) relayé aux navigateurs via Server-Sent Events (`GET /api/orders/stream`) — pas de Socket.io ni de service tiers, voir `CONTEXT.md` §12.6 pour le détail et la limite connue en hébergement serverless. Le statut de la table (`free`/`occupied`) suit automatiquement ses commandes actives.
