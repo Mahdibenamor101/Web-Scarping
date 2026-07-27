@@ -83,18 +83,18 @@ export default function HomePage() {
       <div className="relative overflow-hidden bg-dot-grid">
         <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <Logo />
-          <div className="hidden items-center gap-7 text-sm font-medium text-slate-600 sm:flex">
-            <a href="#apercu" className="transition hover:text-accent">
+          <div className="hidden items-center gap-7 text-sm font-medium sm:flex">
+            <a href="#apercu" className="nav-link">
               Aperçu
             </a>
-            <a href="#fonctionnalites" className="transition hover:text-accent">
+            <a href="#fonctionnalites" className="nav-link">
               Fonctionnalités
             </a>
-            <a href="#tarifs" className="transition hover:text-accent">
+            <a href="#tarifs" className="nav-link">
               Tarifs
             </a>
           </div>
-          <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-accent">
+          <Link href="/login" className="nav-link text-sm font-medium">
             Se connecter
           </Link>
         </nav>

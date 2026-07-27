@@ -215,6 +215,8 @@ Le nom n'est pas bloquant : coder avec un placeholder, trancher le nom en parall
 
 **Deuxième passage design — système de tokens complet, dark mode dashboard, Framer Motion : FAIT (27 juillet 2026).** Nouvelle palette (accent `#2196F3`, fond `#FAFBFC`, Inter) pilotée par `src/lib/design-tokens.ts`, appliquée à toute l'app. Dashboard restaurant passé en dark mode (`#0F1420`/`#1A2035`), site public resté clair — deux thèmes distincts, pas un interrupteur. Héro avec mockup téléphone flottant + cartes de notification, compteurs animés, badges pastel avec point "EN DIRECT" qui pulse. Voir §12.11 pour le détail et trois décisions notables : toggle de tarifs 3/6/12 mois rendu honnête (seul 12 mois est réellement achetable), compteurs de statistiques sur des faits produit plutôt que des chiffres d'usage inventés, composant témoignages construit mais non affiché (toujours aucun pilote réel).
 
+**Polish interaction/UX : FAIT (27 juillet 2026).** Modale de confirmation animée à la place de `window.confirm()`/`alert()` pour les suppressions (table, catégorie, plat), états de chargement (squelettes qui pulsent) pour que les pages dashboard et le menu public n'affichent plus brièvement "vide" avant que les données réelles n'arrivent, défilement fluide + soulignement animé sur la nav de la landing, transition en fondu entre les sections du dashboard. Voir §12.12.
+
 ### Phase A — Pilotes (3-4 semaines)
 5-8 restos du réseau, **gratuits 3 mois**. Ce n'est pas de la générosité : c'est l'achat d'actifs publicitaires. À exiger explicitement dès le départ :
 - vidéos du produit en service réel (scan client → commande en cuisine)
@@ -390,6 +392,20 @@ Le fondateur a fourni un brief de design system complet (palette, typographie, c
 **Cartes témoignages — composant construit, non utilisé sur la page réelle.** Même raisonnement qu'en §12.10 pour les témoignages : `src/components/testimonial-card.tsx` existe (carte blanche, 5 étoiles, avatar rond à initiale, exactement comme demandé visuellement) mais n'est importé nulle part sur la landing — un commentaire dans le fichier explique pourquoi et pointe vers la Phase A. Prêt à être branché dès que de vrais avis existent, sans travail de design supplémentaire à ce moment-là.
 
 Vérifié comme les passes précédentes : `tsc`/`eslint`/`next build`/`vitest` (15 tests) au vert, et capture d'écran Playwright de chaque page modifiée (héro, aperçu produit avec les deux nouveaux visuels, tarifs, les cinq pages du dashboard en dark mode, menu public) — pas seulement une vérification de compilation.
+
+### 12.12 Polish interaction/UX (27 juillet 2026)
+
+Demande de suite du fondateur, plus ouverte : "ajouter des design animés et mettre le site plus beau avec ui ux". Plutôt que de continuer à empiler des animations décoratives sur la landing (déjà bien couverte, §12.10-12.11), le travail est allé chercher les endroits où l'expérience était réellement rugueuse :
+
+**`window.confirm()`/`window.alert()` remplacés par une modale animée** (`src/components/confirm-dialog.tsx`, Framer Motion, fondu du fond + scale-in de la carte). Les dialogues natifs du navigateur ne peuvent pas être stylés et détonnaient au milieu du reste de l'app — utilisés pour la suppression d'une table (`/dashboard/tables`) et d'une catégorie/d'un plat (`/dashboard/menu`). Le bouton "Annuler" une commande (`/dashboard/orders`) n'a délibérément pas de confirmation, ni avant ni maintenant — voir §13, c'est un choix assumé pour que le staff agisse vite.
+
+**États de chargement au lieu d'un flash "vide".** Avant : les pages dashboard démarraient avec un tableau vide en state, donc affichaient brièvement "Aucune table pour l'instant" / "Aucune catégorie..." avant que le premier fetch ne réponde — un mensonge visuel momentané. `src/components/skeleton.tsx` (bloc qui pulse, variante claire/sombre) comble ce trou sur `/dashboard/orders`, `/dashboard/menu`, `/dashboard/tables`, `/dashboard/staff` et sur `/menu/[qrToken]` (menu public, avant que les données du restaurant n'arrivent).
+
+**Navigation** : `scroll-behavior: smooth` (défilement vers les ancres `#apercu`/`#fonctionnalites`/`#tarifs` de la landing), et un soulignement en dégradé accent qui se déploie au survol des liens de nav (`.nav-link` dans `globals.css`, pseudo-élément `after` animé en `scale-x`, pas de JS).
+
+**Transition entre les sections du dashboard** (`src/app/dashboard/page-transition.tsx`) : un fondu + léger déplacement vertical à chaque changement de route, sans attendre la sortie de l'ancienne page (pas de `mode="wait"`) pour ne pas ajouter de latence perçue à la navigation.
+
+Vérifié à l'écran (capture de la modale de confirmation ouverte, du soulignement au survol) en plus de `tsc`/`eslint`/`next build`/`vitest`.
 
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 

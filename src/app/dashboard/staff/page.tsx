@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Skeleton from "@/components/skeleton";
 
 type StaffMember = {
   id: string;
@@ -23,6 +24,7 @@ const ROLES = ["OWNER", "MANAGER", "SERVER", "KITCHEN"] as const;
 export default function StaffPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<(typeof ROLES)[number]>("SERVER");
   const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
@@ -35,6 +37,7 @@ export default function StaffPage() {
       setStaff(body.staff);
       setInvitations(body.invitations);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -73,6 +76,15 @@ export default function StaffPage() {
     <div className="flex max-w-3xl flex-col gap-8">
       <h1 className="text-2xl font-extrabold tracking-tight text-white">Équipe</h1>
 
+      {loading && (
+        <div className="card-dash-static flex flex-col gap-3">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      )}
+
+      {!loading && (
       <section className="card-dash overflow-hidden p-0">
         <table className="w-full text-sm">
           <thead>
@@ -103,7 +115,9 @@ export default function StaffPage() {
           </tbody>
         </table>
       </section>
+      )}
 
+      {!loading && (
       <section>
         <h2 className="mb-3 text-base font-semibold text-white">Invitations en attente</h2>
         {invitations.length === 0 && <p className="text-sm text-slate-400">Aucune invitation en attente.</p>}
@@ -118,6 +132,7 @@ export default function StaffPage() {
           ))}
         </ul>
       </section>
+      )}
 
       <section className="card-dash">
         <h2 className="mb-4 text-base font-semibold text-white">Inviter un membre</h2>

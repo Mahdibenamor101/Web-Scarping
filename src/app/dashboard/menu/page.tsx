@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { ALLERGEN_LABELS } from "@/lib/allergens";
 import ItemForm, { type ItemFormValues } from "./item-form";
+import ConfirmDialog from "@/components/confirm-dialog";
+import Skeleton from "@/components/skeleton";
 
 type Category = { id: string; nameIt: string; nameEn: string | null; sortOrder: number };
 type Item = {
@@ -20,15 +22,19 @@ type Item = {
 export default function MenuPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [addingItemFor, setAddingItemFor] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDeleteCategory, setConfirmDeleteCategory] = useState<string | null>(null);
+  const [confirmDeleteItem, setConfirmDeleteItem] = useState<string | null>(null);
 
   async function load() {
     const [catRes, itemRes] = await Promise.all([fetch("/api/menu/categories"), fetch("/api/menu/items")]);
     if (catRes.ok) setCategories((await catRes.json()).categories);
     if (itemRes.ok) setItems((await itemRes.json()).items);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -53,8 +59,8 @@ export default function MenuPage() {
   }
 
   async function deleteCategory(id: string) {
-    if (!confirm("Supprimer cette catégorie et tous ses plats ?")) return;
     const res = await fetch(`/api/menu/categories/${id}`, { method: "DELETE" });
+    setConfirmDeleteCategory(null);
     if (res.ok) load();
   }
 
@@ -96,8 +102,8 @@ export default function MenuPage() {
   }
 
   async function deleteItem(id: string) {
-    if (!confirm("Supprimer ce plat ?")) return;
     const res = await fetch(`/api/menu/items/${id}`, { method: "DELETE" });
+    setConfirmDeleteItem(null);
     if (res.ok) load();
   }
 
@@ -122,11 +128,20 @@ export default function MenuPage() {
         {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
       </section>
 
-      {categories.length === 0 && (
+      {loading &&
+        Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="card-dash-static flex flex-col gap-3">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-full" />
+          </div>
+        ))}
+
+      {!loading && categories.length === 0 && (
         <p className="text-sm text-slate-400">Aucune catégorie pour l&apos;instant — commencez par en créer une.</p>
       )}
 
-      {categories.map((category) => {
+      {!loading && categories.map((category) => {
         const categoryItems = items.filter((i) => i.categoryId === category.id);
         return (
           <section key={category.id} className="card-dash animate-bump-in">
@@ -141,7 +156,7 @@ export default function MenuPage() {
                 >
                   + Ajouter un plat
                 </button>
-                <button onClick={() => deleteCategory(category.id)} className="btn-link-dash-danger">
+                <button onClick={() => setConfirmDeleteCategory(category.id)} className="btn-link-dash-danger">
                   Supprimer la catégorie
                 </button>
               </div>
@@ -189,7 +204,7 @@ export default function MenuPage() {
                       <button onClick={() => setEditingItem(item.id)} className="btn-link-dash">
                         Modifier
                       </button>
-                      <button onClick={() => deleteItem(item.id)} className="btn-link-dash-danger">
+                      <button onClick={() => setConfirmDeleteItem(item.id)} className="btn-link-dash-danger">
                         Supprimer
                       </button>
                     </div>
@@ -213,6 +228,25 @@ export default function MenuPage() {
           </section>
         );
       })}
+
+      <ConfirmDialog
+        open={confirmDeleteCategory !== null}
+        title="Supprimer cette catégorie ?"
+        body="Tous les plats qu'elle contient seront supprimés avec elle."
+        confirmLabel="Supprimer"
+        danger
+        onConfirm={() => confirmDeleteCategory && deleteCategory(confirmDeleteCategory)}
+        onCancel={() => setConfirmDeleteCategory(null)}
+      />
+      <ConfirmDialog
+        open={confirmDeleteItem !== null}
+        title="Supprimer ce plat ?"
+        body="Cette action est définitive."
+        confirmLabel="Supprimer"
+        danger
+        onConfirm={() => confirmDeleteItem && deleteItem(confirmDeleteItem)}
+        onCancel={() => setConfirmDeleteItem(null)}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Badge from "@/components/badge";
+import Skeleton from "@/components/skeleton";
 
 type OrderStatus = "PENDING" | "IN_PROGRESS" | "READY" | "SERVED" | "CANCELLED";
 
@@ -23,12 +24,14 @@ const COLUMNS: { status: OrderStatus; title: string; next?: OrderStatus; badge: 
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/orders");
     if (res.ok) setOrders((await res.json()).orders);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -64,6 +67,19 @@ export default function OrdersPage() {
         )}
       </div>
 
+      {loading && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {COLUMNS.map((column) => (
+            <div key={column.status} className="flex flex-col gap-3 rounded-2xl bg-white/[0.03] p-3">
+              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!loading && (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {COLUMNS.map((column) => {
           const columnOrders = orders
@@ -120,6 +136,7 @@ export default function OrdersPage() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

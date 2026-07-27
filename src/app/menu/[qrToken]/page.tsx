@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { ALLERGEN_LABELS } from "@/lib/allergens";
+import Skeleton from "@/components/skeleton";
 
 type Category = { id: string; nameIt: string; nameEn: string | null; sortOrder: number };
 type Item = {
@@ -119,7 +120,21 @@ export default function PublicMenuPage() {
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <main className="mx-auto min-h-screen max-w-md pb-24">
+        <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 py-3">
+          <Skeleton tone="light" className="h-4 w-32" />
+          <Skeleton tone="light" className="mt-2 h-3 w-20" />
+        </div>
+        <div className="flex flex-col gap-3 p-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} tone="light" className="h-20 w-full" />
+          ))}
+        </div>
+      </main>
+    );
+  }
 
   if (confirmedOrderId) {
     return (

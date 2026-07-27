@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-canvas text-ink;
 }
@@ -113,5 +117,13 @@ body {
   .bg-dot-grid-dark {
     background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
     background-size: 18px 18px;
+  }
+
+  /* Nav link with an accent underline that grows in from the left on hover. */
+  .nav-link {
+    @apply relative text-slate-600 transition-colors duration-200 hover:text-accent
+      after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left
+      after:scale-x-0 after:bg-accent-gradient after:transition-transform after:duration-300 after:ease-out
+      hover:after:scale-x-100;
   }
 }

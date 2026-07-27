@@ -5,6 +5,7 @@ import { canManageStaff, MENU_MANAGEMENT_ROLES, TABLE_MANAGEMENT_ROLES, BILLING_
 import Logo from "@/components/logo";
 import LogoutButton from "./logout-button";
 import NavLink from "./nav-link";
+import PageTransition from "./page-transition";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -43,7 +44,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
       </aside>
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 p-8">
+        <PageTransition>{children}</PageTransition>
+      </main>
     </div>
   );
 }
