@@ -102,11 +102,11 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <h1 className="text-lg font-semibold">Menu</h1>
+    <div className="flex max-w-3xl flex-col gap-8">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Menu</h1>
 
-      <section>
-        <h2 className="mb-3 text-base font-semibold">Nouvelle catégorie</h2>
+      <section className="card">
+        <h2 className="mb-3 text-base font-semibold text-slate-900">Nouvelle catégorie</h2>
         <form onSubmit={addCategory} className="flex max-w-md gap-2">
           <input
             required
@@ -115,11 +115,11 @@ export default function MenuPage() {
             placeholder="Antipasti, Primi, Dolci…"
             className="input flex-1"
           />
-          <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+          <button type="submit" className="btn-primary shrink-0">
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
       </section>
 
       {categories.length === 0 && (
@@ -129,19 +129,19 @@ export default function MenuPage() {
       {categories.map((category) => {
         const categoryItems = items.filter((i) => i.categoryId === category.id);
         return (
-          <section key={category.id} className="rounded-md border border-slate-200 p-4">
+          <section key={category.id} className="card">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold">
+              <h2 className="text-base font-semibold text-slate-900">
                 {category.nameIt} {category.nameEn && <span className="text-slate-400">({category.nameEn})</span>}
               </h2>
-              <div className="flex gap-3 text-xs">
+              <div className="flex gap-4">
                 <button
                   onClick={() => setAddingItemFor(addingItemFor === category.id ? null : category.id)}
-                  className="text-slate-600 underline"
+                  className="btn-link"
                 >
                   + Ajouter un plat
                 </button>
-                <button onClick={() => deleteCategory(category.id)} className="text-red-600 underline">
+                <button onClick={() => deleteCategory(category.id)} className="btn-link-danger">
                   Supprimer la catégorie
                 </button>
               </div>
@@ -166,11 +166,16 @@ export default function MenuPage() {
                     />
                   </li>
                 ) : (
-                  <li key={item.id} className="flex items-start justify-between rounded-md border border-slate-100 px-3 py-2 text-sm">
+                  <li
+                    key={item.id}
+                    className="flex items-start justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-sm"
+                  >
                     <div>
-                      <p className="font-medium">
-                        {item.nameIt} — {item.price.toFixed(2)} €{" "}
-                        {!item.isAvailable && <span className="text-red-600">(indisponible)</span>}
+                      <p className="font-medium text-slate-900">
+                        {item.nameIt} <span className="text-slate-400">—</span> {item.price.toFixed(2)} €{" "}
+                        {!item.isAvailable && (
+                          <span className="badge bg-rose-50 text-rose-600">indisponible</span>
+                        )}
                       </p>
                       {item.descriptionIt && <p className="text-slate-500">{item.descriptionIt}</p>}
                       {item.allergens.length > 0 && (
@@ -179,14 +184,14 @@ export default function MenuPage() {
                         </p>
                       )}
                     </div>
-                    <div className="flex shrink-0 gap-3 text-xs">
-                      <button onClick={() => toggleAvailable(item)} className="text-slate-600 underline">
+                    <div className="flex shrink-0 gap-3">
+                      <button onClick={() => toggleAvailable(item)} className="btn-link">
                         {item.isAvailable ? "Marquer indisponible" : "Marquer disponible"}
                       </button>
-                      <button onClick={() => setEditingItem(item.id)} className="text-slate-600 underline">
+                      <button onClick={() => setEditingItem(item.id)} className="btn-link">
                         Modifier
                       </button>
-                      <button onClick={() => deleteItem(item.id)} className="text-red-600 underline">
+                      <button onClick={() => deleteItem(item.id)} className="btn-link-danger">
                         Supprimer
                       </button>
                     </div>

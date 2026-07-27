@@ -1,8 +1,8 @@
-# [Resto SaaS — nom à définir]
+# mbQr
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe). Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant.
+**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe), plus limitation de débit et un premier passage nom + identité visuelle. Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant. Le nom "mbQr" n'a pas non plus été vérifié juridiquement (marque, domaine) — voir `CONTEXT.md` §2.
 
 ## Stack
 
@@ -73,3 +73,7 @@ Chaque table métier porte un `organization_id`, et une policy Postgres (`Row-Le
 ## Limitation de débit
 
 Compteur en mémoire par clé (`src/lib/rate-limit.ts`), même limite de conception que le temps réel (un seul processus Node — voir `CONTEXT.md` §12.8 pour le détail et ce qu'il faudrait pour un déploiement multi-instances). Appliqué à la connexion (par IP et par email), l'inscription, la commande client (par table et par IP), l'acceptation/lecture d'invitation, l'envoi d'invitations (par organisation) et les actions de facturation. Les lectures authentifiées du dashboard ne sont volontairement pas limitées.
+
+## Identité visuelle
+
+Accent `sky-500` (Tailwind, `#0ea5e9`), fond navy foncé pour les sections héro/sidebar, boutons en pilule, cartes très arrondies — palette et conventions de forme extraites du CSS réellement livré par un concurrent (QonnectQR) à la demande du fondateur, appliquées à un contenu et une structure originaux. Système de composants partagé dans `src/app/globals.css` (`@layer components` : `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.badge`) plutôt que des utilitaires Tailwind répétés à chaque page. Voir `CONTEXT.md` §12.9.

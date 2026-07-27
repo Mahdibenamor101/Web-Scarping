@@ -35,31 +35,32 @@ export default async function BillingPage({
 
   return (
     <div className="flex max-w-md flex-col gap-6">
-      <h1 className="text-lg font-semibold">Abonnement</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Abonnement</h1>
 
       {searchParams.checkout === "success" && (
-        <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">
+        <p className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">
           Paiement en cours de confirmation — le statut ci-dessous se mettra à jour automatiquement dès que Stripe
           nous aura notifiés.
         </p>
       )}
       {searchParams.checkout === "cancelled" && (
-        <p className="rounded-md bg-slate-50 p-3 text-sm text-slate-600">Paiement annulé, rien n&apos;a été débité.</p>
+        <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">Paiement annulé, rien n&apos;a été débité.</p>
       )}
 
-      <div className="rounded-md border border-slate-200 p-4 text-sm">
-        <p>
-          Statut : <strong>{STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}</strong>
+      <div className="card text-sm">
+        <p className="text-slate-600">
+          Statut :{" "}
+          <span className="badge">{STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}</span>
         </p>
         {organization.subscriptionStatus === "trialing" && trialDaysLeft !== null && (
-          <p className="mt-1 text-slate-500">
+          <p className="mt-2 text-slate-500">
             {trialDaysLeft > 0 ? `${trialDaysLeft} jour(s) restant(s) d'essai gratuit.` : "Essai gratuit terminé."}
           </p>
         )}
       </div>
 
       {!stripeConfigured && (
-        <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-700">
+        <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">
           Stripe n&apos;est pas configuré sur cet environnement (variables <code>STRIPE_SECRET_KEY</code> /{" "}
           <code>STRIPE_PRICE_ID</code> absentes) — normal en local sans compte Stripe. Voir <code>.env.example</code>.
         </p>

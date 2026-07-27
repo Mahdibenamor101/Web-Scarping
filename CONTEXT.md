@@ -1,7 +1,7 @@
-# CONTEXT.md — [nom à trancher]
+# CONTEXT.md — mbQr
 
 > Fichier de mémoire du projet. À coller en début de chaque session de travail (chat ou Claude Code) et à tenir à jour après chaque décision importante.
-> Dernière mise à jour : 27 juillet 2026 — Phase 0 complète : étapes 1 à 5 (fondations + multi-tenant, menu, QR + commande client, dashboard temps réel, Stripe) implémentées, plus un durcissement limitation de débit (§12.8), décisions d'architecture consignées en §12. Stripe non vérifié contre un vrai compte — voir §12.7 et §13.
+> Dernière mise à jour : 27 juillet 2026 — Phase 0 complète : étapes 1 à 5 (fondations + multi-tenant, menu, QR + commande client, dashboard temps réel, Stripe) implémentées, plus un durcissement limitation de débit (§12.8) et un premier passage nom + identité visuelle (§2, §12.9). Décisions d'architecture consignées en §12. Stripe non vérifié contre un vrai compte (§12.7) et nom non vérifié juridiquement (§2, §13) — deux réserves à ne pas perdre de vue.
 
 ## 1. Vision
 
@@ -38,7 +38,9 @@ Au moins **dix acteurs identifiés** sur le menu QR en Italie, dont plusieurs gr
 
 ## 2. Nom
 
-**Statut : aucun nom retenu.** Sept candidats testés, tous éliminés ou affaiblis :
+**Statut : "mbQr" retenu comme nom de travail (27 juillet 2026), les vérifications obligatoires ci-dessous restent à faire.** Choisi directement par le fondateur pendant le build (Phase 0), sans repasser par le processus décrit plus bas (générer 20 candidats → vérifier les domaines en masse). Ce n'est pas un problème en soi — §9 dit explicitement que le nom n'est pas bloquant pour le build — mais ça veut dire que les leçons de méthode ci-dessous n'ont pas été appliquées à "mbQr" spécifiquement, et qu'aucune des quatre vérifications obligatoires n'a été faite. **À faire avant la Phase B**, pas avant.
+
+Sept candidats antérieurs testés, tous éliminés ou affaiblis :
 
 | Candidat | Verdict |
 |---|---|
@@ -203,6 +205,8 @@ Le nom n'est pas bloquant : coder avec un placeholder, trancher le nom en parall
 
 **Durcissement post-Phase 0 — limitation de débit : FAITE.** Signup, connexion (par IP et par email), acceptation d'invitation, commande client (par table et par IP), invitations envoyées (par organisation), et les actions de facturation sont maintenant limitées en fréquence — c'était le point le plus concret listé en §13 après l'étape 5. Voir §12.8 pour le mécanisme et sa même limite de processus unique que le temps réel (§12.6).
 
+**Nom + premier passage design : FAIT (27 juillet 2026).** Nom de travail "mbQr" retenu (voir §2, vérifications obligatoires encore à faire). Identité visuelle Tailwind appliquée à tout l'app — accent sky-500, boutons pilule, cartes `rounded-2xl`, sidebar/hero en navy foncé — voir §12.9 pour le détail et la source de la référence visuelle. §4 prévoyait la "personnalisation de marque" comme fonctionnalité MVP (logo/couleurs *par restaurant*) ; ce qui a été fait ici est différent et plus en amont : l'identité visuelle *du produit lui-même*, pas encore la personnalisation par tenant — cette dernière reste à faire.
+
 ### Phase A — Pilotes (3-4 semaines)
 5-8 restos du réseau, **gratuits 3 mois**. Ce n'est pas de la générosité : c'est l'achat d'actifs publicitaires. À exiger explicitement dès le départ :
 - vidéos du produit en service réel (scan client → commande en cuisine)
@@ -329,6 +333,18 @@ C'est cohérent avec le reste de l'architecture : la base est déjà la source d
 
 **Ce qui n'est délibérément pas limité** : les lectures authentifiées du tableau de bord (`/api/orders`, `/api/menu/*`, `/api/staff`) — un membre du staff qui recharge sa page ne doit jamais se heurter à une limite pensée pour du trafic public non authentifié.
 
+### 12.9 Nom + identité visuelle
+
+**Nom** : "mbQr", choisi directement par le fondateur (voir §2 pour ce qui reste à vérifier avant que ce nom soit définitif).
+
+**Design** : demande explicite d'un rendu "comme QonnectQR" (un concurrent listé en §1). Plutôt que deviner un style à partir du nom, le CSS réellement livré par qonnectqr.com a été récupéré et inspecté (feuilles de style `_next/static/css/*.css`, via le proxy sortant de l'environnement) pour en extraire la vraie palette : accent bleu ciel `#0ea5e9` (le `sky-500` de Tailwind, exactement), fond navy foncé `#0d1b3e` pour les sections héro/sombres, boutons en pilule (`border-radius:9999px`), cartes très arrondies (`1.5rem`), ombres teintées de la couleur d'accent plutôt que grises neutres. Aucun asset (logo, texte, image) du concurrent n'a été copié — seule la palette et les conventions de forme ont servi de référence, appliquées à un contenu et une structure originaux.
+
+Implémenté comme un petit système de composants Tailwind (`src/app/globals.css`, classes `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.badge` sous `@layer components`) plutôt que des chaînes Tailwind répétées à chaque page — cohérence garantie par construction plutôt que par discipline de copier-coller. Appliqué à l'ensemble du parcours : landing, authentification, les cinq pages du dashboard (sidebar navy), et le menu public/panier mobile.
+
+**Ce que ça ne couvre pas** : la personnalisation de marque *par restaurant* (logo, couleurs personnalisées — §4, colonnes `logo_url`/`theme_color` déjà présentes sur `organizations` depuis l'étape 1 mais sans UI pour les éditer). Ce qui a été fait ici est l'identité visuelle du produit mbQr lui-même, pas encore un mécanisme pour qu'un restaurant y superpose la sienne.
+
+## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
+
 - **Pas d'envoi d'email réel.** L'invitation de staff génère un lien qu'il faut transmettre à la main (affiché dans le dashboard, loggé côté serveur). Premier vrai manque à combler dès que des restaurateurs pilotes utilisent le produit.
 - **Email globalement unique pour les comptes staff** (voir §12.2.3) : une personne travaillant dans deux restaurants ne peut pas avoir le même email des deux côtés. Non bloquant pour le MVP, mais à concevoir explicitement si le besoin apparaît (compte multi-organisation) plutôt que de le découvrir en production.
 - **`DIRECT_DATABASE_URL` (rôle `app_migrator`) ne doit jamais être utilisé par le code applicatif.** Prisma Client ne s'en sert qu'au moment des migrations, jamais à l'exécution — mais c'est une convention à faire respecter en revue de code, pas quelque chose que la base empêche mécaniquement si quelqu'un l'utilisait par erreur dans une future route API.
@@ -341,3 +357,4 @@ C'est cohérent avec le reste de l'architecture : la base est déjà la source d
 - **RGPD** : le schéma des `organizations`/`users` est prêt à recevoir une base légale de traitement documentée et un droit à l'effacement, mais ni l'un ni l'autre n'est implémenté (pas de mentions légales, pas d'endpoint de suppression de compte) — attendu pour avant le premier paiement (§10). Le client final qui commande via QR est, lui aussi, une personne dont on traite des données (commande horodatée, éventuellement des notes en texte libre) sans base légale documentée ni mention affichée sur la page publique.
 - **Stripe n'a jamais tourné contre un vrai compte** (voir §12.7) — le code est en place et vérifié dans la mesure du possible sans identifiants, mais un vrai parcours de paiement (mode test) reste à dérouler une fois avant tout pilote payant.
 - **Pas d'application du statut d'abonnement.** Un essai expiré ou un abonnement `past_due`/`canceled` ne bloque rien aujourd'hui — l'organisation garde un accès complet à toutes les fonctionnalités quel que soit `subscription_status`. Choix délibéré pour cette étape (verrouiller l'accès sur une intégration Stripe non testée en conditions réelles aurait été prématuré et risqué de bloquer un pilote par erreur) mais à trancher explicitement avant la Phase C (test média) : qu'est-ce qui se passe vraiment quand l'essai se termine ?
+- **"mbQr" n'a subi aucune des quatre vérifications que §2 lui-même liste comme obligatoires** (TMview, UIBM, domaine, stores). Utilisable comme nom de travail pendant le reste du build ; à vérifier avant la Phase B, pas avant — mais ne pas oublier que ça n'a pas été fait, précisément parce que rien dans le produit ne le rappellera tout seul.

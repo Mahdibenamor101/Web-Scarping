@@ -57,10 +57,10 @@ export default function ItemForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
       <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-600">Nom (IT)</span>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-slate-700">Nom (IT)</span>
           <input
             required
             value={values.nameIt}
@@ -68,8 +68,8 @@ export default function ItemForm({
             className="input"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-600">Nom (EN)</span>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-slate-700">Nom (EN)</span>
           <input
             value={values.nameEn}
             onChange={(e) => setValues((v) => ({ ...v, nameEn: e.target.value }))}
@@ -77,8 +77,8 @@ export default function ItemForm({
           />
         </label>
       </div>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="text-slate-600">Description (IT)</span>
+      <label className="flex flex-col gap-1.5 text-sm">
+        <span className="font-medium text-slate-700">Description (IT)</span>
         <textarea
           value={values.descriptionIt}
           onChange={(e) => setValues((v) => ({ ...v, descriptionIt: e.target.value }))}
@@ -87,8 +87,8 @@ export default function ItemForm({
         />
       </label>
       <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-600">Prix (€)</span>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-slate-700">Prix (€)</span>
           <input
             required
             type="number"
@@ -99,8 +99,8 @@ export default function ItemForm({
             className="input"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-600">Photo (URL, optionnel)</span>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-slate-700">Photo (URL, optionnel)</span>
           <input
             value={values.photoUrl}
             onChange={(e) => setValues((v) => ({ ...v, photoUrl: e.target.value }))}
@@ -110,27 +110,28 @@ export default function ItemForm({
         </label>
       </div>
       <fieldset>
-        <legend className="mb-1 text-sm text-slate-600">Allergènes (Règlement UE n°1169/2011)</legend>
-        <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
+        <legend className="mb-2 text-sm font-medium text-slate-700">Allergènes (Règlement UE n°1169/2011)</legend>
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {ALL_ALLERGENS.map((a) => (
-            <label key={a} className="flex items-center gap-2 text-xs">
-              <input type="checkbox" checked={values.allergens.includes(a)} onChange={() => toggleAllergen(a)} />
+            <label key={a} className="flex items-center gap-2 text-xs text-slate-600">
+              <input
+                type="checkbox"
+                checked={values.allergens.includes(a)}
+                onChange={() => toggleAllergen(a)}
+                className="accent-sky-500"
+              />
               {ALLERGEN_LABELS[a]}
             </label>
           ))}
         </div>
       </fieldset>
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+      {error && <p className="text-sm text-rose-600">{error}</p>}
+      <div className="flex items-center gap-4">
+        <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "…" : submitLabel}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="text-sm text-slate-500 hover:text-slate-900">
+          <button type="button" onClick={onCancel} className="btn-link">
             Annuler
           </button>
         )}

@@ -51,10 +51,10 @@ export default function TablesPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-lg font-semibold">Tables</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tables</h1>
 
-      <section>
-        <h2 className="mb-3 text-base font-semibold">Nouvelle table</h2>
+      <section className="card max-w-3xl">
+        <h2 className="mb-3 text-base font-semibold text-slate-900">Nouvelle table</h2>
         <form onSubmit={addTable} className="flex max-w-md gap-2">
           <input
             required
@@ -63,11 +63,11 @@ export default function TablesPage() {
             placeholder="Table 1, Terrasse 3…"
             className="input flex-1"
           />
-          <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+          <button type="submit" className="btn-primary shrink-0">
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
       </section>
 
       {tables.length === 0 && (
@@ -78,11 +78,15 @@ export default function TablesPage() {
         {tables.map((table) => {
           const url = origin ? `${origin}/menu/${table.qrToken}` : "";
           return (
-            <div key={table.id} className="flex flex-col items-center gap-2 rounded-md border border-slate-200 p-4 text-center">
-              <p className="text-sm font-medium">{table.label}</p>
-              {url && <QrCode url={url} />}
+            <div key={table.id} className="card flex flex-col items-center gap-2 text-center">
+              <p className="text-sm font-semibold text-slate-900">{table.label}</p>
+              {url && (
+                <div className="rounded-xl border border-slate-100 p-2">
+                  <QrCode url={url} />
+                </div>
+              )}
               <p className="break-all text-xs text-slate-400">{url}</p>
-              <button onClick={() => removeTable(table.id)} className="text-xs text-red-600 underline">
+              <button onClick={() => removeTable(table.id)} className="btn-link-danger">
                 Supprimer
               </button>
             </div>

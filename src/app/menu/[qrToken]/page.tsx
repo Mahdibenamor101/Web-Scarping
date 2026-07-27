@@ -114,7 +114,7 @@ export default function PublicMenuPage() {
   if (loadError) {
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-red-600">{loadError}</p>
+        <p className="text-rose-600">{loadError}</p>
       </main>
     );
   }
@@ -124,13 +124,12 @@ export default function PublicMenuPage() {
   if (confirmedOrderId) {
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-3 px-6 text-center">
-        <p className="text-2xl">✅</p>
-        <h1 className="text-xl font-semibold">{t.confirmed}</h1>
-        <p className="text-slate-600">{t.confirmedBody}</p>
-        <button
-          onClick={() => setConfirmedOrderId(null)}
-          className="mt-4 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-        >
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-500 text-2xl text-white">
+          ✓
+        </span>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">{t.confirmed}</h1>
+        <p className="text-slate-500">{t.confirmedBody}</p>
+        <button onClick={() => setConfirmedOrderId(null)} className="btn-secondary mt-4">
           {t.back}
         </button>
       </main>
@@ -139,10 +138,10 @@ export default function PublicMenuPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-md pb-24">
-      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white px-4 py-3">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold">{data.organizationName}</p>
+            <p className="text-sm font-bold text-slate-900">{data.organizationName}</p>
             <p className="text-xs text-slate-500">
               {t.table} : {data.tableLabel}
             </p>
@@ -150,13 +149,13 @@ export default function PublicMenuPage() {
           <div className="flex gap-1 text-xs">
             <button
               onClick={() => setLang("it")}
-              className={`rounded px-2 py-1 ${lang === "it" ? "bg-slate-900 text-white" : "border border-slate-300"}`}
+              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "it" ? "bg-sky-500 text-white" : "border border-slate-200 text-slate-500"}`}
             >
               IT
             </button>
             <button
               onClick={() => setLang("en")}
-              className={`rounded px-2 py-1 ${lang === "en" ? "bg-slate-900 text-white" : "border border-slate-300"}`}
+              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "en" ? "bg-sky-500 text-white" : "border border-slate-200 text-slate-500"}`}
             >
               EN
             </button>
@@ -170,14 +169,16 @@ export default function PublicMenuPage() {
           if (items.length === 0) return null;
           return (
             <section key={category.id}>
-              <h2 className="mb-2 text-base font-semibold">
+              <h2 className="mb-2 text-base font-bold tracking-tight text-slate-900">
                 {lang === "it" ? category.nameIt : category.nameEn || category.nameIt}
               </h2>
               <ul className="flex flex-col gap-3">
                 {items.map((item) => (
-                  <li key={item.id} className="flex items-start justify-between gap-3 rounded-md border border-slate-200 p-3">
+                  <li key={item.id} className="card flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{lang === "it" ? item.nameIt : item.nameEn || item.nameIt}</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {lang === "it" ? item.nameIt : item.nameEn || item.nameIt}
+                      </p>
                       {(lang === "it" ? item.descriptionIt : item.descriptionEn) && (
                         <p className="text-xs text-slate-500">
                           {lang === "it" ? item.descriptionIt : item.descriptionEn}
@@ -188,7 +189,7 @@ export default function PublicMenuPage() {
                           {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
                         </p>
                       )}
-                      <p className="mt-1 text-sm font-semibold">{item.price.toFixed(2)} €</p>
+                      <p className="mt-1 text-sm font-bold text-slate-900">{item.price.toFixed(2)} €</p>
                     </div>
                     <QuantityStepper value={cart[item.id] ?? 0} onChange={(qty) => setQty(item.id, qty)} />
                   </li>
@@ -202,7 +203,7 @@ export default function PublicMenuPage() {
       {cartCount > 0 && !showCart && (
         <button
           onClick={() => setShowCart(true)}
-          className="fixed bottom-4 left-1/2 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-between rounded-md bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-lg"
+          className="fixed bottom-4 left-1/2 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-between rounded-full bg-sky-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/40"
         >
           <span>
             {t.cart} · {cartCount}
@@ -212,12 +213,12 @@ export default function PublicMenuPage() {
       )}
 
       {showCart && (
-        <div className="fixed inset-0 z-20 flex flex-col justify-end bg-black/40" onClick={() => setShowCart(false)}>
+        <div className="fixed inset-0 z-20 flex flex-col justify-end bg-slate-900/40" onClick={() => setShowCart(false)}>
           <div
-            className="flex max-h-[80vh] flex-col gap-3 rounded-t-2xl bg-white p-4"
+            className="flex max-h-[80vh] flex-col gap-3 rounded-t-3xl bg-white p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold">{t.cart}</h2>
+            <h2 className="text-base font-bold tracking-tight text-slate-900">{t.cart}</h2>
             <ul className="flex flex-col gap-2 overflow-y-auto">
               {cartLines.map(([id, qty]) => {
                 const item = itemsById.get(id);
@@ -227,22 +228,18 @@ export default function PublicMenuPage() {
                     <span>
                       {qty} × {lang === "it" ? item.nameIt : item.nameEn || item.nameIt}
                     </span>
-                    <span>{(item.price * qty).toFixed(2)} €</span>
+                    <span className="font-medium">{(item.price * qty).toFixed(2)} €</span>
                   </li>
                 );
               })}
               {cartLines.length === 0 && <p className="text-sm text-slate-500">{t.empty}</p>}
             </ul>
-            <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-sm font-semibold">
+            <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-sm font-bold text-slate-900">
               <span>{t.total}</span>
               <span>{cartTotal.toFixed(2)} €</span>
             </div>
-            {submitError && <p className="text-sm text-red-600">{submitError}</p>}
-            <button
-              onClick={submitOrder}
-              disabled={submitting || cartLines.length === 0}
-              className="rounded-md bg-slate-900 px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
-            >
+            {submitError && <p className="text-sm text-rose-600">{submitError}</p>}
+            <button onClick={submitOrder} disabled={submitting || cartLines.length === 0} className="btn-primary w-full py-3">
               {submitting ? "…" : t.order}
             </button>
           </div>
@@ -257,7 +254,7 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
     return (
       <button
         onClick={() => onChange(1)}
-        className="h-8 w-8 shrink-0 rounded-full bg-slate-900 text-sm font-medium text-white"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white shadow-sm shadow-sky-500/30"
       >
         +
       </button>
@@ -265,11 +262,17 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
   }
   return (
     <div className="flex shrink-0 items-center gap-2">
-      <button onClick={() => onChange(value - 1)} className="h-8 w-8 rounded-full border border-slate-300 text-sm">
+      <button
+        onClick={() => onChange(value - 1)}
+        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600"
+      >
         −
       </button>
-      <span className="w-4 text-center text-sm">{value}</span>
-      <button onClick={() => onChange(value + 1)} className="h-8 w-8 rounded-full border border-slate-300 text-sm">
+      <span className="w-4 text-center text-sm font-medium">{value}</span>
+      <button
+        onClick={() => onChange(value + 1)}
+        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600"
+      >
         +
       </button>
     </div>
