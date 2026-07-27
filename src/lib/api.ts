@@ -45,24 +45,32 @@ export function handleApiError(error: unknown) {
   if (error instanceof ZodError) {
     return NextResponse.json({ error: "invalid_input", issues: error.issues }, { status: 400 });
   }
-  // Raw SQL errors from the SECURITY DEFINER functions (create_organization_and_owner,
-  // accept_invitation, ...) surface as the plain Postgres error message, not
-  // through Prisma's own error codes below -- $queryRaw doesn't translate them.
-  if (error instanceof Error && /duplicate key value violates unique constraint/.test(error.message)) {
-    return NextResponse.json({ error: "already_exists" }, { status: 409 });
-  }
-  if (error instanceof Error && /invitation_invalid_or_expired/.test(error.message)) {
-    return NextResponse.json({ error: "invitation_invalid_or_expired" }, { status: 410 });
-  }
-  // Same two constraint violations, but raised by an ordinary Prisma Client
-  // call (e.g. tx.restaurantTable.create / .delete) -- Prisma translates
-  // these into its own error codes instead of the raw Postgres message.
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    // Ordinary Prisma Client calls (e.g. tx.restaurantTable.create / .delete)
+    // translate constraint violations into their own error codes.
     if (error.code === "P2002") {
       return NextResponse.json({ error: "already_exists" }, { status: 409 });
     }
     if (error.code === "P2003") {
       return NextResponse.json({ error: "referenced_by_other_records" }, { status: 409 });
+    }
+    // Raw SQL calls into the SECURITY DEFINER functions (create_organization_and_owner,
+    // accept_invitation, ...) never get a P2002/P2003 -- $queryRaw/$executeRaw always
+    // wrap the underlying Postgres error as P2010, with the real SQLSTATE and message
+    // in `meta`, not in `error.message` itself (which is just "Raw query failed...").
+    if (error.code === "P2010") {
+      const meta = error.meta as { code?: string; message?: string } | undefined;
+      if (meta?.code === "23505") {
+        return NextResponse.json({ error: "already_exists" }, { status: 409 });
+      }
+      if (meta?.code === "23503") {
+        return NextResponse.json({ error: "referenced_by_other_records" }, { status: 409 });
+      }
+      // Custom RAISE EXCEPTION 'invitation_invalid_or_expired' from accept_invitation /
+      // invitation_lookup_by_token -- Postgres passes the raw message through in meta.
+      if (meta?.message && /invitation_invalid_or_expired/.test(meta.message)) {
+        return NextResponse.json({ error: "invitation_invalid_or_expired" }, { status: 410 });
+      }
     }
   }
   console.error(error);
