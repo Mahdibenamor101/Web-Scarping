@@ -1,7 +1,7 @@
 # CONTEXT.md — [nom à trancher]
 
 > Fichier de mémoire du projet. À coller en début de chaque session de travail (chat ou Claude Code) et à tenir à jour après chaque décision importante.
-> Dernière mise à jour : 27 juillet 2026 — Phase 0, étape 1 (fondations + multi-tenant) implémentée, décisions d'architecture consignées en §12
+> Dernière mise à jour : 27 juillet 2026 — Phase 0, étapes 1 à 3 (fondations + multi-tenant, menu, QR + commande client) implémentées, décisions d'architecture consignées en §12
 
 ## 1. Vision
 
@@ -193,7 +193,9 @@ Le nom n'est pas bloquant : coder avec un placeholder, trancher le nom en parall
 
 **Étape 2 — gestion du menu : FAITE.** CRUD catégories/plats (owner/manager), 14 allergènes UE, multilingue IT/EN, disponibilité, dans `/dashboard/menu`. Lecture seule pour les autres rôles (server/kitchen en ont besoin au quotidien). Pas encore de upload de photo (URL collée à la main — voir §13), pas de drag-and-drop pour le tri.
 
-Reste à faire dans la Phase 0 : QR + commande client (affichage public du menu, panier, commande sans compte), dashboard temps réel cuisine/salle, Stripe.
+**Étape 3 — QR + commande client : FAITE.** Gestion des tables (`/dashboard/tables`, owner/manager) avec QR code généré par table. Page publique `/menu/[qrToken]` (sans compte, mobile-first, IT/EN) : parcours du menu, panier, envoi de commande. Le prix facturé est toujours recalculé côté serveur à partir du menu au moment de la commande, jamais accepté depuis le client. Voir §12.5 pour le mécanisme de résolution QR → organisation et le durcissement du schéma qui l'a accompagné (clés étrangères composites).
+
+Reste à faire dans la Phase 0 : dashboard temps réel cuisine/salle (afficher les commandes qui arrivent, faire suivre leur statut), Stripe. Les commandes créées via `/menu/[qrToken]` existent déjà en base (table `orders`/`order_items`) mais aucune UI staff ne les affiche encore — vérifié par requête SQL directe pendant cette étape, pas par une interface.
 
 ### Phase A — Pilotes (3-4 semaines)
 5-8 restos du réseau, **gratuits 3 mois**. Ce n'est pas de la générosité : c'est l'achat d'actifs publicitaires. À exiger explicitement dès le départ :
@@ -274,13 +276,22 @@ C'était la contrainte explicite de cette étape. Mécanisme :
 
 Non tranché à ce stade (cohérent avec §10, question ouverte non bloquante), mais cadré : le choix se fera entre Neon et Supabase, tous deux avec des régions Francfort, et tous deux compatibles avec le modèle RLS mis en place ici — donc pas de retour en arrière architectural à prévoir quel que soit le choix final.
 
+### 12.5 QR + commande client (étape 3) — le même schéma de contournement étroit, étendu au client final
+
+Le client qui scanne un QR n'a ni compte ni session : c'est la même catégorie de problème que l'inscription/connexion/invitation (§12.3), avec la même solution. Une seule fonction `SECURITY DEFINER` de plus, `resolve_table_by_qr_token`, qui transforme le `qr_token` d'une table en `organization_id`. **Une fois cet identifiant connu, tout le reste — lire le menu, insérer la commande — passe par le `withTenant()` RLS-scopé normal, exactement comme une écriture faite par le staff.** Il n'y a pas de fonction `SECURITY DEFINER` pour créer une commande : la garantie `WITH CHECK` de RLS suffit, une fois qu'on est dans le bon tenant.
+
+**Prix jamais fait confiance au client** : le prix facturé est relu depuis `menu_items` au moment de la commande, dans la même transaction qui crée la commande — un client qui manipule la requête HTTP pour envoyer un prix différent n'a aucun effet, le schéma de validation n'accepte même pas de champ prix côté commande.
+
+**Durcissement supplémentaire découvert pendant cette étape** : RLS garantit qu'une organisation ne peut pas *lire* les tables d'une autre, mais ne garantit pas, à elle seule, qu'une ligne `orders` ne puisse pas *pointer* vers une table d'une autre organisation (une commande avec `organization_id` correct mais `table_id` d'un autre tenant serait acceptée par la policy RLS, qui ne vérifie que la colonne `organization_id`). Corrigé par des **clés étrangères composites** : `orders.table_id` référence désormais `tables(id, organization_id)` et non plus `tables(id)` seul (même traitement pour `menu_items.category_id`, `order_items.order_id`, `order_items.menu_item_id`, `staff_calls.table_id`). La base rejette maintenant nativement toute ligne où les deux tenants ne correspondent pas — plus une propriété qu'on espère du code applicatif, une contrainte que Postgres impose à l'écriture. Voir `prisma/migrations/*_composite_tenant_foreign_keys`.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue de l'étape 1)
 
 - **Pas d'envoi d'email réel.** L'invitation de staff génère un lien qu'il faut transmettre à la main (affiché dans le dashboard, loggé côté serveur). Premier vrai manque à combler dès que des restaurateurs pilotes utilisent le produit.
 - **Email globalement unique pour les comptes staff** (voir §12.2.3) : une personne travaillant dans deux restaurants ne peut pas avoir le même email des deux côtés. Non bloquant pour le MVP, mais à concevoir explicitement si le besoin apparaît (compte multi-organisation) plutôt que de le découvrir en production.
 - **`DIRECT_DATABASE_URL` (rôle `app_migrator`) ne doit jamais être utilisé par le code applicatif.** Prisma Client ne s'en sert qu'au moment des migrations, jamais à l'exécution — mais c'est une convention à faire respecter en revue de code, pas quelque chose que la base empêche mécaniquement si quelqu'un l'utilisait par erreur dans une future route API.
-- **Les quatre fonctions `SECURITY DEFINER`** (`create_organization_and_owner`, `auth_lookup_user`, `accept_invitation`, `invitation_lookup_by_token`) sont la seule surface qui contourne RLS. Elles sont volontairement étroites, mais toute nouvelle fonction de ce type doit être traitée avec la même rigueur : elle est par construction en dehors de la garantie décrite en §12.3.
-- **Pas de vérification d'email ni de limitation de débit (rate limiting)** sur signup/login/invitation — acceptable pour une étape de fondations testée en local, à traiter avant toute exposition publique.
-- **Le schéma §5 restant (tables, commandes, abonnements) est présent en base mais jamais exercé par du code applicatif réel** : le menu (catégories/plats) l'est désormais (étape 2) et la garantie RLS a tenu sous ce premier usage réel — la prochaine étape (commande client, flux orders/order_items à fort volume) reste la première occasion de la vérifier sous une charge de lecture/écriture réaliste.
+- **Les cinq fonctions `SECURITY DEFINER`** (`create_organization_and_owner`, `auth_lookup_user`, `accept_invitation`, `invitation_lookup_by_token`, `resolve_table_by_qr_token`) sont la seule surface qui contourne RLS. Elles sont volontairement étroites, mais toute nouvelle fonction de ce type doit être traitée avec la même rigueur : elle est par construction en dehors de la garantie décrite en §12.3.
+- **Pas de vérification d'email ni de limitation de débit (rate limiting)** sur signup/login/invitation — acceptable pour une étape de fondations testée en local, à traiter avant toute exposition publique. **S'applique maintenant aussi à la commande client** (`/menu/[qrToken]`) : rien n'empêche aujourd'hui un client (ou un script) de spammer des commandes sur une table. À traiter avant le premier pilote réel, pas juste avant l'exposition publique générale — un service ouvert au public dès cette étape.
 - **Pas d'upload de photo pour les plats.** Le champ `photoUrl` attend une URL déjà hébergée ailleurs — pas de stockage S3-compatible branché (Supabase Storage / R2, prévu §6). À faire avant que des restaurateurs pilotes alimentent vraiment leur menu.
-- **RGPD** : le schéma des `organizations`/`users` est prêt à recevoir une base légale de traitement documentée et un droit à l'effacement, mais ni l'un ni l'autre n'est implémenté (pas de mentions légales, pas d'endpoint de suppression de compte) — attendu pour avant le premier paiement (§10).
+- **Les commandes créées via `/menu/[qrToken]` n'ont aucune UI côté staff.** Elles existent en base (`orders`/`order_items`, statut `PENDING`), vérifiées par requête SQL directe pendant cette étape — mais tant que le dashboard temps réel cuisine/salle (prochaine étape de la Phase 0) n'existe pas, une commande passée par un client n'apparaît nulle part pour le restaurant. Ne pas confondre "le flux marche de bout en bout en base" avec "un restaurateur pilote peut s'en servir".
+- **Statut de table (`free`/`occupied`) jamais mis à jour automatiquement.** Une commande n'occupe pas la table dans le modèle actuel — laissé pour l'étape dashboard temps réel, où le statut aura un sens opérationnel réel (le serveur doit savoir quelle table libérer).
+- **RGPD** : le schéma des `organizations`/`users` est prêt à recevoir une base légale de traitement documentée et un droit à l'effacement, mais ni l'un ni l'autre n'est implémenté (pas de mentions légales, pas d'endpoint de suppression de compte) — attendu pour avant le premier paiement (§10). Le client final qui commande via QR est maintenant, lui aussi, une personne dont on traite des données (commande horodatée, éventuellement des notes en texte libre) sans base légale documentée ni mention affichée sur la page publique.

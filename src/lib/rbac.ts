@@ -20,6 +20,9 @@ export const STAFF_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
  */
 export const MENU_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
 
+/** Roles allowed to add/remove physical tables and their QR codes. Same set as menu management today, same caveat. */
+export const TABLE_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
+
 /**
  * Who is allowed to invite whom. An OWNER can bring in any role, including
  * another OWNER (co-founders, handing off the account). A MANAGER can only

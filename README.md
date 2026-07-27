@@ -2,7 +2,7 @@
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0. Étape 1 (fondations + isolation multi-tenant) et étape 2 (gestion du menu) faites. Reste : QR + commande client, dashboard temps réel cuisine/salle, Stripe.
+**Où on en est** : Phase 0. Étapes 1 à 3 faites (fondations + isolation multi-tenant, gestion du menu, QR + commande client). Reste : dashboard temps réel cuisine/salle, Stripe.
 
 ## Stack
 
@@ -53,3 +53,9 @@ Chaque table métier porte un `organization_id`, et une policy Postgres (`Row-Le
 ## Menu
 
 `/dashboard/menu` (owner/manager) : catégories, plats, prix, disponibilité, étiquetage des 14 allergènes UE (Règlement (UE) n°1169/2011), noms/descriptions IT/EN. Lecture seule pour server/kitchen. Pas encore d'upload de photo — le champ attend une URL déjà hébergée ailleurs.
+
+## QR + commande client
+
+`/dashboard/tables` (owner/manager) : ajouter une table génère un QR code pointant vers `/menu/[qrToken]` — page publique, sans compte, mobile-first, bascule IT/EN, panier, envoi de commande. Le client n'a jamais de session ; la résolution QR → organisation passe par une fonction Postgres dédiée (`resolve_table_by_qr_token`, voir `prisma/migrations/*_public_ordering`), et tout le reste (lecture du menu, création de la commande) passe par les mêmes policies RLS que le reste de l'app. Le prix facturé est toujours recalculé côté serveur.
+
+Pas encore d'UI staff pour voir les commandes reçues (prochaine étape : dashboard temps réel cuisine/salle) — vérifié par requête SQL directe pendant le développement.

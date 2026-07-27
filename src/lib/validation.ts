@@ -55,3 +55,22 @@ export const createMenuItemSchema = z.object({
 });
 
 export const updateMenuItemSchema = createMenuItemSchema.partial();
+
+export const createTableSchema = z.object({
+  label: z.string().trim().min(1).max(50),
+});
+
+export const updateTableSchema = z.object({
+  label: z.string().trim().min(1).max(50).optional(),
+  status: z.enum(["FREE", "OCCUPIED"]).optional(),
+});
+
+export const createOrderItemSchema = z.object({
+  menuItemId: z.string().uuid(),
+  quantity: z.number().int().min(1).max(50),
+  notes: z.string().trim().max(500).optional(),
+});
+
+export const createOrderSchema = z.object({
+  items: z.array(createOrderItemSchema).min(1).max(50),
+});

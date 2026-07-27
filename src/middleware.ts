@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/session";
-import { ROLE_HOME, STAFF_MANAGEMENT_ROLES, MENU_MANAGEMENT_ROLES } from "@/lib/rbac";
+import { ROLE_HOME, STAFF_MANAGEMENT_ROLES, MENU_MANAGEMENT_ROLES, TABLE_MANAGEMENT_ROLES } from "@/lib/rbac";
 
 // Defense in depth: this only decides which *page* a role can land on.
 // The real, unbypassable boundary is Row-Level Security in Postgres (see
@@ -9,6 +9,7 @@ import { ROLE_HOME, STAFF_MANAGEMENT_ROLES, MENU_MANAGEMENT_ROLES } from "@/lib/
 const ROLE_ONLY_PREFIXES: { prefix: string; roles: string[] }[] = [
   { prefix: "/dashboard/staff", roles: STAFF_MANAGEMENT_ROLES },
   { prefix: "/dashboard/menu", roles: MENU_MANAGEMENT_ROLES },
+  { prefix: "/dashboard/tables", roles: TABLE_MANAGEMENT_ROLES },
 ];
 
 export async function middleware(req: NextRequest) {

@@ -168,6 +168,10 @@ model RestaurantTable {
   staffCalls StaffCall[]
 
   @@unique([organizationId, label])
+  // Lets child tables (orders, staff_calls) declare a composite FK on
+  // (tableId, organizationId) instead of just (tableId) -- see the note on
+  // Order.table below for why that matters.
+  @@unique([id, organizationId])
   @@index([organizationId])
   @@map("tables")
 }
@@ -184,6 +188,7 @@ model MenuCategory {
 
   items MenuItem[]
 
+  @@unique([id, organizationId])
   @@index([organizationId])
   @@map("menu_categories")
 }
@@ -193,7 +198,13 @@ model MenuItem {
   organizationId String       @map("organization_id") @db.Uuid
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   categoryId     String       @map("category_id") @db.Uuid
-  category       MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  // Composite FK: category must belong to the SAME organization as the
+  // item, not merely exist. A single-column FK on categoryId alone would
+  // let a buggy write attach an item to another tenant's category (RLS
+  // would still stop anyone from ever reading it back through that other
+  // tenant, but the row itself would be silently inconsistent). This way
+  // the database rejects the write outright.
+  category       MenuCategory @relation(fields: [categoryId, organizationId], references: [id, organizationId], onDelete: Cascade)
   nameIt         String       @map("name_it")
   nameEn         String?      @map("name_en")
   descriptionIt  String?      @map("description_it")
@@ -208,6 +219,7 @@ model MenuItem {
 
   orderItems OrderItem[]
 
+  @@unique([id, organizationId])
   @@index([organizationId])
   @@index([categoryId])
   @@map("menu_items")
@@ -218,7 +230,12 @@ model Order {
   organizationId String          @map("organization_id") @db.Uuid
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   tableId        String          @map("table_id") @db.Uuid
-  table          RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Restrict)
+  // Composite FK (see MenuItem.category above): the table an order points
+  // to must belong to the same organization as the order itself. This is
+  // the exact bug the public ordering flow (resolveTableByQrToken ->
+  // withTenant) is trusted to never produce -- the constraint makes that
+  // trust unnecessary to maintain by hand as the codebase grows.
+  table          RestaurantTable @relation(fields: [tableId, organizationId], references: [id, organizationId], onDelete: Restrict)
   status         OrderStatus     @default(PENDING)
   totalAmount    Decimal         @default(0) @map("total_amount") @db.Decimal(10, 2)
   createdAt      DateTime        @default(now()) @map("created_at")
@@ -226,6 +243,7 @@ model Order {
 
   items OrderItem[]
 
+  @@unique([id, organizationId])
   @@index([organizationId])
   @@index([tableId])
   @@map("orders")
@@ -236,9 +254,9 @@ model OrderItem {
   organizationId String       @map("organization_id") @db.Uuid
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   orderId        String       @map("order_id") @db.Uuid
-  order          Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order          Order        @relation(fields: [orderId, organizationId], references: [id, organizationId], onDelete: Cascade)
   menuItemId     String       @map("menu_item_id") @db.Uuid
-  menuItem       MenuItem     @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  menuItem       MenuItem     @relation(fields: [menuItemId, organizationId], references: [id, organizationId], onDelete: Restrict)
   quantity       Int
   unitPrice      Decimal      @map("unit_price") @db.Decimal(10, 2)
   notes          String?
@@ -254,7 +272,7 @@ model StaffCall {
   organizationId String          @map("organization_id") @db.Uuid
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   tableId        String          @map("table_id") @db.Uuid
-  table          RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  table          RestaurantTable @relation(fields: [tableId, organizationId], references: [id, organizationId], onDelete: Cascade)
   status         StaffCallStatus @default(PENDING)
   createdAt      DateTime        @default(now()) @map("created_at")
 
