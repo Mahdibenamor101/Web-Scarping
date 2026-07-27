@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/logo";
 import { APP_NAME } from "@/lib/brand";
 
 const STEPS = [
@@ -29,15 +30,27 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <main>
-      <div className="bg-navy text-white">
-        <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-          <span className="text-lg font-bold tracking-tight">{APP_NAME}</span>
+      <div className="relative overflow-hidden bg-navy text-white">
+        {/* Soft accent glows + faint grid texture -- self-contained CSS, no image assets */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+          }}
+        />
+        <div className="pointer-events-none absolute left-1/2 top-[-10rem] h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-sky-500/30 blur-[110px]" />
+        <div className="pointer-events-none absolute bottom-[-8rem] right-[-6rem] h-[20rem] w-[20rem] rounded-full bg-indigo-500/20 blur-[100px]" />
+
+        <nav className="relative mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+          <Logo />
           <Link href="/login" className="text-sm font-medium text-slate-300 hover:text-white">
             Se connecter
           </Link>
         </nav>
 
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 pb-20 pt-10 text-center sm:pb-28 sm:pt-16">
+        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 pb-28 pt-10 text-center sm:pb-36 sm:pt-16">
           <span className="badge bg-sky-500/10 text-sky-300">Menu QR &amp; commande à table</span>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Le QR sur la table.
@@ -57,13 +70,22 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
+
+        <svg
+          className="relative block w-full text-slate-50"
+          viewBox="0 0 1440 60"
+          fill="currentColor"
+          preserveAspectRatio="none"
+        >
+          <path d="M0,32 C320,72 1120,-8 1440,32 L1440,60 L0,60 Z" />
+        </svg>
       </div>
 
       <section className="mx-auto max-w-5xl px-6 py-16 sm:py-20">
         <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900">Comment ça marche</h2>
         <div className="mt-10 grid gap-6 sm:grid-cols-3">
           {STEPS.map((step) => (
-            <div key={step.n} className="card">
+            <div key={step.n} className="card transition hover:-translate-y-0.5 hover:shadow-md">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white">
                 {step.n}
               </span>
@@ -79,7 +101,7 @@ export default function HomePage() {
           <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900">Fait pour l&apos;Italie</h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((feature) => (
-              <div key={feature.title} className="card">
+              <div key={feature.title} className="card transition hover:-translate-y-0.5 hover:shadow-md">
                 <h3 className="text-sm font-semibold text-slate-900">{feature.title}</h3>
                 <p className="mt-1 text-sm text-slate-500">{feature.body}</p>
               </div>

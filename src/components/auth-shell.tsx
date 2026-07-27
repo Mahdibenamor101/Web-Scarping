@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { APP_NAME } from "@/lib/brand";
+import Logo from "@/components/logo";
 
 export default function AuthShell({
   title,
@@ -12,8 +12,8 @@ export default function AuthShell({
 }) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-50 px-6 py-12">
-      <Link href="/" className="text-lg font-bold tracking-tight text-navy">
-        {APP_NAME}
+      <Link href="/">
+        <Logo wordmarkClassName="text-lg font-bold tracking-tight text-navy" />
       </Link>
       <div className="w-full max-w-sm">
         <div className="card px-6 py-8 shadow-md shadow-slate-200/80">

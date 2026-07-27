@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { withTenant } from "@/lib/db";
 import { canManageStaff, MENU_MANAGEMENT_ROLES, TABLE_MANAGEMENT_ROLES, BILLING_MANAGEMENT_ROLES } from "@/lib/rbac";
-import { APP_NAME } from "@/lib/brand";
+import Logo from "@/components/logo";
 import LogoutButton from "./logout-button";
 import NavLink from "./nav-link";
 
@@ -20,7 +20,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="flex min-h-screen">
       <aside className="flex w-60 shrink-0 flex-col justify-between bg-navy px-4 py-6 text-white">
         <div>
-          <span className="px-2 text-lg font-bold tracking-tight">{APP_NAME}</span>
+          <div className="px-2">
+            <Logo />
+          </div>
           <nav className="mt-8 flex flex-col gap-1">
             <NavLink href="/dashboard/orders">Commandes</NavLink>
             {canManageStaff(session.role) && <NavLink href="/dashboard/staff">Staff</NavLink>}

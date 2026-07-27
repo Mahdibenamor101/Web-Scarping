@@ -1,7 +1,7 @@
 # CONTEXT.md — mbQr
 
 > Fichier de mémoire du projet. À coller en début de chaque session de travail (chat ou Claude Code) et à tenir à jour après chaque décision importante.
-> Dernière mise à jour : 27 juillet 2026 — Phase 0 complète : étapes 1 à 5 (fondations + multi-tenant, menu, QR + commande client, dashboard temps réel, Stripe) implémentées, plus un durcissement limitation de débit (§12.8) et un premier passage nom + identité visuelle (§2, §12.9). Décisions d'architecture consignées en §12. Stripe non vérifié contre un vrai compte (§12.7) et nom non vérifié juridiquement (§2, §13) — deux réserves à ne pas perdre de vue.
+> Dernière mise à jour : 27 juillet 2026 — Phase 0 complète : étapes 1 à 5 (fondations + multi-tenant, menu, QR + commande client, dashboard temps réel, Stripe) implémentées, plus un durcissement limitation de débit (§12.8) et nom + identité visuelle + logo (§2, §12.9). Décisions d'architecture consignées en §12. Réserves à ne pas perdre de vue : Stripe non vérifié contre un vrai compte (§12.7), nom non vérifié juridiquement (§2, §13), logo produit en code plutôt qu'en Figma faute de connecteur disponible (§12.9, §13).
 
 ## 1. Vision
 
@@ -343,6 +343,14 @@ Implémenté comme un petit système de composants Tailwind (`src/app/globals.cs
 
 **Ce que ça ne couvre pas** : la personnalisation de marque *par restaurant* (logo, couleurs personnalisées — §4, colonnes `logo_url`/`theme_color` déjà présentes sur `organizations` depuis l'étape 1 mais sans UI pour les éditer). Ce qui a été fait ici est l'identité visuelle du produit mbQr lui-même, pas encore un mécanisme pour qu'un restaurant y superpose la sienne.
 
+**Logo** : demande explicite d'un logo et de passer par Figma. **Figma n'est pas connecté à cet environnement** (recherche de connecteur infructueuse, opt-in requis côté compte) — le logo a donc été produit directement en SVG dans le code plutôt que dans un outil de design externe. Le résultat visuel est le même ; ce qui change, c'est qu'il n'existe pas de fichier `.fig` éditable à côté — si un vrai fichier Figma (pour itérer visuellement, faire éditer par quelqu'un d'autre, exporter des variantes) est nécessaire, il faudra soit connecter Figma à ce compte, soit reconstruire le mark dans Figma à partir du SVG (`src/components/logo.tsx`).
+
+Le mark : trois motifs "finder pattern" de QR code (les carrés imbriqués qui permettent à un scanner de s'orienter) sur trois coins d'un badge dégradé sky-400→sky-600, un simple point sur le quatrième coin — asymétrie volontaire pour que ça se lise comme une marque, pas comme un vrai QR code scannable. Deux exports : `<Logo />` (mark + nom, utilisé partout où l'app se présente : nav landing, sidebar dashboard, en-tête auth) et `<LogoMark />` (icône seule). `src/app/icon.svg` réutilise le même dessin comme favicon (convention Next.js : un fichier `icon.svg` dans `app/` est automatiquement servi comme favicon, pas de câblage supplémentaire nécessaire).
+
+Volontairement absent du menu public (`/menu/[qrToken]`) : cette page affiche le nom du *restaurant*, pas celui de mbQr — le client scanne pour voir le menu de "Trattoria da Mario", pas pour découvrir le SaaS qui le sert.
+
+Élévation visuelle de la landing en même temps : dégradé/lueur radiale en fond du héro, texture de grille légère (CSS pur, aucune image), séparateur en vague entre le héro sombre et le contenu clair, léger effet de survol (translation + ombre) sur les cartes — même esprit "SaaS moderne" que la palette de référence, sans copier sa mise en page.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Pas d'envoi d'email réel.** L'invitation de staff génère un lien qu'il faut transmettre à la main (affiché dans le dashboard, loggé côté serveur). Premier vrai manque à combler dès que des restaurateurs pilotes utilisent le produit.
@@ -358,3 +366,4 @@ Implémenté comme un petit système de composants Tailwind (`src/app/globals.cs
 - **Stripe n'a jamais tourné contre un vrai compte** (voir §12.7) — le code est en place et vérifié dans la mesure du possible sans identifiants, mais un vrai parcours de paiement (mode test) reste à dérouler une fois avant tout pilote payant.
 - **Pas d'application du statut d'abonnement.** Un essai expiré ou un abonnement `past_due`/`canceled` ne bloque rien aujourd'hui — l'organisation garde un accès complet à toutes les fonctionnalités quel que soit `subscription_status`. Choix délibéré pour cette étape (verrouiller l'accès sur une intégration Stripe non testée en conditions réelles aurait été prématuré et risqué de bloquer un pilote par erreur) mais à trancher explicitement avant la Phase C (test média) : qu'est-ce qui se passe vraiment quand l'essai se termine ?
 - **"mbQr" n'a subi aucune des quatre vérifications que §2 lui-même liste comme obligatoires** (TMview, UIBM, domaine, stores). Utilisable comme nom de travail pendant le reste du build ; à vérifier avant la Phase B, pas avant — mais ne pas oublier que ça n'a pas été fait, précisément parce que rien dans le produit ne le rappellera tout seul.
+- **Pas de fichier Figma.** Le logo (§12.9) existe en SVG dans le code, pas dans un outil de design — Figma n'est pas connecté à cet environnement. Si quelqu'un d'autre doit itérer visuellement dessus (variantes, retouche par un designer), il faudra soit connecter Figma, soit reconstruire le mark depuis `src/components/logo.tsx`.

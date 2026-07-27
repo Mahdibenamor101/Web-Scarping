@@ -77,3 +77,5 @@ Compteur en mémoire par clé (`src/lib/rate-limit.ts`), même limite de concept
 ## Identité visuelle
 
 Accent `sky-500` (Tailwind, `#0ea5e9`), fond navy foncé pour les sections héro/sidebar, boutons en pilule, cartes très arrondies — palette et conventions de forme extraites du CSS réellement livré par un concurrent (QonnectQR) à la demande du fondateur, appliquées à un contenu et une structure originaux. Système de composants partagé dans `src/app/globals.css` (`@layer components` : `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.badge`) plutôt que des utilitaires Tailwind répétés à chaque page. Voir `CONTEXT.md` §12.9.
+
+**Logo** (`src/components/logo.tsx`) : mark géométrique en SVG (motifs "finder pattern" de QR code sur trois coins d'un badge dégradé, un point sur le quatrième), produit directement en code plutôt que dans Figma — **aucun connecteur Figma n'est disponible dans cet environnement**. `src/app/icon.svg` réutilise le même dessin comme favicon. Absent volontairement de `/menu/[qrToken]` : cette page montre le nom du restaurant, pas celui de mbQr.
