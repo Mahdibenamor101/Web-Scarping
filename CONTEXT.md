@@ -1,0 +1,281 @@
+# CONTEXT.md — [nom à trancher]
+
+> Fichier de mémoire du projet. À coller en début de chaque session de travail (chat ou Claude Code) et à tenir à jour après chaque décision importante.
+> Dernière mise à jour : 27 juillet 2026 — Phase 0, étape 1 (fondations + multi-tenant) implémentée, décisions d'architecture consignées en §12
+
+## 1. Vision
+
+Un SaaS de menu QR digital et de commande à table pour les restaurants et cafés en Italie. Un client scanne le QR de sa table, consulte le menu depuis son téléphone (rien à installer) et commande — la commande arrive instantanément en cuisine et sur le dashboard du restaurant.
+
+**Positionnement — TRANCHÉ : l'angle est la distribution, pas la fonctionnalité.**
+
+Le produit reste une réplique fonctionnelle du cœur de marché (menu + commande + temps réel + staff + analytics). Ce qui différencie n'est pas ce que fait le logiciel, mais comment il arrive chez le client : acquisition payante alimentée par une preuve sociale réelle, construite avec un réseau de restaurateurs sur place.
+
+**Atouts du fondateur :** présence en Italie + réseau de contacts dans la restauration. Ce sont ces deux éléments qui rendent le plan viable — pas une supériorité produit.
+
+**Décision d'acquisition : publicité payante** (et non vente en direct par le réseau). Le réseau ne sert pas de canal de vente mais de **source de preuve sociale** : il produit les témoignages, vidéos et chiffres qui rendent les publicités rentables. Sans cette preuve, les créas d'un SaaS inconnu convertissent très mal.
+
+### ⚠️ Paysage concurrentiel réel (révisé — bien plus dense qu'estimé initialement)
+
+Au moins **dix acteurs identifiés** sur le menu QR en Italie, dont plusieurs gratuits ou freemium :
+
+| Concurrent | Positionnement |
+|---|---|
+| Comanda Facile / Comanda Assistant | gestion complète salle/cuisine + menu QR, bien installés |
+| MenüQR | menu + upsell piloté par IA, analytics |
+| Qromo | gestionnaire complet, remplace les palmaires par smartphone |
+| atavola.menu (@tavola) | menu QR, multilingue, allergènes + filtres — le plus proche du MVP prévu |
+| e-menu.it | menu digital, allergènes, tarif bas |
+| SmartTouch Menu | commande table/plage/hôtel + paiement in-app |
+| Etable | menu digital + découverte de locaux |
+| MenuPrime | menu digital, 1er mois gratuit |
+| leggimenu.it | **gratuit** en version de base, extensions payantes |
+| JMENU | activation gratuite, sans abonnement |
+
+**Implication stratégique (non résolue) :** la stratégie initiale — lancer sans différenciation à 40€/mois — a été décidée en pensant le marché peu peuplé. Elle ne tient pas face à dix concurrents dont certains gratuits. Sans angle, il n'y a pas de raison pour un restaurateur de choisir ce produit, donc pas de première traction, donc pas de données pour différencier plus tard. **L'angle doit être défini AVANT le build, pas après.**
+
+**Le pricing à 40€/mois est également à revalider** dans ce contexte : le positionnement se justifie seulement si l'angle le justifie.
+
+## 2. Nom
+
+**Statut : aucun nom retenu.** Sept candidats testés, tous éliminés ou affaiblis :
+
+| Candidat | Verdict |
+|---|---|
+| QRisto | ❌ qristo.app = "QRisto Menu", produit identique |
+| Ordimo | ❌ app estonienne de commande QR à table, même flux |
+| MenuVivo | ❌ menuvivo.com pris (app repas IA) |
+| Menoo | ❌ pris 6× (.ro, .us, .io, .me, usemenoo.com, apps) |
+| Tavolà | ❌ atavola.menu = concurrent direct |
+| Servito | ⚠️ libre, mais mot ultra-courant du secteur → invisible en recherche |
+| Sedimo | ⚠️ libre, mais évoque "sedimento" en italien |
+
+**Leçons de méthode :**
+- Les noms descriptifs composés (QR/ordre + suffixe italien) sont tous pris — c'est la formule que tout le monde applique. Les acteurs installés ont des noms **inventés** : QonnectQR, Qromo, Mobee, Etable.
+- Éviter les mots italiens courants du secteur (*portata*, *servito*, *comanda*) : noyés dans les tournures idiomatiques, inutilisables en SEO.
+- **Bon ordre** : définir l'angle → générer 20 candidats → vérifier les domaines en masse chez un registrar (5 min) → n'approfondir que les survivants. Chercher un nom avant de connaître l'angle fait tourner en rond.
+
+**Vérification obligatoire avant engagement** (non faite, hors de portée de la recherche web) :
+1. TMview (EUIPO) — marques UE, classes 9 et 42 pour du SaaS
+2. UIBM — marques italiennes nationales
+3. Disponibilité domaine .it / .com
+4. App Store + Google Play
+
+Un nom peut être déposé sans aucune présence web visible.
+
+## 3. Personas
+
+| Persona | Besoin principal | Point de friction actuel |
+|---|---|---|
+| Gérant / propriétaire | Réduire les erreurs de commande, voir le CA en direct | Gère tout sur papier, aucune visibilité temps réel |
+| Serveur / staff cuisine | Recevoir les commandes sans ambiguïté, gérer les statuts | Commandes criées à voix haute, erreurs de transcription |
+| Client final (souvent touriste) | Commander vite, comprendre le menu dans sa langue | Menu papier en italien uniquement, doit héler un serveur |
+
+## 4. Fonctionnalités (MVP)
+
+Réplique du cœur de marché, avec deux éléments non négociables en Italie (pas des "bonus", des prérequis légaux/commerciaux) :
+
+| Fonctionnalité | Note |
+|---|---|
+| QR par table, menu digital | |
+| Commande client sans compte | |
+| Dashboard commandes temps réel | statuts à faire / en cours / prêt |
+| Gestion du menu (catégories, plats, photos, rupture de stock) | |
+| **Menu multilingue (IT + EN minimum)** | attendu par le marché vu le poids du tourisme, pas un luxe |
+| **Étiquetage des 14 allergènes UE** | obligation légale — Règlement UE n°1169/2011, pas optionnel |
+| Comptes staff + rôles | |
+| Appeler le serveur depuis le menu | |
+| Abonnement + essai gratuit, paiement Stripe | |
+| Analytics de base (CA, plats vedettes, heures de pointe) | |
+| Personnalisation de marque (logo, couleurs) | |
+
+## 5. Modèle de données (premier jet)
+
+```
+organizations (le "tenant" = un restaurant)
+  id, name, slug, address, city, phone, logo_url,
+  theme_color, default_language (it),
+  subscription_plan, subscription_status, trial_ends_at
+
+users (staff)
+  id, organization_id → organizations, name, email,
+  password_hash, role (owner/manager/server/kitchen),
+  last_active_at
+
+tables (tables physiques du restaurant)
+  id, organization_id → organizations, label,
+  qr_token (unique), status (free/occupied)
+
+menu_categories
+  id, organization_id → organizations, name_it, name_en, sort_order
+
+menu_items
+  id, category_id → menu_categories, organization_id → organizations,
+  name_it, name_en, description_it, description_en,
+  price, photo_url, is_available, sort_order,
+  allergens (array — 14 allergènes UE, ex: gluten, lactose, fruits à coque...)
+
+orders
+  id, organization_id → organizations, table_id → tables,
+  status (pending/in_progress/ready/served/cancelled),
+  total_amount, created_at, updated_at
+
+order_items
+  id, order_id → orders, menu_item_id → menu_items,
+  quantity, unit_price, notes
+
+staff_calls (bouton "appeler le serveur")
+  id, table_id → tables, status (pending/acknowledged), created_at
+
+subscriptions
+  id, organization_id → organizations, plan, status,
+  payment_provider (stripe), external_subscription_id,
+  current_period_end
+```
+
+Tout est scopé par `organization_id` — c'est la clé de l'isolation multi-tenant.
+
+> **Implémenté en Phase 0 / étape 1 avec deux écarts par rapport à ce premier jet — voir §12.2** : `order_items` et `staff_calls` portent aussi un `organization_id` direct (pas seulement via leur FK parent), et une table `invitations` (absente d'ici) a été ajoutée pour le flux d'invitation du staff.
+
+## 6. Stack technique
+
+- **Frontend** (menu public + dashboard) : Next.js + Tailwind, mobile-first pour le menu public
+- **Temps réel** : Socket.io ou Supabase Realtime pour le flux commande → cuisine
+- **Backend** : Node/TS (API routes Next.js ou NestJS séparé)
+- **Base de données** : PostgreSQL (Supabase ou Neon pour démarrer vite)
+- **Auth staff** : Supabase Auth / Clerk — les clients qui commandent n'ont pas de compte
+- **Stockage photos** : S3-compatible (Supabase Storage / Cloudflare R2)
+- **Paiement/abonnement** : Stripe (pleinement supporté en Italie, contrairement à la Tunisie — pas de contournement nécessaire)
+- **Notifications** : Web Push (statut commande, appel serveur)
+- **Hébergement** : Vercel (front + edge) + Postgres managé, idéalement région UE (Frankfurt/Paris) pour la latence et la conformité RGPD
+
+> **Précisions apportées en Phase 0 / étape 1 — voir §12.1** : API routes Next.js retenues (pas de NestJS séparé) ; auth staff maison (JWT + bcrypt) en attendant de rebrancher Supabase Auth/Clerk ; PostgreSQL avec Row-Level Security comme mécanisme d'isolation multi-tenant, quel que soit l'hébergeur choisi ensuite (Neon/Supabase, tous deux compatibles RLS).
+
+## 7. Contraintes non-fonctionnelles
+
+- **Latence** : la commande doit apparaître côté cuisine en moins de 2-3 secondes après validation client
+- **Isolation multi-tenant** : aucune fuite de données entre restaurants
+- **RGPD** : régime UE complet (plus strict que le cadre tunisien envisagé initialement) — base légale claire pour chaque donnée collectée, droit à l'effacement, hébergement UE recommandé
+- **Allergènes** : conformité Règlement UE n°1169/2011 (14 allergènes à signaler clairement)
+- **Multilingue dès le MVP** : italien + anglais au minimum
+- **Résilience réseau** : le wifi resto n'est pas toujours fiable — comportement dégradé propre plutôt qu'un plantage silencieux
+
+## 8. Pricing
+
+**Modèle retenu : annuel prépayé, ~400 €/an.**
+
+Raison : avec une acquisition payante, le coût d'acquisition client (CAC) est estimé entre 80 et 300 €. Un abonnement mensuel à 40 € oblige à financer 2 à 6 mois de trésorerie avant de rembourser l'acquisition de chaque client. L'annuel prépayé rembourse le CAC immédiatement.
+
+**Arithmétique à valider par le test** (ordres de grandeur B2B, pas des prévisions) :
+
+| Variable | Estimation |
+|---|---|
+| Durée de vie moyenne client | 10-15 mois (les petits restos churnent beaucoup) |
+| Valeur client (LTV) brute | 400-600 € |
+| Coût par lead (Meta, B2B resto Italie) | 5-30 € |
+| Taux lead → client payant | 5-15 % |
+| **CAC estimé** | **80-300 €** |
+| Retour sur investissement | 4-8 mois en mensuel / immédiat en annuel |
+
+Marge d'erreur faible : ces chiffres doivent être remplacés par les chiffres réels du test média (Phase C) avant tout engagement budgétaire sérieux.
+
+Essai gratuit à définir.
+
+## 9. Roadmap
+
+⚠️ **Correction de séquençage** : une version antérieure plaçait les pilotes en phase 1. Impossible — on ne peut pas installer chez des restaurateurs un produit qui n'existe pas. **Le build vient en premier.**
+
+### Phase 0 — Build du MVP ← ON EST ICI
+QR + menu multilingue + allergènes + commande + dashboard temps réel + staff + Stripe.
+Le nom n'est pas bloquant : coder avec un placeholder, trancher le nom en parallèle (il devient nécessaire en Phase B).
+
+**Étape 1 — fondations + multi-tenant : FAITE.** Voir §12 pour le détail des décisions et §13 pour ce qui reste fragile. Reste à faire dans la Phase 0 : menu (catégories/plats/allergènes/multilingue), QR + commande client, dashboard temps réel cuisine/salle, Stripe.
+
+### Phase A — Pilotes (3-4 semaines)
+5-8 restos du réseau, **gratuits 3 mois**. Ce n'est pas de la générosité : c'est l'achat d'actifs publicitaires. À exiger explicitement dès le départ :
+- vidéos du produit en service réel (scan client → commande en cuisine)
+- 2-3 témoignages nommés, avec nom et logo du resto
+- chiffres concrets : temps de service, commandes/soir, erreurs évitées
+- **autorisation écrite** d'utiliser nom, logo et images en publicité
+
+### Phase B — Actifs, avant la première dépense pub
+- Landing page en italien : promesse claire, prix visible, et **QR de démo scannable directement depuis la page** (essayer en 5 secondes bat n'importe quel argumentaire)
+- 3-5 créas vidéo tirées des pilotes, format vertical
+- Le nom + domaine doivent être tranchés ici
+
+### Phase C — Test média (budget 500-1000 € sur 3-4 semaines)
+**Commencer par Google Search, pas Meta.** Capter une demande existante ("menu digitale ristorante", "qr code menu ristorante") coûte bien moins cher que la créer. Volume plus faible, conversion nettement meilleure. Meta ensuite pour le volume : ciblage géographique régional, propriétaires d'entreprises / HoReCa, puis audiences similaires sur les premiers clients payants.
+
+Objectif de ce budget : **acheter une réponse à "combien me coûte un client"** — pas acquérir des clients.
+
+Métriques : coût par lead qualifié, taux essai → payant, délai de rentabilisation. Pas les clics, pas les impressions.
+
+**Seuil d'abandon à fixer AVANT de dépenser**, ex. : si après 1000 € le CAC dépasse 300 €, on revoit l'offre — pas le ciblage.
+
+### Phase D — Scale ou pivot selon les chiffres réels du test
+
+## 10. Questions ouvertes
+
+**Résolues :**
+- ~~Angle~~ → distribution / acquisition payante adossée à la preuve sociale du réseau
+- ~~Pricing~~ → annuel prépayé ~400 €/an
+- ~~Séquençage~~ → build d'abord, pilotes ensuite
+
+**Ouvertes, non bloquantes pour le build :**
+- **Le nom** — nécessaire en Phase B, pas en Phase 0. Voir §2 pour la méthode
+- Durée de l'essai gratuit
+- Région d'hébergement précise (UE) pour la conformité RGPD — voir §12.4, non tranchée mais cadrée
+- Structure juridique et fiscale côté vendeur (TVA, facturation) — à voir avec un commercialista avant d'encaisser le premier euro
+- Mentions légales, CGV, politique de confidentialité RGPD — avant le premier paiement
+
+## 11. Outillage de développement
+
+- **Claude Code** (pas l'interface chat) : lit et écrit directement dans le repo, CONTEXT.md vit dans le projet au lieu d'être recollé à chaque session
+- **Modèle par défaut : Claude Opus 5** — recommandé par la doc officielle pour le codage agentique complexe ; 1M de contexte (CONTEXT.md + une bonne partie du codebase tiennent dedans), 128k de sortie
+- **Paramètre `effort`** : déjà sur `high` par défaut sur Opus 5 ; passer à `xhigh` pour l'architecture et le flux temps réel
+- **Sonnet 5** pour le travail de routine (CRUD, formulaires, CSS) — bascule via `/model` en cours de session
+- Prérequis : Opus 5 exige Claude Code v2.1.219+ (`claude update`)
+
+**Note :** le choix du modèle est un levier plus faible qu'il n'y paraît. Ce qui sépare un SaaS professionnel d'un prototype, c'est la gestion des cas limites, les tests, la propreté du multi-tenant et la discipline du CONTEXT.md — pas quelques points de benchmark.
+
+## 12. Phase 0 / étape 1 — décisions d'architecture (fondations + multi-tenant)
+
+Implémenté : projet Next.js 14 (App Router) + TypeScript + Prisma + PostgreSQL, isolation multi-tenant par Row-Level Security, signup restaurateur, invitation de staff par rôle, dashboard minimal par rôle, démarrage local en une commande (`npm run setup`).
+
+### 12.1 Précisions sur la stack (§6) — pas de contradiction, des choix concrets faits
+
+- **API routes Next.js, pas NestJS.** §6 laissait le choix ouvert. Un backend séparé n'apporte rien tant qu'il n'y a qu'une seule application cliente (le dashboard) — c'est de la complexité à justifier plus tard si un vrai besoin de découplage apparaît (ex. un service worker séparé pour le temps réel à fort volume).
+- **Auth maison (JWT en cookie httpOnly + bcrypt), pas Supabase Auth/Clerk pour l'instant.** Le mécanisme de vérité — l'isolation — devait être prouvé au niveau de la base de données indépendamment de qui authentifie l'utilisateur. Écrire l'auth soi-même a permis de contrôler exactement ce qui se passe entre "l'utilisateur est authentifié" et "la policy RLS s'applique" (voir 12.3). Rebrancher Supabase Auth ou Clerk plus tard reste possible : il suffirait de leur faire émettre le même type de session (userId + organizationId + role) et de garder la même couche RLS — c'est le point d'intégration, pas un mur.
+- **PostgreSQL avec Row-Level Security, indépendant de l'hébergeur.** Neon et Supabase supportent tous les deux RLS nativement ; ce choix ne ferme aucune porte sur l'hébergement UE (§12.4).
+
+### 12.2 Écarts par rapport au premier jet du schéma (§5)
+
+1. **`organization_id` dénormalisé sur `order_items` et `staff_calls`.** Le jet initial ne les scope qu'indirectement (via `order_id` / `table_id`). Une policy RLS a besoin d'une colonne sur la ligne elle-même pour filtrer efficacement — passer par une sous-requête vers la table parente à chaque lecture aurait fonctionné mais coûté cher en performance sur les tables les plus chaudes (commandes). Dénormaliser le `organization_id` est une pratique reconnue en multi-tenant Postgres avec RLS.
+2. **Table `invitations` ajoutée**, absente du jet initial. Nécessaire pour que "inviter du staff" soit un vrai flux (lien à durée de vie limitée, rôle proposé, statut accepté/en attente) plutôt qu'un compte pré-créé avec un mot de passe à deviner.
+3. **`users.email` est unique globalement**, pas seulement par organisation. Un membre du staff se connecte sans indiquer d'abord son restaurant — l'email doit donc être non ambigu à l'échelle du système. Limite connue : une même personne ne peut pas avoir un compte dans deux restaurants différents avec le même email (voir §13).
+
+Le reste du schéma §5 (`tables`, `menu_categories`, `menu_items`, `orders`, `subscriptions`) est en place dans Prisma et protégé par RLS, mais sans logique métier ni UI — c'est le socle pour les prochaines étapes de la Phase 0, pas une fonctionnalité livrée.
+
+### 12.3 L'isolation multi-tenant est une garantie Postgres, pas une convention de code
+
+C'était la contrainte explicite de cette étape. Mécanisme :
+
+- Le rôle applicatif (`app_user`, celui que Next.js utilise pour se connecter) ne possède aucune table et n'a pas l'attribut `BYPASSRLS`. Un rôle séparé (`app_migrator`) possède le schéma et exécute les migrations — voir `docker/init-roles.sql`.
+- Chaque table scopée par organisation a une policy `USING / WITH CHECK (organization_id = current_setting('app.current_org_id'))`. Sans ce réglage de session, la policy s'évalue à `NULL` (donc "aucune ligne") — la position par défaut est "ne rien voir", pas "tout voir".
+- Toute requête applicative passe par `withTenant(organizationId, ...)` (`src/lib/db.ts`), qui ouvre une transaction et fixe cette variable de session avant d'exécuter quoi que ce soit.
+- Trois flux sont légitimement antérieurs à tout contexte de tenant (inscription, connexion, acceptation d'invitation) et ne peuvent pas passer par une transaction scopée — chacun a sa propre fonction Postgres `SECURITY DEFINER`, étroite et à usage unique, plutôt qu'un contournement large de RLS pour tout le rôle applicatif.
+- **Preuve automatisée** : `tests/isolation.test.ts` crée deux organisations et vérifie, au niveau de la base (pas via l'API), que ni une lecture ni une écriture ne peuvent franchir la frontière — y compris dans le cas d'un bug applicatif simulé (une requête qui "oublie" de filtrer par organisation).
+
+### 12.4 Hébergement UE (RGPD)
+
+Non tranché à ce stade (cohérent avec §10, question ouverte non bloquante), mais cadré : le choix se fera entre Neon et Supabase, tous deux avec des régions Francfort, et tous deux compatibles avec le modèle RLS mis en place ici — donc pas de retour en arrière architectural à prévoir quel que soit le choix final.
+
+## 13. Ce qui reste fragile ou à surveiller (issu de la revue de l'étape 1)
+
+- **Pas d'envoi d'email réel.** L'invitation de staff génère un lien qu'il faut transmettre à la main (affiché dans le dashboard, loggé côté serveur). Premier vrai manque à combler dès que des restaurateurs pilotes utilisent le produit.
+- **Email globalement unique pour les comptes staff** (voir §12.2.3) : une personne travaillant dans deux restaurants ne peut pas avoir le même email des deux côtés. Non bloquant pour le MVP, mais à concevoir explicitement si le besoin apparaît (compte multi-organisation) plutôt que de le découvrir en production.
+- **`DIRECT_DATABASE_URL` (rôle `app_migrator`) ne doit jamais être utilisé par le code applicatif.** Prisma Client ne s'en sert qu'au moment des migrations, jamais à l'exécution — mais c'est une convention à faire respecter en revue de code, pas quelque chose que la base empêche mécaniquement si quelqu'un l'utilisait par erreur dans une future route API.
+- **Les quatre fonctions `SECURITY DEFINER`** (`create_organization_and_owner`, `auth_lookup_user`, `accept_invitation`, `invitation_lookup_by_token`) sont la seule surface qui contourne RLS. Elles sont volontairement étroites, mais toute nouvelle fonction de ce type doit être traitée avec la même rigueur : elle est par construction en dehors de la garantie décrite en §12.3.
+- **Pas de vérification d'email ni de limitation de débit (rate limiting)** sur signup/login/invitation — acceptable pour une étape de fondations testée en local, à traiter avant toute exposition publique.
+- **Le schéma §5 restant (tables, menu, commandes, abonnements) est présent en base mais jamais exercé par du code applicatif réel** : la prochaine étape qui l'utilisera est aussi la première occasion de vérifier que les policies RLS posées ici tiennent sous une charge de lecture/écriture réaliste (ex. flux commande → cuisine).
+- **RGPD** : le schéma des `organizations`/`users` est prêt à recevoir une base légale de traitement documentée et un droit à l'effacement, mais ni l'un ni l'autre n'est implémenté (pas de mentions légales, pas d'endpoint de suppression de compte) — attendu pour avant le premier paiement (§10).
