@@ -1,0 +1,280 @@
+// Data model for Phase 0 / step 1 (foundations + multi-tenant isolation).
+//
+// Every tenant-owned table carries `organizationId` directly -- including
+// order_items and staff_calls, which the CONTEXT.md §5 draft only reached
+// indirectly through a parent FK. That's a deliberate deviation, documented
+// in CONTEXT.md: Postgres RLS policies need a column on the row itself to
+// filter on, and a direct column is far cheaper than a per-row subquery
+// through the parent on every read.
+//
+// Tables beyond `organizations` / `users` / `invitations` are schema-only
+// scaffolding for this step: the shape is here (and RLS-protected) so later
+// phases don't need a migration that reshapes tenant boundaries, but no
+// business logic or UI reads/writes them yet.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Prisma Client (app runtime) connects through this URL: the restricted
+  // `app_user` role, fully subject to Row-Level Security.
+  url       = env("DATABASE_URL")
+  // `prisma migrate` / `prisma db push` connect through this URL instead:
+  // the `app_migrator` role, which owns the schema.
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+enum StaffRole {
+  OWNER
+  MANAGER
+  SERVER
+  KITCHEN
+
+  @@map("staff_role")
+}
+
+enum TableStatus {
+  FREE
+  OCCUPIED
+
+  @@map("table_status")
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  READY
+  SERVED
+  CANCELLED
+
+  @@map("order_status")
+}
+
+enum StaffCallStatus {
+  PENDING
+  ACKNOWLEDGED
+
+  @@map("staff_call_status")
+}
+
+/// The 14 EU-regulated allergens (Regulation (EU) No 1169/2011, Annex II).
+enum Allergen {
+  GLUTEN
+  CRUSTACEANS
+  EGGS
+  FISH
+  PEANUTS
+  SOYBEANS
+  MILK
+  NUTS
+  CELERY
+  MUSTARD
+  SESAME
+  SULPHITES
+  LUPIN
+  MOLLUSCS
+
+  @@map("allergen")
+}
+
+/// The tenant. Every other table (directly or via FK) is scoped to one row here.
+model Organization {
+  id                 String    @id @default(uuid()) @db.Uuid
+  name               String
+  slug               String    @unique
+  address            String?
+  city               String?
+  phone              String?
+  logoUrl            String?   @map("logo_url")
+  themeColor         String?   @map("theme_color")
+  defaultLanguage    String    @default("it") @map("default_language")
+  subscriptionPlan   String    @default("trial") @map("subscription_plan")
+  subscriptionStatus String    @default("trialing") @map("subscription_status")
+  trialEndsAt        DateTime? @map("trial_ends_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  users          User[]
+  invitations    Invitation[]
+  tables         RestaurantTable[]
+  menuCategories MenuCategory[]
+  menuItems      MenuItem[]
+  orders         Order[]
+  orderItems     OrderItem[]
+  staffCalls     StaffCall[]
+  subscriptions  Subscription[]
+
+  @@map("organizations")
+}
+
+/// Staff account. `email` is globally unique on purpose: a person logs in
+/// without first picking an organization, so lookup-by-email at login time
+/// has to be unambiguous across the whole system, not just within one tenant.
+model User {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  email          String       @unique
+  passwordHash   String       @map("password_hash")
+  role           StaffRole    @default(SERVER)
+  isActive       Boolean      @default(true) @map("is_active")
+  lastActiveAt   DateTime?    @map("last_active_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  sentInvitations Invitation[] @relation("InvitedBy")
+
+  @@index([organizationId])
+  @@map("users")
+}
+
+/// Pending staff invitation. Kept separate from `users` so an unaccepted
+/// invite never shows up as a half-real staff account; `accept_invitation()`
+/// (see RLS migration) turns one of these into a `users` row atomically.
+model Invitation {
+  id              String       @id @default(uuid()) @db.Uuid
+  organizationId  String       @map("organization_id") @db.Uuid
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email           String
+  role            StaffRole
+  token           String       @unique
+  invitedByUserId String       @map("invited_by_user_id") @db.Uuid
+  invitedBy       User         @relation("InvitedBy", fields: [invitedByUserId], references: [id])
+  expiresAt       DateTime     @map("expires_at")
+  acceptedAt      DateTime?    @map("accepted_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  @@unique([organizationId, email])
+  @@index([organizationId])
+  @@map("invitations")
+}
+
+/// Physical table, identified to guests by its QR code. Scaffolded now,
+/// wired up to real QR generation + public menu routes in a later phase.
+model RestaurantTable {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  label          String
+  qrToken        String       @unique @map("qr_token")
+  status         TableStatus  @default(FREE)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  orders     Order[]
+  staffCalls StaffCall[]
+
+  @@unique([organizationId, label])
+  @@index([organizationId])
+  @@map("tables")
+}
+
+model MenuCategory {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  nameIt         String       @map("name_it")
+  nameEn         String?      @map("name_en")
+  sortOrder      Int          @default(0) @map("sort_order")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  items MenuItem[]
+
+  @@index([organizationId])
+  @@map("menu_categories")
+}
+
+model MenuItem {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  categoryId     String       @map("category_id") @db.Uuid
+  category       MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  nameIt         String       @map("name_it")
+  nameEn         String?      @map("name_en")
+  descriptionIt  String?      @map("description_it")
+  descriptionEn  String?      @map("description_en")
+  price          Decimal      @db.Decimal(10, 2)
+  photoUrl       String?      @map("photo_url")
+  isAvailable    Boolean      @default(true) @map("is_available")
+  sortOrder      Int          @default(0) @map("sort_order")
+  allergens      Allergen[]   @default([])
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  orderItems OrderItem[]
+
+  @@index([organizationId])
+  @@index([categoryId])
+  @@map("menu_items")
+}
+
+model Order {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tableId        String          @map("table_id") @db.Uuid
+  table          RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Restrict)
+  status         OrderStatus     @default(PENDING)
+  totalAmount    Decimal         @default(0) @map("total_amount") @db.Decimal(10, 2)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  items OrderItem[]
+
+  @@index([organizationId])
+  @@index([tableId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  orderId        String       @map("order_id") @db.Uuid
+  order          Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId     String       @map("menu_item_id") @db.Uuid
+  menuItem       MenuItem     @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  quantity       Int
+  unitPrice      Decimal      @map("unit_price") @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model StaffCall {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tableId        String          @map("table_id") @db.Uuid
+  table          RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  status         StaffCallStatus @default(PENDING)
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([tableId])
+  @@map("staff_calls")
+}
+
+model Subscription {
+  id                     String       @id @default(uuid()) @db.Uuid
+  organizationId         String       @map("organization_id") @db.Uuid
+  organization           Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                   String
+  status                 String
+  paymentProvider        String       @default("stripe") @map("payment_provider")
+  externalSubscriptionId String?      @map("external_subscription_id")
+  currentPeriodEnd       DateTime?    @map("current_period_end")
+  createdAt              DateTime     @default(now()) @map("created_at")
+  updatedAt              DateTime     @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@map("subscriptions")
+}
