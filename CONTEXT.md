@@ -189,7 +189,11 @@ Essai gratuit à définir.
 QR + menu multilingue + allergènes + commande + dashboard temps réel + staff + Stripe.
 Le nom n'est pas bloquant : coder avec un placeholder, trancher le nom en parallèle (il devient nécessaire en Phase B).
 
-**Étape 1 — fondations + multi-tenant : FAITE.** Voir §12 pour le détail des décisions et §13 pour ce qui reste fragile. Reste à faire dans la Phase 0 : menu (catégories/plats/allergènes/multilingue), QR + commande client, dashboard temps réel cuisine/salle, Stripe.
+**Étape 1 — fondations + multi-tenant : FAITE.** Voir §12 pour le détail des décisions et §13 pour ce qui reste fragile.
+
+**Étape 2 — gestion du menu : FAITE.** CRUD catégories/plats (owner/manager), 14 allergènes UE, multilingue IT/EN, disponibilité, dans `/dashboard/menu`. Lecture seule pour les autres rôles (server/kitchen en ont besoin au quotidien). Pas encore de upload de photo (URL collée à la main — voir §13), pas de drag-and-drop pour le tri.
+
+Reste à faire dans la Phase 0 : QR + commande client (affichage public du menu, panier, commande sans compte), dashboard temps réel cuisine/salle, Stripe.
 
 ### Phase A — Pilotes (3-4 semaines)
 5-8 restos du réseau, **gratuits 3 mois**. Ce n'est pas de la générosité : c'est l'achat d'actifs publicitaires. À exiger explicitement dès le départ :
@@ -277,5 +281,6 @@ Non tranché à ce stade (cohérent avec §10, question ouverte non bloquante), 
 - **`DIRECT_DATABASE_URL` (rôle `app_migrator`) ne doit jamais être utilisé par le code applicatif.** Prisma Client ne s'en sert qu'au moment des migrations, jamais à l'exécution — mais c'est une convention à faire respecter en revue de code, pas quelque chose que la base empêche mécaniquement si quelqu'un l'utilisait par erreur dans une future route API.
 - **Les quatre fonctions `SECURITY DEFINER`** (`create_organization_and_owner`, `auth_lookup_user`, `accept_invitation`, `invitation_lookup_by_token`) sont la seule surface qui contourne RLS. Elles sont volontairement étroites, mais toute nouvelle fonction de ce type doit être traitée avec la même rigueur : elle est par construction en dehors de la garantie décrite en §12.3.
 - **Pas de vérification d'email ni de limitation de débit (rate limiting)** sur signup/login/invitation — acceptable pour une étape de fondations testée en local, à traiter avant toute exposition publique.
-- **Le schéma §5 restant (tables, menu, commandes, abonnements) est présent en base mais jamais exercé par du code applicatif réel** : la prochaine étape qui l'utilisera est aussi la première occasion de vérifier que les policies RLS posées ici tiennent sous une charge de lecture/écriture réaliste (ex. flux commande → cuisine).
+- **Le schéma §5 restant (tables, commandes, abonnements) est présent en base mais jamais exercé par du code applicatif réel** : le menu (catégories/plats) l'est désormais (étape 2) et la garantie RLS a tenu sous ce premier usage réel — la prochaine étape (commande client, flux orders/order_items à fort volume) reste la première occasion de la vérifier sous une charge de lecture/écriture réaliste.
+- **Pas d'upload de photo pour les plats.** Le champ `photoUrl` attend une URL déjà hébergée ailleurs — pas de stockage S3-compatible branché (Supabase Storage / R2, prévu §6). À faire avant que des restaurateurs pilotes alimentent vraiment leur menu.
 - **RGPD** : le schéma des `organizations`/`users` est prêt à recevoir une base légale de traitement documentée et un droit à l'effacement, mais ni l'un ni l'autre n'est implémenté (pas de mentions légales, pas d'endpoint de suppression de compte) — attendu pour avant le premier paiement (§10).

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { withTenant } from "@/lib/db";
-import { canManageStaff } from "@/lib/rbac";
+import { canManageStaff, MENU_MANAGEMENT_ROLES } from "@/lib/rbac";
 import LogoutButton from "./logout-button";
 import NavLink from "./nav-link";
 
@@ -29,6 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex">
         <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-4">
           {canManageStaff(session.role) && <NavLink href="/dashboard/staff">Staff</NavLink>}
+          {MENU_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/menu">Menu</NavLink>}
           {session.role === "SERVER" && <NavLink href="/dashboard/floor">Salle</NavLink>}
           {session.role === "KITCHEN" && <NavLink href="/dashboard/kitchen">Cuisine</NavLink>}
         </nav>

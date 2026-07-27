@@ -2,7 +2,7 @@
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0, étape 1 — fondations techniques + isolation multi-tenant. Pas encore de fonctionnalités métier (menu, commande, temps réel) : l'objectif de cette étape est un socle où l'isolation entre restaurants est une garantie de base de données, pas une convention de code.
+**Où on en est** : Phase 0. Étape 1 (fondations + isolation multi-tenant) et étape 2 (gestion du menu) faites. Reste : QR + commande client, dashboard temps réel cuisine/salle, Stripe.
 
 ## Stack
 
@@ -49,3 +49,7 @@ npm run build
 Chaque table métier porte un `organization_id`, et une policy Postgres (`Row-Level Security`) filtre chaque lecture/écriture sur `organization_id = <org de la session>`. Le rôle applicatif (`app_user`) qui exécute les requêtes n'a **aucun moyen de contourner cette policy** : il ne possède pas les tables et n'a pas l'attribut `BYPASSRLS`. Voir `prisma/migrations/*_row_level_security/migration.sql` pour le détail, et `tests/isolation.test.ts` pour la preuve automatisée (deux organisations, lectures et écritures croisées, toutes rejetées).
 
 `docker/init-roles.sql` documente la séparation des rôles PostgreSQL (`app_migrator` vs `app_user`) qui rend ça possible.
+
+## Menu
+
+`/dashboard/menu` (owner/manager) : catégories, plats, prix, disponibilité, étiquetage des 14 allergènes UE (Règlement (UE) n°1169/2011), noms/descriptions IT/EN. Lecture seule pour server/kitchen. Pas encore d'upload de photo — le champ attend une URL déjà hébergée ailleurs.
