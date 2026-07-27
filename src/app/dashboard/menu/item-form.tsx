@@ -57,38 +57,38 @@ export default function ItemForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Nom (IT)</span>
+          <span className="font-medium text-slate-300">Nom (IT)</span>
           <input
             required
             value={values.nameIt}
             onChange={(e) => setValues((v) => ({ ...v, nameIt: e.target.value }))}
-            className="input"
+            className="input-dash"
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Nom (EN)</span>
+          <span className="font-medium text-slate-300">Nom (EN)</span>
           <input
             value={values.nameEn}
             onChange={(e) => setValues((v) => ({ ...v, nameEn: e.target.value }))}
-            className="input"
+            className="input-dash"
           />
         </label>
       </div>
       <label className="flex flex-col gap-1.5 text-sm">
-        <span className="font-medium text-slate-700">Description (IT)</span>
+        <span className="font-medium text-slate-300">Description (IT)</span>
         <textarea
           value={values.descriptionIt}
           onChange={(e) => setValues((v) => ({ ...v, descriptionIt: e.target.value }))}
-          className="input"
+          className="input-dash"
           rows={2}
         />
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Prix (€)</span>
+          <span className="font-medium text-slate-300">Prix (€)</span>
           <input
             required
             type="number"
@@ -96,42 +96,42 @@ export default function ItemForm({
             min="0"
             value={values.price}
             onChange={(e) => setValues((v) => ({ ...v, price: e.target.value }))}
-            className="input"
+            className="input-dash"
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Photo (URL, optionnel)</span>
+          <span className="font-medium text-slate-300">Photo (URL, optionnel)</span>
           <input
             value={values.photoUrl}
             onChange={(e) => setValues((v) => ({ ...v, photoUrl: e.target.value }))}
-            className="input"
+            className="input-dash"
             placeholder="https://…"
           />
         </label>
       </div>
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-slate-700">Allergènes (Règlement UE n°1169/2011)</legend>
+        <legend className="mb-2 text-sm font-medium text-slate-300">Allergènes (Règlement UE n°1169/2011)</legend>
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {ALL_ALLERGENS.map((a) => (
-            <label key={a} className="flex items-center gap-2 text-xs text-slate-600">
+            <label key={a} className="flex items-center gap-2 text-xs text-slate-400">
               <input
                 type="checkbox"
                 checked={values.allergens.includes(a)}
                 onChange={() => toggleAllergen(a)}
-                className="accent-sky-500"
+                className="accent-accent"
               />
               {ALLERGEN_LABELS[a]}
             </label>
           ))}
         </div>
       </fieldset>
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {error && <p className="text-sm text-rose-400">{error}</p>}
       <div className="flex items-center gap-4">
         <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "…" : submitLabel}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="btn-link">
+          <button type="button" onClick={onCancel} className="btn-link-dash">
             Annuler
           </button>
         )}

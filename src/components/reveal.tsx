@@ -1,53 +1,53 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
+import { revealVariants, staggerContainerVariants } from "@/lib/design-tokens";
 
-/**
- * Fades + slides children in once they scroll into view. Pure
- * IntersectionObserver, no animation library -- disconnects after the
- * first reveal so it never re-triggers on scroll-back.
- */
+/** Fades + slides a section in once it scrolls into view (once, not on scroll-back). */
 export default function Reveal({
   children,
   className = "",
-  delayMs = 0,
+  as = "div",
 }: {
   children: ReactNode;
   className?: string;
-  delayMs?: number;
+  as?: "div" | "section";
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
+  const MotionTag = as === "section" ? motion.section : motion.div;
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-      } ${className}`}
-      style={delayMs ? { transitionDelay: `${delayMs}ms` } : undefined}
+    <MotionTag
+      className={className}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-80px" }}
+      variants={revealVariants}
     >
       {children}
-    </div>
+    </MotionTag>
+  );
+}
+
+/** Wraps a group of children so they reveal with a stagger, one after another. */
+export function StaggerGroup({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-80px" }}
+      variants={staggerContainerVariants}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** A single staggered child -- use inside <StaggerGroup>, not on its own. */
+export function StaggerItem({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <motion.div className={className} variants={revealVariants}>
+      {children}
+    </motion.div>
   );
 }

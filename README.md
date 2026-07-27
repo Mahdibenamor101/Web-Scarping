@@ -2,14 +2,14 @@
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe), plus limitation de débit et un premier passage nom + identité visuelle. Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant. Le nom "mbQr" n'a pas non plus été vérifié juridiquement (marque, domaine) — voir `CONTEXT.md` §2.
+**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe), plus limitation de débit et deux passages de design (nom + identité visuelle, puis système de tokens complet avec dashboard en dark mode). Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant. Le nom "mbQr" n'a pas non plus été vérifié juridiquement (marque, domaine) — voir `CONTEXT.md` §2.
 
 ## Stack
 
 - Next.js 14 (App Router) + TypeScript
 - PostgreSQL avec Row-Level Security (isolation multi-tenant appliquée par la base, pas par l'application)
 - Prisma (schéma + migrations)
-- Tailwind CSS
+- Tailwind CSS + Framer Motion
 - Auth maison (JWT en cookie httpOnly, bcrypt) — voir "Pourquoi pas Supabase Auth/Clerk pour l'instant" dans `CONTEXT.md`
 
 ## Démarrage local
@@ -78,8 +78,12 @@ Compteur en mémoire par clé (`src/lib/rate-limit.ts`), même limite de concept
 
 ## Identité visuelle
 
-Accent `sky-500` (Tailwind, `#0ea5e9`), fond navy foncé pour les sections héro/sidebar, boutons en pilule, cartes très arrondies — palette et conventions de forme extraites du CSS réellement livré par un concurrent (QonnectQR) à la demande du fondateur, appliquées à un contenu et une structure originaux. Système de composants partagé dans `src/app/globals.css` (`@layer components` : `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.badge`) plutôt que des utilitaires Tailwind répétés à chaque page. Voir `CONTEXT.md` §12.9.
+Système de design piloté par `src/lib/design-tokens.ts` (source de vérité unique, importé dans `tailwind.config.ts`) : accent bleu `#2196F3` → `#0D8BF0` en dégradé, fond `#FAFBFC`, Inter, boutons pilule, cartes `18px`, ombres douces teintées d'accent. Système de composants partagé dans `src/app/globals.css` (`@layer components` : `.btn-primary`, `.card`, `.input`, `.badge-success`/`.badge-warning`/`.badge-live`, `.eyebrow`, `.bg-dot-grid`…) plutôt que des utilitaires Tailwind répétés à chaque page. Voir `CONTEXT.md` §12.9 et §12.11 pour l'historique des deux passages de design.
+
+**Deux thèmes distincts, pas un interrupteur clair/sombre** : le site public (landing, connexion, menu client) reste clair, seul `/dashboard/*` passe en dark mode (`#0F1420`, cartes `#1A2035`) — variantes de classes séparées (`.card` vs `.card-dash`, etc.), pas de préfixe `dark:` généralisé.
+
+**Animations** : [Framer Motion](https://www.framer.com/motion/) pour les révélations au scroll (`src/components/reveal.tsx`, fondu + translation, stagger 0,08s entre enfants) et les compteurs animés (`src/components/stat-counter.tsx`) ; animations continues (flottement, point qui pulse) en CSS pur (`tailwind.config.ts`) plutôt qu'en JS.
 
 **Logo** (`src/components/logo.tsx`) : mark géométrique en SVG (motifs "finder pattern" de QR code sur trois coins d'un badge dégradé, un point sur le quatrième), produit directement en code plutôt que dans Figma — **aucun connecteur Figma n'est disponible dans cet environnement**. `src/app/icon.svg` réutilise le même dessin comme favicon. Absent volontairement de `/menu/[qrToken]` : cette page montre le nom du restaurant, pas celui de mbQr.
 
-**Landing page** : section "aperçu du produit" avec de vraies captures d'écran de l'app (`public/screenshots/`, à régénérer après tout changement visuel notable du dashboard ou du menu public — voir `CONTEXT.md` §13), section tarifs, animations légères au scroll (`src/components/reveal.tsx`, IntersectionObserver, sans librairie externe). Volontairement sans témoignages clients : aucun pilote réel n'a encore eu lieu, voir `CONTEXT.md` §12.10.
+**Landing page** : héro avec mockup téléphone flottant (illustration stylisée, pas une capture — voir `src/components/hero-mockup.tsx`), puis section "aperçu du produit" avec de vraies captures d'écran de l'app (`public/screenshots/`, à régénérer après tout changement visuel notable du dashboard ou du menu public — voir `CONTEXT.md` §13), section tarifs avec toggle 3/6/12 mois (seul 12 mois est réellement achetable — le mensuel est explicitement hors modèle, voir `CONTEXT.md` §8/§12.11), compteurs animés sur des faits produit réels. Volontairement sans témoignages clients affichés (le composant existe, `src/components/testimonial-card.tsx`, mais n'est pas branché) : aucun pilote réel n'a encore eu lieu, voir `CONTEXT.md` §12.10/§12.11.

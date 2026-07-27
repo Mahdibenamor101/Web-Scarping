@@ -35,22 +35,26 @@ export default async function BillingPage({
 
   return (
     <div className="flex max-w-md flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Abonnement</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight text-white">Abonnement</h1>
 
       {searchParams.checkout === "success" && (
-        <p className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">
+        <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-300">
           Paiement en cours de confirmation — le statut ci-dessous se mettra à jour automatiquement dès que Stripe
           nous aura notifiés.
         </p>
       )}
       {searchParams.checkout === "cancelled" && (
-        <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">Paiement annulé, rien n&apos;a été débité.</p>
+        <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-slate-400">
+          Paiement annulé, rien n&apos;a été débité.
+        </p>
       )}
 
-      <div className="card animate-bump-in text-sm">
-        <p className="text-slate-600">
+      <div className="card-dash animate-bump-in text-sm">
+        <p className="text-slate-400">
           Statut :{" "}
-          <span className="badge">{STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}</span>
+          <span className="badge-pill bg-accent/10 text-accent">
+            {STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}
+          </span>
         </p>
         {organization.subscriptionStatus === "trialing" && trialDaysLeft !== null && (
           <p className="mt-2 text-slate-500">
@@ -60,7 +64,7 @@ export default async function BillingPage({
       </div>
 
       {!stripeConfigured && (
-        <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">
+        <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-300">
           Stripe n&apos;est pas configuré sur cet environnement (variables <code>STRIPE_SECRET_KEY</code> /{" "}
           <code>STRIPE_PRICE_ID</code> absentes) — normal en local sans compte Stripe. Voir <code>.env.example</code>.
         </p>
@@ -68,7 +72,7 @@ export default async function BillingPage({
 
       {stripeConfigured && (isSubscribed ? <ManageBillingButton /> : <SubscribeButton />)}
 
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-500">
         Abonnement annuel prépayé (~400 €/an). Gérable à tout moment depuis Stripe : moyen de paiement, factures,
         résiliation.
       </p>

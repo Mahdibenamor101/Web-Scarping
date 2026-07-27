@@ -3,48 +3,115 @@
 @tailwind utilities;
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  @apply bg-canvas text-ink;
 }
 
 /*
- * Shared component classes so every page draws from the same small
- * vocabulary instead of each repeating its own inline Tailwind string.
- * Visual language (sky-500 accent, pill buttons, rounded-2xl cards, soft
- * tinted shadows) matches qonnectqr.com's actual shipped CSS, fetched and
- * inspected while designing this -- not a guess at "similar SaaS style."
+ * Shared component classes -- every page (marketing or dashboard) draws
+ * from this vocabulary instead of repeating Tailwind strings. Values come
+ * from src/lib/design-tokens.ts (imported into tailwind.config.ts), so a
+ * token change here is a token change everywhere.
+ *
+ * Two card variants: `.card` is the light marketing/auth surface,
+ * `.card-dash` is the dark dashboard surface (#1A2035 on #0F1420) --
+ * deliberately different rooms, not a light/dark toggle of the same one.
  */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-sky-500 px-5 py-2.5
-      text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition
-      hover:bg-sky-600 disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent-gradient px-5 py-2.5
+      text-sm font-semibold text-white shadow-soft transition duration-200 ease-out
+      hover:scale-[1.03] hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100;
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-full border border-slate-300
-      bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition
-      hover:border-slate-400 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50;
+      bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition duration-200 ease-out
+      hover:scale-[1.03] hover:border-slate-400 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100;
   }
 
   .btn-link {
-    @apply text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-slate-900 hover:underline;
+    @apply text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-ink hover:underline;
   }
 
   .btn-link-danger {
     @apply text-sm font-medium text-rose-600 underline-offset-2 transition hover:text-rose-700 hover:underline;
   }
 
+  /* Dark-dashboard counterparts of .btn-link / .btn-link-danger. */
+  .btn-link-dash {
+    @apply text-sm font-medium text-slate-400 underline-offset-2 transition hover:text-white hover:underline;
+  }
+
+  .btn-link-dash-danger {
+    @apply text-sm font-medium text-rose-400 underline-offset-2 transition hover:text-rose-300 hover:underline;
+  }
+
   .card {
-    @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/60;
+    @apply rounded-card border border-slate-200 bg-white p-4 shadow-soft transition duration-200 ease-out
+      hover:-translate-y-1 hover:shadow-softLg;
+  }
+
+  .card-static {
+    @apply rounded-card border border-slate-200 bg-white p-4 shadow-soft;
+  }
+
+  .card-dash {
+    @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark transition duration-200 ease-out
+      hover:-translate-y-1 hover:shadow-dark;
+  }
+
+  .card-dash-static {
+    @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark;
   }
 
   .input {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-ink
       outline-none transition placeholder:text-slate-400
-      focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15;
+      focus:border-accent focus:ring-4 focus:ring-accent/15;
   }
 
-  .badge {
-    @apply inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700;
+  .input-dash {
+    @apply w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white
+      outline-none transition placeholder:text-slate-500
+      focus:border-accent focus:ring-4 focus:ring-accent/20;
+  }
+
+  .eyebrow {
+    @apply text-[13px] font-semibold uppercase text-accent;
+    letter-spacing: 3px;
+  }
+
+  .badge-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge-pill bg-success-bg text-success-text;
+  }
+
+  .badge-warning {
+    @apply badge-pill bg-warning-bg text-warning-text;
+  }
+
+  .badge-live {
+    @apply badge-pill bg-live-bg text-live-text;
+  }
+
+  .badge-dot {
+    @apply h-1.5 w-1.5 rounded-full bg-current;
+  }
+
+  .badge-dot-live {
+    @apply badge-dot animate-pulse-dot;
+  }
+
+  .bg-dot-grid {
+    background-image: radial-gradient(rgba(11, 18, 32, 0.05) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .bg-dot-grid-dark {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 18px 18px;
   }
 }

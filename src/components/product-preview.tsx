@@ -58,13 +58,13 @@ export default function ProductPreview() {
             key={tab.id}
             type="button"
             onClick={() => setActiveId(tab.id)}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition duration-200 hover:scale-[1.03] ${
               tab.id === activeId
-                ? "border-sky-500 bg-sky-500 text-white shadow-md shadow-sky-500/30"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                ? "border-accent bg-accent-gradient text-white shadow-soft"
+                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-ink"
             }`}
           >
-            <span className={tab.id === activeId ? "text-white" : "text-sky-500"}>{tab.icon}</span>
+            <span className={tab.id === activeId ? "text-white" : "text-accent"}>{tab.icon}</span>
             {tab.label}
           </button>
         ))}
@@ -77,9 +77,9 @@ export default function ProductPreview() {
           style={{ maxWidth: active.frame === "phone" ? "22rem" : "56rem" }}
         >
           {active.frame === "phone" ? (
-            <div className="mx-auto w-full max-w-[22rem] rounded-[2.5rem] border-8 border-navy bg-navy p-1.5 shadow-2xl shadow-slate-900/20">
+            <div className="mx-auto w-full max-w-[22rem] rounded-[2.5rem] border-8 border-ink bg-ink p-1.5 shadow-softLg">
               <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-white">
-                <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-navy" />
+                <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-ink" />
                 <Image src={active.src} alt={active.alt} fill sizes="352px" className="object-cover object-top" priority={false} />
               </div>
             </div>

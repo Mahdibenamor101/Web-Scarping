@@ -17,11 +17,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   );
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="flex w-60 shrink-0 flex-col justify-between bg-navy px-4 py-6 text-white">
+    <div className="flex min-h-screen bg-dash-bg">
+      <aside className="flex w-60 shrink-0 flex-col justify-between border-r border-white/5 bg-dash-card px-4 py-6 text-white">
         <div>
           <div className="px-2">
-            <Logo />
+            <Logo wordmarkClassName="text-lg font-bold tracking-tight text-white" />
           </div>
           <nav className="mt-8 flex flex-col gap-1">
             <NavLink href="/dashboard/orders">Commandes</NavLink>
@@ -34,7 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </nav>
         </div>
         <div className="border-t border-white/10 px-2 pt-4">
-          <p className="truncate text-sm font-semibold">{organization?.name ?? "—"}</p>
+          <p className="truncate text-sm font-semibold text-white">{organization?.name ?? "—"}</p>
           <p className="truncate text-xs text-slate-400">
             {session.name} · {ROLE_LABEL[session.role]}
           </p>
@@ -43,7 +43,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
       </aside>
-      <main className="flex-1 bg-slate-50 p-8">{children}</main>
+      <main className="flex-1 p-8">{children}</main>
     </div>
   );
 }

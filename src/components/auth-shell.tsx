@@ -11,13 +11,13 @@ export default function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-50 px-6 py-12">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-dot-grid px-6 py-12">
       <Link href="/">
-        <Logo wordmarkClassName="text-lg font-bold tracking-tight text-navy" />
+        <Logo wordmarkClassName="text-lg font-bold tracking-tight text-ink" />
       </Link>
       <div className="w-full max-w-sm animate-bump-in">
-        <div className="card px-6 py-8 shadow-md shadow-slate-200/80">
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">{title}</h1>
+        <div className="card-static px-6 py-8">
+          <h1 className="text-xl font-extrabold tracking-tight text-ink">{title}</h1>
           {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
           <div className="mt-6">{children}</div>
         </div>

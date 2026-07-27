@@ -103,45 +103,45 @@ export default function MenuPage() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-8">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Menu</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight text-white">Menu</h1>
 
-      <section className="card">
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Nouvelle catégorie</h2>
+      <section className="card-dash">
+        <h2 className="mb-3 text-base font-semibold text-white">Nouvelle catégorie</h2>
         <form onSubmit={addCategory} className="flex max-w-md gap-2">
           <input
             required
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             placeholder="Antipasti, Primi, Dolci…"
-            className="input flex-1"
+            className="input-dash flex-1"
           />
           <button type="submit" className="btn-primary shrink-0">
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
+        {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
       </section>
 
       {categories.length === 0 && (
-        <p className="text-sm text-slate-500">Aucune catégorie pour l&apos;instant — commencez par en créer une.</p>
+        <p className="text-sm text-slate-400">Aucune catégorie pour l&apos;instant — commencez par en créer une.</p>
       )}
 
       {categories.map((category) => {
         const categoryItems = items.filter((i) => i.categoryId === category.id);
         return (
-          <section key={category.id} className="card animate-bump-in">
+          <section key={category.id} className="card-dash animate-bump-in">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-slate-900">
-                {category.nameIt} {category.nameEn && <span className="text-slate-400">({category.nameEn})</span>}
+              <h2 className="text-base font-semibold text-white">
+                {category.nameIt} {category.nameEn && <span className="text-slate-500">({category.nameEn})</span>}
               </h2>
               <div className="flex gap-4">
                 <button
                   onClick={() => setAddingItemFor(addingItemFor === category.id ? null : category.id)}
-                  className="btn-link"
+                  className="btn-link-dash"
                 >
                   + Ajouter un plat
                 </button>
-                <button onClick={() => deleteCategory(category.id)} className="btn-link-danger">
+                <button onClick={() => deleteCategory(category.id)} className="btn-link-dash-danger">
                   Supprimer la catégorie
                 </button>
               </div>
@@ -168,30 +168,28 @@ export default function MenuPage() {
                 ) : (
                   <li
                     key={item.id}
-                    className="flex animate-bump-in items-start justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-sm transition hover:border-slate-200 hover:bg-white hover:shadow-sm"
+                    className="flex animate-bump-in items-start justify-between rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-white/10 hover:bg-white/[0.06]"
                   >
                     <div>
-                      <p className="font-medium text-slate-900">
-                        {item.nameIt} <span className="text-slate-400">—</span> {item.price.toFixed(2)} €{" "}
-                        {!item.isAvailable && (
-                          <span className="badge bg-rose-50 text-rose-600">indisponible</span>
-                        )}
+                      <p className="font-medium text-white">
+                        {item.nameIt} <span className="text-slate-500">—</span> {item.price.toFixed(2)} €{" "}
+                        {!item.isAvailable && <span className="badge-pill bg-rose-500/10 text-rose-300">indisponible</span>}
                       </p>
-                      {item.descriptionIt && <p className="text-slate-500">{item.descriptionIt}</p>}
+                      {item.descriptionIt && <p className="text-slate-400">{item.descriptionIt}</p>}
                       {item.allergens.length > 0 && (
-                        <p className="mt-1 text-xs text-slate-400">
+                        <p className="mt-1 text-xs text-slate-500">
                           Allergènes : {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
                         </p>
                       )}
                     </div>
                     <div className="flex shrink-0 gap-3">
-                      <button onClick={() => toggleAvailable(item)} className="btn-link">
+                      <button onClick={() => toggleAvailable(item)} className="btn-link-dash">
                         {item.isAvailable ? "Marquer indisponible" : "Marquer disponible"}
                       </button>
-                      <button onClick={() => setEditingItem(item.id)} className="btn-link">
+                      <button onClick={() => setEditingItem(item.id)} className="btn-link-dash">
                         Modifier
                       </button>
-                      <button onClick={() => deleteItem(item.id)} className="btn-link-danger">
+                      <button onClick={() => deleteItem(item.id)} className="btn-link-dash-danger">
                         Supprimer
                       </button>
                     </div>
@@ -199,7 +197,7 @@ export default function MenuPage() {
                 ),
               )}
               {categoryItems.length === 0 && addingItemFor !== category.id && (
-                <p className="text-sm text-slate-400">Aucun plat dans cette catégorie.</p>
+                <p className="text-sm text-slate-500">Aucun plat dans cette catégorie.</p>
               )}
             </ul>
 

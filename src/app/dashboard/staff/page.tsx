@@ -71,12 +71,12 @@ export default function StaffPage() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-8">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Équipe</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight text-white">Équipe</h1>
 
-      <section className="card overflow-hidden p-0">
+      <section className="card-dash overflow-hidden p-0">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+            <tr className="border-b border-white/5 bg-white/[0.03] text-left text-xs font-medium uppercase tracking-wide text-slate-400">
               <th className="px-4 py-3">Nom</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Rôle</th>
@@ -86,15 +86,15 @@ export default function StaffPage() {
           </thead>
           <tbody>
             {staff.map((m) => (
-              <tr key={m.id} className="border-b border-slate-100 transition last:border-0 hover:bg-slate-50/80">
-                <td className="px-4 py-3 font-medium text-slate-900">{m.name}</td>
-                <td className="px-4 py-3 text-slate-500">{m.email}</td>
+              <tr key={m.id} className="border-b border-white/5 transition last:border-0 hover:bg-white/[0.03]">
+                <td className="px-4 py-3 font-medium text-white">{m.name}</td>
+                <td className="px-4 py-3 text-slate-400">{m.email}</td>
                 <td className="px-4 py-3">
-                  <span className="badge">{m.role}</span>
+                  <span className="badge-pill bg-accent/10 text-accent">{m.role}</span>
                 </td>
-                <td className="px-4 py-3 text-slate-500">{m.isActive ? "Actif" : "Désactivé"}</td>
+                <td className="px-4 py-3 text-slate-400">{m.isActive ? "Actif" : "Désactivé"}</td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => toggleActive(m)} className="btn-link">
+                  <button onClick={() => toggleActive(m)} className="btn-link-dash">
                     {m.isActive ? "Désactiver" : "Réactiver"}
                   </button>
                 </td>
@@ -105,41 +105,39 @@ export default function StaffPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Invitations en attente</h2>
-        {invitations.length === 0 && <p className="text-sm text-slate-500">Aucune invitation en attente.</p>}
+        <h2 className="mb-3 text-base font-semibold text-white">Invitations en attente</h2>
+        {invitations.length === 0 && <p className="text-sm text-slate-400">Aucune invitation en attente.</p>}
         <ul className="flex flex-col gap-2 text-sm">
           {invitations.map((inv) => (
-            <li key={inv.id} className="card flex justify-between px-4 py-3">
-              <span>
-                {inv.email} — <span className="badge">{inv.role}</span>
+            <li key={inv.id} className="card-dash-static flex justify-between px-4 py-3">
+              <span className="text-slate-300">
+                {inv.email} — <span className="badge-pill bg-accent/10 text-accent">{inv.role}</span>
               </span>
-              <span className="text-slate-400">
-                expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}
-              </span>
+              <span className="text-slate-500">expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}</span>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="card">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">Inviter un membre</h2>
+      <section className="card-dash">
+        <h2 className="mb-4 text-base font-semibold text-white">Inviter un membre</h2>
         <form onSubmit={onInvite} className="flex max-w-md flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">Email</span>
+            <span className="font-medium text-slate-300">Email</span>
             <input
               required
               type="email"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="input"
+              className="input-dash"
             />
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">Rôle</span>
+            <span className="font-medium text-slate-300">Rôle</span>
             <select
               value={inviteRole}
               onChange={(e) => setInviteRole(e.target.value as (typeof ROLES)[number])}
-              className="input"
+              className="input-dash"
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
@@ -148,9 +146,9 @@ export default function StaffPage() {
               ))}
             </select>
           </label>
-          {error && <p className="text-sm text-rose-600">{error}</p>}
+          {error && <p className="text-sm text-rose-400">{error}</p>}
           {lastInviteUrl && (
-            <p className="animate-bump-in break-all rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <p className="animate-bump-in break-all rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
               Lien d&apos;invitation (aucun email n&apos;est envoyé pour l&apos;instant — transmettez-le
               manuellement) : {lastInviteUrl}
             </p>
