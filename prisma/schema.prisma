@@ -93,6 +93,11 @@ model Organization {
   subscriptionPlan   String    @default("trial") @map("subscription_plan")
   subscriptionStatus String    @default("trialing") @map("subscription_status")
   trialEndsAt        DateTime? @map("trial_ends_at")
+  /// Stripe Customer id, created lazily on first checkout attempt. Not in
+  /// the original §5 draft -- needed so a returning owner's "Gérer mon
+  /// abonnement" click can open a Stripe Billing Portal session without
+  /// re-collecting payment details or re-creating the customer.
+  stripeCustomerId   String?   @unique @map("stripe_customer_id")
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
@@ -288,7 +293,10 @@ model Subscription {
   plan                   String
   status                 String
   paymentProvider        String       @default("stripe") @map("payment_provider")
-  externalSubscriptionId String?      @map("external_subscription_id")
+  /// Stripe subscription id (globally unique on Stripe's side already) --
+  /// unique here too so the webhook handler can upsert on it directly
+  /// instead of needing a separate lookup-then-write.
+  externalSubscriptionId String?      @unique @map("external_subscription_id")
   currentPeriodEnd       DateTime?    @map("current_period_end")
   createdAt              DateTime     @default(now()) @map("created_at")
   updatedAt              DateTime     @updatedAt @map("updated_at")

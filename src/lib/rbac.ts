@@ -24,6 +24,13 @@ export const MENU_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
 export const TABLE_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
 
 /**
+ * Billing is OWNER-only, not MANAGER -- unlike staff/menu/tables. Payment
+ * details and subscription cancellation are the one thing this app treats
+ * as a step above day-to-day restaurant management.
+ */
+export const BILLING_MANAGEMENT_ROLES: StaffRole[] = ["OWNER"];
+
+/**
  * Who is allowed to invite whom. An OWNER can bring in any role, including
  * another OWNER (co-founders, handing off the account). A MANAGER can only
  * bring in front-of-house/kitchen staff -- not peers or owners. This is an

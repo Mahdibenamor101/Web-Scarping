@@ -2,7 +2,7 @@
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0. Étapes 1 à 4 faites (fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel). Reste : Stripe.
+**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe). Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant.
 
 ## Stack
 
@@ -61,3 +61,11 @@ Chaque table métier porte un `organization_id`, et une policy Postgres (`Row-Le
 ## Dashboard commandes temps réel
 
 `/dashboard/orders` (les quatre rôles) : colonnes à faire / en cours / prêt, mise à jour en direct sans recharger la page. Le mécanisme est Postgres `LISTEN`/`NOTIFY` (un trigger sur `orders`, voir `prisma/migrations/*_order_realtime_notify`) relayé aux navigateurs via Server-Sent Events (`GET /api/orders/stream`) — pas de Socket.io ni de service tiers, voir `CONTEXT.md` §12.6 pour le détail et la limite connue en hébergement serverless. Le statut de la table (`free`/`occupied`) suit automatiquement ses commandes actives.
+
+## Stripe
+
+`/dashboard/billing` (owner uniquement) : statut d'abonnement/essai, bouton d'abonnement (Stripe Checkout, un seul plan ~400 €/an), bouton de gestion (Stripe Billing Portal). `POST /api/billing/webhook` synchronise le statut à chaque événement Stripe.
+
+**Sans configuration Stripe (`STRIPE_SECRET_KEY` / `STRIPE_PRICE_ID` / `STRIPE_WEBHOOK_SECRET` absentes de `.env`), tout le reste de l'app fonctionne normalement** — les routes de facturation renvoient un 501 propre, la page billing affiche un avertissement. `npm run setup` ne nécessite donc pas de compte Stripe.
+
+**Non vérifié : un vrai paiement de bout en bout.** Le webhook a été testé avec des événements Stripe signés localement (voir `CONTEXT.md` §12.7), mais aucun appel n'a été fait contre un vrai compte Stripe. Avant le premier pilote payant : créer un compte Stripe (mode test), renseigner les trois variables d'environnement, et dérouler le parcours Checkout une fois pour de vrai.
