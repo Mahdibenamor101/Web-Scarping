@@ -22,6 +22,8 @@ npm run setup
 
 Cette commande unique : démarre Postgres, applique les migrations (schéma + policies RLS), génère le client Prisma, seed un restaurant de démo, puis lance le serveur de dev sur http://localhost:3000.
 
+Le script (`scripts/dev-setup.mjs`) est en Node.js pur, pas en bash — il tourne tel quel sous Windows (cmd ou PowerShell, sans WSL), macOS et Linux. Seul Docker Desktop doit être installé et lancé au préalable. Si vous voyez une erreur liée à WSL (`execvpe(/bin/bash) failed`), c'est que vous êtes sur une version d'avant ce changement — faites `git pull` sur cette branche et réessayez.
+
 Comptes de démo créés par le seed (mot de passe `password123`) :
 
 | Email | Rôle |

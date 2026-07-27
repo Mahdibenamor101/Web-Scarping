@@ -20,7 +20,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
-    "setup": "bash scripts/dev-setup.sh",
+    "setup": "node scripts/dev-setup.mjs",
     "test": "vitest run"
   },
   "dependencies": {
