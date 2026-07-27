@@ -86,7 +86,7 @@ export default function StaffPage() {
           </thead>
           <tbody>
             {staff.map((m) => (
-              <tr key={m.id} className="border-b border-slate-100 last:border-0">
+              <tr key={m.id} className="border-b border-slate-100 transition last:border-0 hover:bg-slate-50/80">
                 <td className="px-4 py-3 font-medium text-slate-900">{m.name}</td>
                 <td className="px-4 py-3 text-slate-500">{m.email}</td>
                 <td className="px-4 py-3">
@@ -150,7 +150,7 @@ export default function StaffPage() {
           </label>
           {error && <p className="text-sm text-rose-600">{error}</p>}
           {lastInviteUrl && (
-            <p className="break-all rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <p className="animate-bump-in break-all rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
               Lien d&apos;invitation (aucun email n&apos;est envoyé pour l&apos;instant — transmettez-le
               manuellement) : {lastInviteUrl}
             </p>

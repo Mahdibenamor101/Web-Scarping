@@ -15,7 +15,7 @@ export default function AuthShell({
       <Link href="/">
         <Logo wordmarkClassName="text-lg font-bold tracking-tight text-navy" />
       </Link>
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-bump-in">
         <div className="card px-6 py-8 shadow-md shadow-slate-200/80">
           <h1 className="text-xl font-bold tracking-tight text-slate-900">{title}</h1>
           {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}

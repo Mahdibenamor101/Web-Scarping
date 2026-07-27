@@ -124,7 +124,7 @@ export default function PublicMenuPage() {
   if (confirmedOrderId) {
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-3 px-6 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-500 text-2xl text-white">
+        <span className="flex h-14 w-14 animate-bump-in items-center justify-center rounded-full bg-sky-500 text-2xl text-white">
           ✓
         </span>
         <h1 className="text-xl font-bold tracking-tight text-slate-900">{t.confirmed}</h1>
@@ -174,7 +174,10 @@ export default function PublicMenuPage() {
               </h2>
               <ul className="flex flex-col gap-3">
                 {items.map((item) => (
-                  <li key={item.id} className="card flex items-start justify-between gap-3">
+                  <li
+                    key={item.id}
+                    className="card flex items-start justify-between gap-3 transition hover:shadow-md"
+                  >
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900">
                         {lang === "it" ? item.nameIt : item.nameEn || item.nameIt}
@@ -202,8 +205,9 @@ export default function PublicMenuPage() {
 
       {cartCount > 0 && !showCart && (
         <button
+          key={cartCount}
           onClick={() => setShowCart(true)}
-          className="fixed bottom-4 left-1/2 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-between rounded-full bg-sky-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/40"
+          className="fixed bottom-4 left-1/2 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 animate-bump-in items-center justify-between rounded-full bg-sky-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/40"
         >
           <span>
             {t.cart} · {cartCount}
@@ -215,7 +219,7 @@ export default function PublicMenuPage() {
       {showCart && (
         <div className="fixed inset-0 z-20 flex flex-col justify-end bg-slate-900/40" onClick={() => setShowCart(false)}>
           <div
-            className="flex max-h-[80vh] flex-col gap-3 rounded-t-3xl bg-white p-5"
+            className="flex max-h-[80vh] animate-bump-in flex-col gap-3 rounded-t-3xl bg-white p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-base font-bold tracking-tight text-slate-900">{t.cart}</h2>
@@ -254,7 +258,7 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
     return (
       <button
         onClick={() => onChange(1)}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white shadow-sm shadow-sky-500/30"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white shadow-sm shadow-sky-500/30 transition hover:scale-105 active:scale-95"
       >
         +
       </button>
@@ -264,14 +268,16 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
     <div className="flex shrink-0 items-center gap-2">
       <button
         onClick={() => onChange(value - 1)}
-        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600"
+        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600 transition hover:scale-105 hover:border-slate-400 active:scale-95"
       >
         −
       </button>
-      <span className="w-4 text-center text-sm font-medium">{value}</span>
+      <span key={value} className="w-4 animate-bump-in text-center text-sm font-medium">
+        {value}
+      </span>
       <button
         onClick={() => onChange(value + 1)}
-        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600"
+        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600 transition hover:scale-105 hover:border-slate-400 active:scale-95"
       >
         +
       </button>

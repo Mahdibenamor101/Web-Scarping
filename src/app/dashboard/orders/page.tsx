@@ -59,7 +59,9 @@ export default function OrdersPage() {
         <span
           className={`inline-flex items-center gap-1.5 text-xs font-medium ${connected ? "text-emerald-600" : "text-slate-400"}`}
         >
-          <span className={`h-1.5 w-1.5 rounded-full ${connected ? "bg-emerald-500" : "bg-slate-300"}`} />
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${connected ? "animate-pulse bg-emerald-500" : "bg-slate-300"}`}
+          />
           {connected ? "En direct" : "Connexion…"}
         </span>
       </div>
@@ -76,7 +78,7 @@ export default function OrdersPage() {
               </h2>
               {columnOrders.length === 0 && <p className="px-1 text-xs text-slate-400">Rien pour l&apos;instant.</p>}
               {columnOrders.map((order) => (
-                <div key={order.id} className="card flex flex-col gap-2 text-sm">
+                <div key={order.id} className="card flex animate-bump-in flex-col gap-2 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-slate-900">{order.table.label}</span>
                     <span className="text-xs text-slate-400">

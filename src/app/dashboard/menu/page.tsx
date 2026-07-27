@@ -129,7 +129,7 @@ export default function MenuPage() {
       {categories.map((category) => {
         const categoryItems = items.filter((i) => i.categoryId === category.id);
         return (
-          <section key={category.id} className="card">
+          <section key={category.id} className="card animate-bump-in">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold text-slate-900">
                 {category.nameIt} {category.nameEn && <span className="text-slate-400">({category.nameEn})</span>}
@@ -168,7 +168,7 @@ export default function MenuPage() {
                 ) : (
                   <li
                     key={item.id}
-                    className="flex items-start justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-sm"
+                    className="flex animate-bump-in items-start justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-sm transition hover:border-slate-200 hover:bg-white hover:shadow-sm"
                   >
                     <div>
                       <p className="font-medium text-slate-900">

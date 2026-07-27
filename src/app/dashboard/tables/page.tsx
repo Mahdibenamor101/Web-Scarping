@@ -78,8 +78,23 @@ export default function TablesPage() {
         {tables.map((table) => {
           const url = origin ? `${origin}/menu/${table.qrToken}` : "";
           return (
-            <div key={table.id} className="card flex flex-col items-center gap-2 text-center">
-              <p className="text-sm font-semibold text-slate-900">{table.label}</p>
+            <div
+              key={table.id}
+              className="card flex animate-bump-in flex-col items-center gap-2 text-center transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-slate-900">{table.label}</p>
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    table.status === "OCCUPIED" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${table.status === "OCCUPIED" ? "bg-amber-500" : "bg-emerald-500"}`}
+                  />
+                  {table.status === "OCCUPIED" ? "Occupée" : "Libre"}
+                </span>
+              </div>
               {url && (
                 <div className="rounded-xl border border-slate-100 p-2">
                   <QrCode url={url} />

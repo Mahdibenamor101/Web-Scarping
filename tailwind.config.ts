@@ -12,6 +12,21 @@ const config: Config = {
           light: "#16264f",
         },
       },
+      keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-14px)" },
+        },
+        "bump-in": {
+          "0%": { transform: "scale(0.85)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+      },
+      animation: {
+        float: "float 7s ease-in-out infinite",
+        "float-delayed": "float 7s ease-in-out 2s infinite",
+        "bump-in": "bump-in 0.2s ease-out",
+      },
     },
   },
   plugins: [],

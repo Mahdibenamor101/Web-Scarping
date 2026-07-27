@@ -47,7 +47,7 @@ export default async function BillingPage({
         <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">Paiement annulé, rien n&apos;a été débité.</p>
       )}
 
-      <div className="card text-sm">
+      <div className="card animate-bump-in text-sm">
         <p className="text-slate-600">
           Statut :{" "}
           <span className="badge">{STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}</span>
