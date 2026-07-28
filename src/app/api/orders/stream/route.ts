@@ -1,14 +1,17 @@
 import { NextRequest } from "next/server";
 import { getSession } from "@/lib/session";
-import { subscribeToOrderEvents } from "@/lib/realtime";
+import { subscribeToOrderEvents, subscribeToStaffCallEvents } from "@/lib/realtime";
 
 export const dynamic = "force-dynamic";
 
 const HEARTBEAT_MS = 15000;
 
 // Server-Sent Events: one long-lived HTTP response per connected staff
-// member, pushed to whenever prisma/migrations/*_order_realtime_notify's
-// trigger fires for their organization. No polling on either side.
+// member, pushed to whenever prisma/migrations/*_order_realtime_notify or
+// *_staff_call_realtime_notify's trigger fires for their organization. No
+// polling on either side. Both event kinds share this one connection
+// (tagged by `kind`) rather than each getting their own EventSource --
+// one long-lived HTTP connection per dashboard session, not two.
 export async function GET(_req: NextRequest) {
   const session = await getSession();
   if (!session) {
@@ -16,7 +19,8 @@ export async function GET(_req: NextRequest) {
   }
 
   const encoder = new TextEncoder();
-  let unsubscribe: (() => void) | null = null;
+  let unsubscribeOrders: (() => void) | null = null;
+  let unsubscribeStaffCalls: (() => void) | null = null;
   let heartbeat: ReturnType<typeof setInterval> | null = null;
 
   const stream = new ReadableStream({
@@ -30,7 +34,12 @@ export async function GET(_req: NextRequest) {
       };
 
       send({ type: "connected" });
-      unsubscribe = await subscribeToOrderEvents(session.organizationId, send);
+      unsubscribeOrders = await subscribeToOrderEvents(session.organizationId, (event) =>
+        send({ ...event, kind: "order" }),
+      );
+      unsubscribeStaffCalls = await subscribeToStaffCallEvents(session.organizationId, (event) =>
+        send({ ...event, kind: "staffCall" }),
+      );
       heartbeat = setInterval(() => {
         try {
           controller.enqueue(encoder.encode(": ping\n\n"));
@@ -40,7 +49,8 @@ export async function GET(_req: NextRequest) {
       }, HEARTBEAT_MS);
     },
     cancel() {
-      unsubscribe?.();
+      unsubscribeOrders?.();
+      unsubscribeStaffCalls?.();
       if (heartbeat) clearInterval(heartbeat);
     },
   });

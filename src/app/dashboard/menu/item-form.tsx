@@ -35,6 +35,34 @@ export default function ItemForm({
   const [values, setValues] = useState<ItemFormValues>({ ...EMPTY, ...initial });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // lets the same file be re-selected after an error
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/menu/photo-upload", { method: "POST", body: formData });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          res.status === 501
+            ? "Upload non configuré sur cet environnement — collez une URL manuellement."
+            : (body.error ?? "Échec de l'envoi"),
+        );
+      }
+      setValues((v) => ({ ...v, photoUrl: body.url }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Échec de l'envoi");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   function toggleAllergen(a: string) {
     setValues((v) => ({
@@ -101,12 +129,29 @@ export default function ItemForm({
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-white/60">Photo (URL, optionnel)</span>
-          <input
-            value={values.photoUrl}
-            onChange={(e) => setValues((v) => ({ ...v, photoUrl: e.target.value }))}
-            className="input-dash"
-            placeholder="https://…"
-          />
+          <div className="flex items-center gap-2">
+            {values.photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- arbitrary external/uploaded URL, not a local asset
+              <img src={values.photoUrl} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover" />
+            )}
+            <input
+              value={values.photoUrl}
+              onChange={(e) => setValues((v) => ({ ...v, photoUrl: e.target.value }))}
+              className="input-dash"
+              placeholder="https://…"
+            />
+          </div>
+          <label className="mt-0.5 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-brand-light transition hover:underline">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={uploading}
+            />
+            {uploading ? "Envoi…" : "ou importer une photo"}
+          </label>
+          {uploadError && <span className="text-xs text-signal">{uploadError}</span>}
         </label>
       </div>
       <fieldset>

@@ -16,6 +16,8 @@ type Order = {
   items: { id: string; quantity: number; notes: string | null; menuItem: { nameIt: string; nameEn: string | null } }[];
 };
 
+type StaffCall = { id: string; createdAt: string; table: { label: string } };
+
 const COLUMNS: {
   status: OrderStatus;
   title: string;
@@ -30,6 +32,7 @@ const COLUMNS: {
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [staffCalls, setStaffCalls] = useState<StaffCall[]>([]);
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -40,18 +43,25 @@ export default function OrdersPage() {
     setLoading(false);
   }, []);
 
+  const loadStaffCalls = useCallback(async () => {
+    const res = await fetch("/api/staff-calls");
+    if (res.ok) setStaffCalls((await res.json()).calls);
+  }, []);
+
   useEffect(() => {
     load();
+    loadStaffCalls();
     const es = new EventSource("/api/orders/stream");
     eventSourceRef.current = es;
     es.onopen = () => setConnected(true);
     es.onerror = () => setConnected(false);
     es.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      if (data.type === "created" || data.type === "updated") load();
+      if (data.kind === "order") load();
+      if (data.kind === "staffCall") loadStaffCalls();
     };
     return () => es.close();
-  }, [load]);
+  }, [load, loadStaffCalls]);
 
   async function setStatus(orderId: string, status: OrderStatus) {
     const res = await fetch(`/api/orders/${orderId}`, {
@@ -60,6 +70,11 @@ export default function OrdersPage() {
       body: JSON.stringify({ status }),
     });
     if (res.ok) load();
+  }
+
+  async function acknowledgeCall(callId: string) {
+    const res = await fetch(`/api/staff-calls/${callId}`, { method: "PATCH" });
+    if (res.ok) loadStaffCalls();
   }
 
   return (
@@ -74,6 +89,27 @@ export default function OrdersPage() {
           <span className="text-xs font-medium text-white/40">Connexion…</span>
         )}
       </div>
+
+      {staffCalls.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-2xl border-l-[3px] border-l-signal bg-white/[0.03] p-3">
+          {staffCalls.map((call) => (
+            <div key={call.id} className="flex items-center justify-between gap-3 text-sm">
+              <div className="flex items-center gap-2.5">
+                <Badge variant="todo" dash>
+                  {call.table.label}
+                </Badge>
+                <span className="text-white">chiama il cameriere</span>
+                <span className="text-xs text-white/40">
+                  {new Date(call.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
+              <button onClick={() => acknowledgeCall(call.id)} className="btn-link-dash text-xs">
+                Segna come vista
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {loading && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

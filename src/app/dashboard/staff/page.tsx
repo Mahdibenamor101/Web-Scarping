@@ -28,6 +28,7 @@ export default function StaffPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<(typeof ROLES)[number]>("SERVER");
   const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
+  const [lastInviteEmailSent, setLastInviteEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
@@ -59,6 +60,7 @@ export default function StaffPage() {
       return;
     }
     setLastInviteUrl(body.inviteUrl);
+    setLastInviteEmailSent(body.emailSent === true);
     setInviteEmail("");
     load();
   }
@@ -163,9 +165,11 @@ export default function StaffPage() {
           </label>
           {error && <p className="text-sm text-signal">{error}</p>}
           {lastInviteUrl && (
-            <p className="animate-bump-in break-all rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
-              Lien d&apos;invitation (aucun email n&apos;est envoyé pour l&apos;instant — transmettez-le
-              manuellement) : {lastInviteUrl}
+            <p className="animate-bump-in break-all rounded-xl border border-brand/20 bg-brand/10 px-3 py-2 text-sm text-brand-light">
+              {lastInviteEmailSent
+                ? "Email envoyé. Lien d'invitation (au cas où) : "
+                : "Aucun envoi d'email configuré pour cet environnement — transmettez ce lien manuellement : "}
+              {lastInviteUrl}
             </p>
           )}
           <button type="submit" className="btn-primary w-fit">

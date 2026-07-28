@@ -38,6 +38,8 @@ const T = {
     back: "Torna al menu",
     loadError: "QR non valido o tavolo non trovato.",
     rateLimited: "Troppi tentativi, riprova tra qualche minuto.",
+    callWaiter: "Chiama il cameriere",
+    called: "Chiamata inviata",
   },
   en: {
     title: "Menu",
@@ -51,8 +53,15 @@ const T = {
     back: "Back to menu",
     loadError: "Invalid QR code or table not found.",
     rateLimited: "Too many attempts, please try again in a few minutes.",
+    callWaiter: "Call waiter",
+    called: "Waiter called",
   },
 };
+
+// Mirrors the server's per-table rate limit (2 min, see
+// src/app/api/public/staff-calls/[qrToken]/route.ts) so the button doesn't
+// re-enable and immediately 429 on a second tap.
+const CALL_COOLDOWN_MS = 2 * 60 * 1000;
 
 export default function PublicMenuPage() {
   const params = useParams<{ qrToken: string }>();
@@ -64,6 +73,8 @@ export default function PublicMenuPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmedOrderId, setConfirmedOrderId] = useState<string | null>(null);
+  const [callState, setCallState] = useState<"idle" | "calling" | "called">("idle");
+  const [callError, setCallError] = useState<string | null>(null);
 
   const t = T[lang];
 
@@ -109,6 +120,22 @@ export default function PublicMenuPage() {
       setSubmitError(err instanceof Error ? err.message : "error");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function callWaiter() {
+    setCallState("calling");
+    setCallError(null);
+    try {
+      const res = await fetch(`/api/public/staff-calls/${params.qrToken}`, { method: "POST" });
+      if (!res.ok) {
+        throw new Error(res.status === 429 ? T[lang].rateLimited : "error");
+      }
+      setCallState("called");
+      setTimeout(() => setCallState("idle"), CALL_COOLDOWN_MS);
+    } catch (err) {
+      setCallState("idle");
+      setCallError(err instanceof Error ? err.message : "error");
     }
   }
 
@@ -161,21 +188,38 @@ export default function PublicMenuPage() {
               {t.table} : {data.tableLabel}
             </p>
           </div>
-          <div className="flex gap-1 text-xs">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setLang("it")}
-              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "it" ? "bg-brand-gradient text-white shadow-soft" : "border border-ink/10 text-muted"}`}
+              onClick={callWaiter}
+              disabled={callState !== "idle"}
+              aria-label={t.callWaiter}
+              title={t.callWaiter}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition disabled:opacity-70 ${
+                callState === "called"
+                  ? "border-brand bg-brand/10 text-brand"
+                  : "border-ink/10 text-muted hover:border-ink/20 hover:text-ink"
+              }`}
             >
-              IT
+              <BellIcon />
             </button>
-            <button
-              onClick={() => setLang("en")}
-              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "en" ? "bg-brand-gradient text-white shadow-soft" : "border border-ink/10 text-muted"}`}
-            >
-              EN
-            </button>
+            <div className="flex gap-1 text-xs">
+              <button
+                onClick={() => setLang("it")}
+                className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "it" ? "bg-brand-gradient text-white shadow-soft" : "border border-ink/10 text-muted"}`}
+              >
+                IT
+              </button>
+              <button
+                onClick={() => setLang("en")}
+                className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "en" ? "bg-brand-gradient text-white shadow-soft" : "border border-ink/10 text-muted"}`}
+              >
+                EN
+              </button>
+            </div>
           </div>
         </div>
+        {callState === "called" && <p className="mt-1.5 text-xs font-medium text-brand">{t.called}</p>}
+        {callError && <p className="mt-1.5 text-xs text-signal">{callError}</p>}
       </header>
 
       <div className="flex flex-col gap-6 p-4">
@@ -265,6 +309,15 @@ export default function PublicMenuPage() {
         </div>
       )}
     </main>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13.73 21a2 2 0 01-3.46 0" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 

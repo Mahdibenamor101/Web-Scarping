@@ -129,6 +129,29 @@ describe("tenant isolation (Row-Level Security)", () => {
     ).rejects.toThrow();
   });
 
+  it("a staff call can never point at another organization's table, and is invisible cross-tenant", async () => {
+    const tableB = await withTenant(orgB.organizationId, (tx) =>
+      tx.restaurantTable.create({
+        data: { organizationId: orgB.organizationId, label: "Call Test B", qrToken: `qr-call-${Date.now()}` },
+      }),
+    );
+
+    await expect(
+      withTenant(orgA.organizationId, (tx) =>
+        tx.staffCall.create({ data: { organizationId: orgA.organizationId, tableId: tableB.id, status: "PENDING" } }),
+      ),
+    ).rejects.toThrow();
+
+    const call = await withTenant(orgB.organizationId, (tx) =>
+      tx.staffCall.create({ data: { organizationId: orgB.organizationId, tableId: tableB.id, status: "PENDING" } }),
+    );
+
+    const fromWrongTenant = await withTenant(orgA.organizationId, (tx) =>
+      tx.staffCall.findUnique({ where: { id: call.id } }),
+    );
+    expect(fromWrongTenant).toBeNull();
+  });
+
   it("resolve_table_by_qr_token only ever resolves to the table's own organization", async () => {
     const qrToken = `qr-resolve-${Date.now()}`;
     const table = await withTenant(orgA.organizationId, (tx) =>
