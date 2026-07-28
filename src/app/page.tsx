@@ -1,11 +1,13 @@
 import Link from "next/link";
-import Logo from "@/components/logo";
 import Reveal, { StaggerGroup, StaggerItem } from "@/components/reveal";
 import ProductPreview from "@/components/product-preview";
 import HeroMockup from "@/components/hero-mockup";
+import HeroParallax from "@/components/hero-parallax";
+import DemoVideo from "@/components/demo-video";
 import StatCounter from "@/components/stat-counter";
 import PricingToggle from "@/components/pricing-toggle";
 import WaveDivider from "@/components/wave-divider";
+import LandingNav from "@/components/landing-nav";
 import { APP_NAME } from "@/lib/brand";
 
 const STEPS = [
@@ -77,63 +79,66 @@ const TRUST_BADGES = [
 export default function HomePage() {
   return (
     <main>
+      <LandingNav />
+
       {/* Hero -- light canvas + dot grid + soft halo behind the floating phone,
           per the design system: the whole marketing site stays light, only
           the dashboard goes dark (see src/app/dashboard/layout.tsx). */}
       <div className="relative overflow-hidden bg-dot-grid">
-        <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-          <Logo />
-          <div className="hidden items-center gap-7 text-sm font-medium sm:flex">
-            <a href="#apercu" className="nav-link">
-              Aperçu
-            </a>
-            <a href="#fonctionnalites" className="nav-link">
-              Fonctionnalités
-            </a>
-            <a href="#tarifs" className="nav-link">
-              Tarifs
-            </a>
-          </div>
-          <Link href="/login" className="nav-link text-sm font-medium">
-            Se connecter
-          </Link>
-        </nav>
-
-        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-8 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-16 sm:pt-12">
-          <div className="flex flex-col items-start gap-6 text-left">
-            <span className="eyebrow">Menu QR &amp; commande à table</span>
-            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              Le <span className="bg-accent-gradient bg-clip-text text-transparent">QR</span> sur la table.
-              <br />
-              La commande en <span className="bg-accent-gradient bg-clip-text text-transparent">cuisine</span>.
-            </h1>
-            <p className="max-w-md text-lg text-slate-500">
-              Menu multilingue, allergènes conformes, commandes en temps réel — sans matériel à installer, sans
-              abonnement à un boîtier.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                Créer mon restaurant
-              </Link>
-              <a href="#apercu" className="btn-secondary px-6 py-3 text-base">
-                Voir le produit
-              </a>
+        <HeroParallax>
+          <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-8 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-16 sm:pt-12">
+            <div className="flex flex-col items-start gap-6 text-left">
+              <span className="eyebrow">Menu QR &amp; commande à table</span>
+              <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
+                Le <span className="bg-accent-gradient bg-clip-text text-transparent">QR</span> sur la table.
+                <br />
+                La commande en <span className="bg-accent-gradient bg-clip-text text-transparent">cuisine</span>.
+              </h1>
+              <p className="max-w-md text-lg text-slate-500">
+                Menu multilingue, allergènes conformes, commandes en temps réel — sans matériel à installer, sans
+                abonnement à un boîtier.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link href="/signup" className="btn-primary px-6 py-3 text-base">
+                  Créer mon restaurant
+                </Link>
+                <a href="#apercu" className="btn-secondary px-6 py-3 text-base">
+                  Voir le produit
+                </a>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-500">
+                {TRUST_BADGES.map((badge) => (
+                  <span key={badge.label} className="inline-flex items-center gap-1.5">
+                    <span className="text-accent">{badge.icon}</span>
+                    {badge.label}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-500">
-              {TRUST_BADGES.map((badge) => (
-                <span key={badge.label} className="inline-flex items-center gap-1.5">
-                  <span className="text-accent">{badge.icon}</span>
-                  {badge.label}
-                </span>
-              ))}
-            </div>
-          </div>
 
-          <HeroMockup />
-        </div>
+            <HeroMockup />
+          </div>
+        </HeroParallax>
 
         <WaveDivider className="text-white" />
       </div>
+
+      <section id="demo" className="bg-white py-16 sm:py-24">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <Reveal>
+            <span className="eyebrow">Démo</span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+              Regardez-le <span className="bg-accent-gradient bg-clip-text text-transparent">fonctionner</span>
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+              Un vrai enregistrement de l&apos;application — scan, menu, panier, commande envoyée.
+            </p>
+          </Reveal>
+          <Reveal className="mt-12">
+            <DemoVideo />
+          </Reveal>
+        </div>
+      </section>
 
       <section id="apercu" className="bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
