@@ -25,7 +25,7 @@ function BillingActionButton({ endpoint, label }: { endpoint: string; label: str
       <button onClick={onClick} disabled={loading} className="btn-primary w-fit">
         {loading ? "…" : label}
       </button>
-      {error && <p className="text-sm text-rose-400">{error}</p>}
+      {error && <p className="text-sm text-signal">{error}</p>}
     </div>
   );
 }

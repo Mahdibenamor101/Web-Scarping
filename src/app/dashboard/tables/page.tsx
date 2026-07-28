@@ -77,11 +77,11 @@ export default function TablesPage() {
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
+        {error && <p className="mt-2 text-sm text-signal">{error}</p>}
       </section>
 
       {deleteError && (
-        <p className="animate-bump-in rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-300">
+        <p className="animate-bump-in rounded-xl border border-signal/20 bg-signal/10 px-4 py-2.5 text-sm text-signal">
           {deleteError}
         </p>
       )}
@@ -99,7 +99,7 @@ export default function TablesPage() {
       )}
 
       {!loading && tables.length === 0 && (
-        <p className="text-sm text-slate-400">Aucune table pour l&apos;instant — ajoutez-en une pour obtenir un QR.</p>
+        <p className="text-sm text-white/40">Aucune table pour l&apos;instant — ajoutez-en une pour obtenir un QR.</p>
       )}
 
       {!loading && tables.length > 0 && (
@@ -110,7 +110,7 @@ export default function TablesPage() {
               <div key={table.id} className="card-dash flex animate-bump-in flex-col items-center gap-2 text-center">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-white">{table.label}</p>
-                  <Badge variant={table.status === "OCCUPIED" ? "warning" : "success"}>
+                  <Badge variant={table.status === "OCCUPIED" ? "todo" : "ready"} dash>
                     {table.status === "OCCUPIED" ? "Occupée" : "Libre"}
                   </Badge>
                 </div>
@@ -119,7 +119,7 @@ export default function TablesPage() {
                     <QrCode url={url} />
                   </div>
                 )}
-                <p className="break-all text-xs text-slate-500">{url}</p>
+                <p className="break-all text-xs text-white/40">{url}</p>
                 <button onClick={() => setConfirmDeleteId(table.id)} className="btn-link-dash-danger">
                   Supprimer
                 </button>

@@ -115,7 +115,7 @@ export default function PublicMenuPage() {
   if (loadError) {
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-rose-500">{loadError}</p>
+        <p className="text-signal">{loadError}</p>
       </main>
     );
   }
@@ -123,7 +123,7 @@ export default function PublicMenuPage() {
   if (!data) {
     return (
       <main className="mx-auto min-h-screen max-w-md pb-24">
-        <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 py-3">
+        <div className="sticky top-0 z-10 border-b border-ink/10 bg-white/90 px-4 py-3">
           <Skeleton tone="light" className="h-4 w-32" />
           <Skeleton tone="light" className="mt-2 h-3 w-20" />
         </div>
@@ -139,11 +139,11 @@ export default function PublicMenuPage() {
   if (confirmedOrderId) {
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-3 px-6 text-center">
-        <span className="flex h-14 w-14 animate-bump-in items-center justify-center rounded-full bg-accent-gradient text-2xl text-white shadow-soft">
+        <span className="flex h-14 w-14 animate-bump-in items-center justify-center rounded-full bg-brand-gradient text-2xl text-white shadow-soft">
           ✓
         </span>
         <h1 className="text-xl font-extrabold tracking-tight text-ink">{t.confirmed}</h1>
-        <p className="text-slate-500">{t.confirmedBody}</p>
+        <p className="text-muted">{t.confirmedBody}</p>
         <button onClick={() => setConfirmedOrderId(null)} className="btn-secondary mt-4">
           {t.back}
         </button>
@@ -153,24 +153,24 @@ export default function PublicMenuPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-md pb-24">
-      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-ink/10 bg-white/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-bold text-ink">{data.organizationName}</p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted">
               {t.table} : {data.tableLabel}
             </p>
           </div>
           <div className="flex gap-1 text-xs">
             <button
               onClick={() => setLang("it")}
-              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "it" ? "bg-accent-gradient text-white shadow-soft" : "border border-slate-200 text-slate-500"}`}
+              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "it" ? "bg-brand-gradient text-white shadow-soft" : "border border-ink/10 text-muted"}`}
             >
               IT
             </button>
             <button
               onClick={() => setLang("en")}
-              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "en" ? "bg-accent-gradient text-white shadow-soft" : "border border-slate-200 text-slate-500"}`}
+              className={`rounded-full px-2.5 py-1 font-semibold transition ${lang === "en" ? "bg-brand-gradient text-white shadow-soft" : "border border-ink/10 text-muted"}`}
             >
               EN
             </button>
@@ -198,12 +198,12 @@ export default function PublicMenuPage() {
                         {lang === "it" ? item.nameIt : item.nameEn || item.nameIt}
                       </p>
                       {(lang === "it" ? item.descriptionIt : item.descriptionEn) && (
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted">
                           {lang === "it" ? item.descriptionIt : item.descriptionEn}
                         </p>
                       )}
                       {item.allergens.length > 0 && (
-                        <p className="mt-1 text-[11px] text-slate-400">
+                        <p className="mt-1 text-[11px] text-muted">
                           {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
                         </p>
                       )}
@@ -222,7 +222,7 @@ export default function PublicMenuPage() {
         <button
           key={cartCount}
           onClick={() => setShowCart(true)}
-          className="fixed bottom-4 left-1/2 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 animate-bump-in items-center justify-between rounded-full bg-accent-gradient px-5 py-3.5 text-sm font-semibold text-white shadow-softLg"
+          className="fixed bottom-4 left-1/2 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 animate-bump-in items-center justify-between rounded-full bg-brand-gradient px-5 py-3.5 text-sm font-semibold text-white shadow-softLg"
         >
           <span>
             {t.cart} · {cartCount}
@@ -232,7 +232,7 @@ export default function PublicMenuPage() {
       )}
 
       {showCart && (
-        <div className="fixed inset-0 z-20 flex flex-col justify-end bg-slate-900/40" onClick={() => setShowCart(false)}>
+        <div className="fixed inset-0 z-20 flex flex-col justify-end bg-ink/40" onClick={() => setShowCart(false)}>
           <div
             className="flex max-h-[80vh] animate-bump-in flex-col gap-3 rounded-t-3xl bg-white p-5"
             onClick={(e) => e.stopPropagation()}
@@ -251,13 +251,13 @@ export default function PublicMenuPage() {
                   </li>
                 );
               })}
-              {cartLines.length === 0 && <p className="text-sm text-slate-500">{t.empty}</p>}
+              {cartLines.length === 0 && <p className="text-sm text-muted">{t.empty}</p>}
             </ul>
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-sm font-bold text-ink">
+            <div className="flex items-center justify-between border-t border-ink/5 pt-3 text-sm font-bold text-ink">
               <span>{t.total}</span>
               <span>{cartTotal.toFixed(2)} €</span>
             </div>
-            {submitError && <p className="text-sm text-rose-500">{submitError}</p>}
+            {submitError && <p className="text-sm text-signal">{submitError}</p>}
             <button onClick={submitOrder} disabled={submitting || cartLines.length === 0} className="btn-primary w-full py-3">
               {submitting ? "…" : t.order}
             </button>
@@ -273,7 +273,7 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
     return (
       <button
         onClick={() => onChange(1)}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-gradient text-sm font-bold text-white shadow-soft transition hover:scale-105 active:scale-95"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-sm font-bold text-white shadow-soft transition hover:scale-105 active:scale-95"
       >
         +
       </button>
@@ -283,7 +283,7 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
     <div className="flex shrink-0 items-center gap-2">
       <button
         onClick={() => onChange(value - 1)}
-        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600 transition hover:scale-105 hover:border-slate-400 active:scale-95"
+        className="h-8 w-8 rounded-full border border-ink/15 text-sm text-muted transition hover:scale-105 hover:border-ink/25 active:scale-95"
       >
         −
       </button>
@@ -292,7 +292,7 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (qty: n
       </span>
       <button
         onClick={() => onChange(value + 1)}
-        className="h-8 w-8 rounded-full border border-slate-300 text-sm text-slate-600 transition hover:scale-105 hover:border-slate-400 active:scale-95"
+        className="h-8 w-8 rounded-full border border-ink/15 text-sm text-muted transition hover:scale-105 hover:border-ink/25 active:scale-95"
       >
         +
       </button>

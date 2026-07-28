@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
  * Dark-themed confirm modal, used in place of window.confirm()/alert() for
@@ -28,35 +28,36 @@ export default function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const reduceMotion = useReducedMotion();
   return (
     <AnimatePresence>
       {open && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6"
-          initial={{ opacity: 0 }}
+          initial={{ opacity: reduceMotion ? 1 : 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          exit={{ opacity: reduceMotion ? 1 : 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.15 }}
           onClick={onCancel}
         >
           <motion.div
             className="card-dash-static w-full max-w-sm"
-            initial={{ opacity: 0, scale: 0.92, y: 10 }}
+            initial={reduceMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.92, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 10 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
+            exit={reduceMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.92, y: 10 }}
+            transition={{ duration: reduceMotion ? 0 : 0.18, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-base font-semibold text-white">{title}</h2>
-            <p className="mt-2 text-sm text-slate-400">{body}</p>
+            <p className="mt-2 text-sm text-muted">{body}</p>
             <div className="mt-6 flex justify-end gap-3">
               <button onClick={onCancel} className="btn-link-dash">
                 {cancelLabel}
               </button>
               <button
                 onClick={onConfirm}
-                className={`rounded-full px-4 py-2 text-sm font-semibold text-white shadow-soft transition duration-200 hover:scale-[1.03] ${
-                  danger ? "bg-rose-500 hover:bg-rose-600" : "bg-accent-gradient"
+                className={`rounded-full px-4 py-2 text-sm font-semibold text-white shadow-soft transition duration-200 hover:-translate-y-0.5 ${
+                  danger ? "bg-signal hover:brightness-95" : "bg-brand-gradient"
                 }`}
               >
                 {confirmLabel}

@@ -16,19 +16,19 @@ type Testimonial = {
 export default function TestimonialCard({ name, role, quote, initial }: Testimonial) {
   return (
     <div className="card-static flex flex-col gap-4">
-      <div className="flex gap-0.5 text-amber-400">
+      <div className="flex gap-0.5 text-signal">
         {Array.from({ length: 5 }).map((_, i) => (
           <StarIcon key={i} />
         ))}
       </div>
-      <p className="text-sm text-slate-600">&ldquo;{quote}&rdquo;</p>
+      <p className="text-sm text-ink/80">&ldquo;{quote}&rdquo;</p>
       <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-bold text-accent">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
           {initial}
         </span>
         <div>
           <p className="text-sm font-semibold text-ink">{name}</p>
-          <p className="text-xs text-slate-500">{role}</p>
+          <p className="text-xs text-muted">{role}</p>
         </div>
       </div>
     </div>

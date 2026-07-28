@@ -60,7 +60,7 @@ export default function ItemForm({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-300">Nom (IT)</span>
+          <span className="font-medium text-white/60">Nom (IT)</span>
           <input
             required
             value={values.nameIt}
@@ -69,7 +69,7 @@ export default function ItemForm({
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-300">Nom (EN)</span>
+          <span className="font-medium text-white/60">Nom (EN)</span>
           <input
             value={values.nameEn}
             onChange={(e) => setValues((v) => ({ ...v, nameEn: e.target.value }))}
@@ -78,7 +78,7 @@ export default function ItemForm({
         </label>
       </div>
       <label className="flex flex-col gap-1.5 text-sm">
-        <span className="font-medium text-slate-300">Description (IT)</span>
+        <span className="font-medium text-white/60">Description (IT)</span>
         <textarea
           value={values.descriptionIt}
           onChange={(e) => setValues((v) => ({ ...v, descriptionIt: e.target.value }))}
@@ -88,7 +88,7 @@ export default function ItemForm({
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-300">Prix (€)</span>
+          <span className="font-medium text-white/60">Prix (€)</span>
           <input
             required
             type="number"
@@ -100,7 +100,7 @@ export default function ItemForm({
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-300">Photo (URL, optionnel)</span>
+          <span className="font-medium text-white/60">Photo (URL, optionnel)</span>
           <input
             value={values.photoUrl}
             onChange={(e) => setValues((v) => ({ ...v, photoUrl: e.target.value }))}
@@ -110,22 +110,22 @@ export default function ItemForm({
         </label>
       </div>
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-slate-300">Allergènes (Règlement UE n°1169/2011)</legend>
+        <legend className="mb-2 text-sm font-medium text-white/60">Allergènes (Règlement UE n°1169/2011)</legend>
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {ALL_ALLERGENS.map((a) => (
-            <label key={a} className="flex items-center gap-2 text-xs text-slate-400">
+            <label key={a} className="flex items-center gap-2 text-xs text-white/40">
               <input
                 type="checkbox"
                 checked={values.allergens.includes(a)}
                 onChange={() => toggleAllergen(a)}
-                className="accent-accent"
+                className="accent-brand"
               />
               {ALLERGEN_LABELS[a]}
             </label>
           ))}
         </div>
       </fieldset>
-      {error && <p className="text-sm text-rose-400">{error}</p>}
+      {error && <p className="text-sm text-signal">{error}</p>}
       <div className="flex items-center gap-4">
         <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "…" : submitLabel}

@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import { colors, radius, shadow } from "./src/lib/design-tokens";
+import { colors, radius, shadow, typeScale } from "./src/lib/design-tokens";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -7,24 +7,36 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-bricolage)", "var(--font-inter)", "system-ui", "sans-serif"],
+      },
+      fontSize: {
+        14: typeScale[14],
+        16: typeScale[16],
+        20: typeScale[20],
+        28: typeScale[28],
+        40: typeScale[40],
+        56: typeScale[56],
       },
       colors: {
-        canvas: colors.background,
+        paper: colors.paper,
         ink: colors.ink,
-        accent: {
-          DEFAULT: colors.accent,
-          dark: colors.accentDark,
+        surface: colors.surface,
+        brand: {
+          DEFAULT: colors.brand,
+          dark: colors.brandDark,
+          light: colors.brandLight,
         },
+        signal: colors.signal,
+        progress: colors.progress,
+        muted: colors.muted,
         dash: {
-          bg: colors.dashboardBg,
+          bg: colors.ink,
           card: colors.dashboardCard,
         },
-        success: colors.badge.success,
-        warning: colors.badge.warning,
-        live: colors.badge.live,
       },
       borderRadius: {
         card: radius.card,
+        container: radius.container,
       },
       boxShadow: {
         soft: shadow.soft,
@@ -32,34 +44,29 @@ const config: Config = {
         dark: shadow.dark,
       },
       backgroundImage: {
-        "accent-gradient": `linear-gradient(135deg, ${colors.accent}, ${colors.accentDark})`,
+        "brand-gradient": `linear-gradient(135deg, ${colors.brand}, ${colors.brandDark})`,
       },
       keyframes: {
-        // Symmetric +-10px oscillation, not a 0-to-N bounce.
+        // Symmetric +-6px oscillation over 8s, per DESIGN.md's floating-card spec.
         float: {
-          "0%, 100%": { transform: "translateY(-10px)" },
-          "50%": { transform: "translateY(10px)" },
-        },
-        "float-slow": {
-          "0%, 100%": { transform: "translateY(-8px) rotate(-1deg)" },
-          "50%": { transform: "translateY(8px) rotate(1deg)" },
+          "0%, 100%": { transform: "translateY(-6px)" },
+          "50%": { transform: "translateY(6px)" },
         },
         "bump-in": {
           "0%": { transform: "scale(0.85)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        // Opacity pulse, 2s -- reserved for the live/real-time indicator dot only.
         "pulse-dot": {
-          "0%, 100%": { opacity: "1", transform: "scale(1)" },
-          "50%": { opacity: "0.4", transform: "scale(0.85)" },
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.35" },
         },
       },
       animation: {
-        float: "float 4s ease-in-out infinite",
-        "float-delayed": "float 4s ease-in-out 1.3s infinite",
-        "float-slow": "float-slow 5.5s ease-in-out infinite",
-        "float-slow-delayed": "float-slow 5.5s ease-in-out 0.8s infinite",
+        float: "float 8s ease-in-out infinite",
+        "float-delayed": "float 8s ease-in-out 2s infinite",
         "bump-in": "bump-in 0.2s ease-out",
-        "pulse-dot": "pulse-dot 1.6s ease-in-out infinite",
+        "pulse-dot": "pulse-dot 2s ease-in-out infinite",
       },
     },
   },

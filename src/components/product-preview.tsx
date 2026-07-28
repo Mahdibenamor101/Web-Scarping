@@ -17,30 +17,30 @@ type Tab = {
 const TABS: Tab[] = [
   {
     id: "menu",
-    label: "Menu client",
+    label: "Menu cliente",
     icon: <PhoneIcon />,
     src: "/screenshots/public-menu.png",
-    alt: "Menu digital ouvert sur un téléphone, avec panier et bouton de commande",
+    alt: "Menu digitale aperto su un telefono, con carrello e pulsante per ordinare",
     frame: "phone",
-    caption: "Le client scanne, parcourt le menu IT/EN et commande depuis son téléphone -- sans rien installer.",
+    caption: "Il cliente scansiona, sfoglia il menu IT/EN e ordina dal telefono — senza installare nulla.",
   },
   {
     id: "orders",
-    label: "Commandes en direct",
+    label: "Ordini in diretta",
     icon: <BoardIcon />,
     src: "/screenshots/dashboard-orders.png",
-    alt: "Tableau de bord des commandes en trois colonnes : à faire, en cours, prêt",
+    alt: "Bacheca ordini in tre colonne: da fare, in corso, pronto",
     frame: "browser",
-    caption: "Chaque commande arrive en cuisine en quelques secondes, mise à jour en direct sans recharger la page.",
+    caption: "Ogni ordine arriva in cucina in pochi secondi, aggiornato in diretta senza ricaricare la pagina.",
   },
   {
     id: "tables",
-    label: "Tables & QR",
+    label: "Tavoli & QR",
     icon: <QrIcon />,
     src: "/screenshots/dashboard-tables.png",
-    alt: "Liste des tables du restaurant avec leur QR code et leur statut",
+    alt: "Elenco dei tavoli del ristorante con il loro QR code e il loro stato",
     frame: "browser",
-    caption: "Un QR par table, généré en un clic -- à imprimer ou à afficher, aucun matériel à acheter.",
+    caption: "Un QR per tavolo, generato con un clic — da stampare o esporre, nessun dispositivo da acquistare.",
   },
 ];
 
@@ -58,13 +58,13 @@ export default function ProductPreview() {
             key={tab.id}
             type="button"
             onClick={() => setActiveId(tab.id)}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition duration-200 hover:scale-[1.03] ${
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 ${
               tab.id === activeId
-                ? "border-accent bg-accent-gradient text-white shadow-soft"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-ink"
+                ? "border-brand bg-brand-gradient text-white shadow-soft"
+                : "border-ink/10 bg-surface text-muted hover:border-ink/20 hover:text-ink"
             }`}
           >
-            <span className={tab.id === activeId ? "text-white" : "text-accent"}>{tab.icon}</span>
+            <span className={tab.id === activeId ? "text-white" : "text-brand"}>{tab.icon}</span>
             {tab.label}
           </button>
         ))}
@@ -78,17 +78,20 @@ export default function ProductPreview() {
         >
           {active.frame === "phone" ? (
             <div className="mx-auto w-full max-w-[22rem] rounded-[2.5rem] border-8 border-ink bg-ink p-1.5 shadow-softLg">
-              <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-white">
+              <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-surface">
                 <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-ink" />
                 <Image src={active.src} alt={active.alt} fill sizes="352px" className="object-cover object-top" priority={false} />
               </div>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
-              <div className="flex items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-4 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-rose-300" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+            <div className="overflow-hidden rounded-2xl border border-ink/10 bg-surface shadow-softLg">
+              {/* Window-chrome dots are decorative (a browser-chrome convention), not
+                  status indicators -- kept neutral so they don't borrow the app's
+                  semantic colors for something that isn't information. */}
+              <div className="flex items-center gap-1.5 border-b border-ink/5 bg-paper px-4 py-2.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
+                <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
+                <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
               </div>
               <div className="relative aspect-[16/10] w-full">
                 <Image src={active.src} alt={active.alt} fill sizes="896px" className="object-cover object-top" priority={false} />
@@ -96,7 +99,7 @@ export default function ProductPreview() {
             </div>
           )}
         </div>
-        <p className="max-w-md text-center text-sm text-slate-500">{active.caption}</p>
+        <p className="max-w-md text-center text-sm text-muted">{active.caption}</p>
       </div>
     </div>
   );

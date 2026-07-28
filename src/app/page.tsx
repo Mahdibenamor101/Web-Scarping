@@ -2,136 +2,140 @@ import Link from "next/link";
 import Reveal, { StaggerGroup, StaggerItem } from "@/components/reveal";
 import ProductPreview from "@/components/product-preview";
 import HeroMockup from "@/components/hero-mockup";
-import HeroParallax from "@/components/hero-parallax";
 import DemoVideo from "@/components/demo-video";
 import StatCounter from "@/components/stat-counter";
 import PricingToggle from "@/components/pricing-toggle";
 import WaveDivider from "@/components/wave-divider";
 import LandingNav from "@/components/landing-nav";
-import { APP_NAME } from "@/lib/brand";
+import LandingFooter from "@/components/landing-footer";
 
+// Landing copy is in Italian end to end (dashboard and auth stay in
+// French -- see CONTEXT.md). The public menu page has its own separate
+// IT/EN toggle and is unrelated to this.
 const STEPS = [
   {
     n: "1",
-    title: "Le client scanne",
-    body: "Un QR par table. Rien à installer, le menu s'ouvre dans le navigateur.",
+    title: "Il cliente scansiona",
+    body: "Un QR per tavolo. Niente da installare, il menu si apre nel browser.",
   },
   {
     n: "2",
-    title: "Il commande depuis son téléphone",
-    body: "Menu en italien et en anglais, allergènes indiqués sur chaque plat.",
+    title: "Ordina dal telefono",
+    body: "Menu in italiano e inglese, allergeni indicati su ogni piatto.",
   },
   {
     n: "3",
-    title: "Ça arrive en cuisine, en direct",
-    body: "À faire, en cours, prêt — mis à jour sans recharger la page.",
+    title: "Arriva in cucina, in diretta",
+    body: "Da fare, in corso, pronto — aggiornato senza ricaricare la pagina.",
   },
 ];
 
 const FEATURES = [
   {
-    title: "14 allergènes UE",
-    body: "Étiquetage conforme au Règlement (UE) n°1169/2011, plat par plat.",
+    title: "14 allergeni UE",
+    body: "Etichettatura conforme al Regolamento (UE) n. 1169/2011, piatto per piatto.",
     icon: <ShieldIcon />,
   },
   {
     title: "IT / EN",
-    body: "Menu bilingue dès le départ, pensé pour une clientèle touristique.",
+    body: "Menu bilingue fin dall'inizio, pensato per una clientela turistica.",
     icon: <GlobeIcon />,
   },
   {
-    title: "Temps réel",
-    body: "La commande arrive en cuisine en quelques secondes, pas en rechargeant la page.",
+    title: "Tempo reale",
+    body: "L'ordine arriva in cucina in pochi secondi, senza ricaricare la pagina.",
     icon: <BoltIcon />,
   },
   {
-    title: "Isolation stricte",
-    body: "Chaque restaurant ne voit que ses propres données — appliqué au niveau de la base.",
+    title: "Isolamento rigoroso",
+    body: "Ogni ristorante vede solo i propri dati — applicato a livello di database.",
     icon: <LockIcon />,
   },
 ];
 
 // Genuine, checkable facts about the product itself -- not fabricated usage
 // or customer numbers. No pilot has run yet (CONTEXT.md §9 Phase A), so
-// there is no real "X restaurants" or "X commandes/mois" to show.
+// there is no real "X restaurants" or "X ordini/mese" to show.
 const STATS = [
-  { value: 14, suffix: "", label: "Allergènes UE étiquetés" },
-  { value: 2, suffix: "", label: "Langues, IT / EN, dès le départ" },
-  { value: 100, suffix: "%", label: "Données isolées par restaurant" },
-  { value: 0, suffix: " €", label: "Matériel supplémentaire à acheter" },
+  { value: 14, suffix: "", label: "Allergeni UE etichettati" },
+  { value: 2, suffix: "", label: "Lingue, IT / EN, fin dall'inizio" },
+  { value: 100, suffix: "%", label: "Dati isolati per ristorante" },
+  { value: 0, suffix: " €", label: "Hardware aggiuntivo da acquistare" },
 ];
 
 const PLAN_FEATURES = [
-  "QR codes et tables illimités",
-  "Menu multilingue italien / anglais",
-  "Étiquetage des 14 allergènes UE",
-  "Commandes en temps réel, sans rechargement",
-  "Comptes staff illimités (manager, serveur, cuisine)",
-  "Aucun boîtier ni matériel à acheter",
+  "QR code e tavoli illimitati",
+  "Menu multilingue italiano / inglese",
+  "Etichettatura dei 14 allergeni UE",
+  "Ordini in tempo reale, senza ricaricare",
+  "Account staff illimitati (manager, cameriere, cucina)",
+  "Nessun dispositivo né hardware da acquistare",
 ];
 
 const TRUST_BADGES = [
-  { icon: <BoltIcon className="h-4 w-4" />, label: "Opérationnel en quelques minutes" },
-  { icon: <CardIcon className="h-4 w-4" />, label: "Sans carte bancaire" },
-  { icon: <StarIcon className="h-4 w-4" />, label: "14 jours d'essai gratuit" },
+  { icon: <BoltIcon className="h-4 w-4" />, label: "Operativo in pochi minuti" },
+  { icon: <CardIcon className="h-4 w-4" />, label: "Senza carta di credito" },
+  { icon: <StarIcon className="h-4 w-4" />, label: "14 giorni di prova gratuita" },
 ];
 
 export default function HomePage() {
   return (
-    <main>
+    <main lang="it">
       <LandingNav />
 
       {/* Hero -- light canvas + dot grid + soft halo behind the floating phone,
           per the design system: the whole marketing site stays light, only
-          the dashboard goes dark (see src/app/dashboard/layout.tsx). */}
+          the dashboard goes dark (see src/app/dashboard/layout.tsx). No
+          scroll-linked motion here: DESIGN.md rules out parallax outright
+          ("pas de parallax"), so the hero is static once painted -- the
+          only continuous motion left is the floating cards and the
+          signature live order card inside HeroMockup. */}
       <div className="relative overflow-hidden bg-dot-grid">
-        <HeroParallax>
-          <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-8 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-16 sm:pt-12">
-            <div className="flex flex-col items-start gap-6 text-left">
-              <span className="eyebrow">Menu QR &amp; commande à table</span>
-              <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-                Le <span className="bg-accent-gradient bg-clip-text text-transparent">QR</span> sur la table.
-                <br />
-                La commande en <span className="bg-accent-gradient bg-clip-text text-transparent">cuisine</span>.
-              </h1>
-              <p className="max-w-md text-lg text-slate-500">
-                Menu multilingue, allergènes conformes, commandes en temps réel — sans matériel à installer, sans
-                abonnement à un boîtier.
-              </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                  Créer mon restaurant
-                </Link>
-                <a href="#apercu" className="btn-secondary px-6 py-3 text-base">
-                  Voir le produit
-                </a>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-500">
-                {TRUST_BADGES.map((badge) => (
-                  <span key={badge.label} className="inline-flex items-center gap-1.5">
-                    <span className="text-accent">{badge.icon}</span>
-                    {badge.label}
-                  </span>
-                ))}
-              </div>
+        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-8 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-16 sm:pt-12">
+          <div className="flex flex-col items-start gap-6 text-left">
+            <span className="eyebrow">Menu QR e ordini al tavolo</span>
+            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
+              Il <span className="bg-brand-gradient bg-clip-text text-transparent">QR</span> sul tavolo.
+              <br />
+              L&apos;ordine in <span className="bg-brand-gradient bg-clip-text text-transparent">cucina</span>.
+            </h1>
+            <p className="max-w-md text-lg text-muted">
+              Menu multilingue, allergeni conformi, ordini in tempo reale — senza hardware da installare, senza
+              abbonamento a un dispositivo.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/signup" className="btn-primary px-6 py-3 text-base">
+                Crea il tuo ristorante
+              </Link>
+              <a href="#apercu" className="btn-secondary px-6 py-3 text-base">
+                Guarda il prodotto
+              </a>
             </div>
-
-            <HeroMockup />
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-muted">
+              {TRUST_BADGES.map((badge) => (
+                <span key={badge.label} className="inline-flex items-center gap-1.5">
+                  <span className="text-brand">{badge.icon}</span>
+                  {badge.label}
+                </span>
+              ))}
+            </div>
           </div>
-        </HeroParallax>
 
-        <WaveDivider className="text-white" />
+          <HeroMockup />
+        </div>
+
+        <WaveDivider className="text-surface" />
       </div>
 
-      <section id="demo" className="bg-white py-16 sm:py-24">
+      <section id="demo" className="bg-surface py-16 sm:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <Reveal>
-            <span className="eyebrow">Démo</span>
+            <span className="eyebrow">Demo</span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              Regardez-le <span className="bg-accent-gradient bg-clip-text text-transparent">fonctionner</span>
+              Guardalo <span className="bg-brand-gradient bg-clip-text text-transparent">funzionare</span>
             </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
-              Un vrai enregistrement de l&apos;application — scan, menu, panier, commande envoyée.
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+              Una vera registrazione dell&apos;applicazione — scansione, menu, carrello, ordine inviato.
             </p>
           </Reveal>
           <Reveal className="mt-12">
@@ -140,15 +144,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="apercu" className="bg-white py-16 sm:py-20">
+      <section id="apercu" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Aperçu du produit</span>
+            <span className="eyebrow">Anteprima del prodotto</span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              Voyez-le en <span className="bg-accent-gradient bg-clip-text text-transparent">action</span>
+              Guardalo in <span className="bg-brand-gradient bg-clip-text text-transparent">azione</span>
             </h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-slate-500">
-              Ce sont de vraies captures de l&apos;application — pas des maquettes.
+            <p className="mx-auto mt-2 max-w-xl text-sm text-muted">
+              Sono vere schermate dell&apos;applicazione — non dei mockup.
             </p>
           </Reveal>
           <Reveal className="mt-10">
@@ -160,20 +164,20 @@ export default function HomePage() {
       <section id="comment-ca-marche" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Trois étapes</span>
+            <span className="eyebrow">Tre passaggi</span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              Comment ça <span className="bg-accent-gradient bg-clip-text text-transparent">marche</span>
+              Come <span className="bg-brand-gradient bg-clip-text text-transparent">funziona</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
             {STEPS.map((step) => (
               <StaggerItem key={step.n}>
                 <div className="card h-full">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent-gradient text-sm font-bold text-white">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-sm font-bold text-white">
                     {step.n}
                   </span>
                   <h3 className="mt-4 text-base font-semibold text-ink">{step.title}</h3>
-                  <p className="mt-1 text-sm text-slate-500">{step.body}</p>
+                  <p className="mt-1 text-sm text-muted">{step.body}</p>
                 </div>
               </StaggerItem>
             ))}
@@ -181,23 +185,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="fonctionnalites" className="bg-white py-16 sm:py-20">
+      <section id="fonctionnalites" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Fonctionnalités</span>
+            <span className="eyebrow">Funzionalità</span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              Fait pour l&apos;<span className="bg-accent-gradient bg-clip-text text-transparent">Italie</span>
+              Pensato per l&apos;<span className="bg-brand-gradient bg-clip-text text-transparent">Italia</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((feature) => (
               <StaggerItem key={feature.title}>
                 <div className="card h-full">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
                     {feature.icon}
                   </span>
                   <h3 className="mt-3 text-sm font-semibold text-ink">{feature.title}</h3>
-                  <p className="mt-1 text-sm text-slate-500">{feature.body}</p>
+                  <p className="mt-1 text-sm text-muted">{feature.body}</p>
                 </div>
               </StaggerItem>
             ))}
@@ -208,9 +212,9 @@ export default function HomePage() {
       <section className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Concrètement</span>
+            <span className="eyebrow">In concreto</span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              Ce que le produit <span className="bg-accent-gradient bg-clip-text text-transparent">fait vraiment</span>
+              Quello che il prodotto <span className="bg-brand-gradient bg-clip-text text-transparent">fa davvero</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-4">
@@ -219,48 +223,48 @@ export default function HomePage() {
                 <p className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
                   <StatCounter value={stat.value} suffix={stat.suffix} />
                 </p>
-                <p className="mt-2 text-sm text-slate-500">{stat.label}</p>
+                <p className="mt-2 text-sm text-muted">{stat.label}</p>
               </StaggerItem>
             ))}
           </StaggerGroup>
         </div>
       </section>
 
-      <section id="tarifs" className="bg-white py-16 sm:py-20">
+      <section id="tarifs" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-2xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Tarifs</span>
+            <span className="eyebrow">Prezzi</span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              Un seul plan. <span className="bg-accent-gradient bg-clip-text text-transparent">Tout inclus.</span>
+              Un solo piano. <span className="bg-brand-gradient bg-clip-text text-transparent">Tutto incluso.</span>
             </h2>
-            <p className="mt-2 text-sm text-slate-500">
-              Pas d&apos;offre &laquo;&nbsp;Basique&nbsp;&raquo; vs &laquo;&nbsp;Pro&nbsp;&raquo; : chaque restaurant
-              accède à toute la plateforme.
+            <p className="mt-2 text-sm text-muted">
+              Nessuna offerta &laquo;&nbsp;Base&nbsp;&raquo; contro &laquo;&nbsp;Pro&nbsp;&raquo;: ogni ristorante
+              accede a tutta la piattaforma.
             </p>
           </Reveal>
           <Reveal className="mt-8 flex justify-center">
             <PricingToggle />
           </Reveal>
           <Reveal>
-            <div className="mt-8 rounded-[1.75rem] border border-accent/20 bg-accent/5 p-8 shadow-soft">
+            <div className="mt-8 rounded-[1.75rem] border border-brand/20 bg-brand/5 p-8 shadow-soft">
               <div className="flex flex-wrap items-baseline justify-center gap-2">
                 <span className="text-4xl font-extrabold text-ink">~33 €</span>
-                <span className="text-sm text-slate-500">/ mois, facturé ~400 € / an</span>
+                <span className="text-sm text-muted">/ mese, fatturato ~400 € / anno</span>
               </div>
-              <p className="mt-2 text-center text-sm text-slate-500">
-                14 jours d&apos;essai gratuit, sans carte bancaire.
+              <p className="mt-2 text-center text-sm text-muted">
+                14 giorni di prova gratuita, senza carta di credito.
               </p>
               <ul className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5">
                 {PLAN_FEATURES.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                  <li key={item} className="flex items-start gap-2 text-sm text-ink/80">
+                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                     {item}
                   </li>
                 ))}
               </ul>
               <div className="mt-8 flex justify-center">
                 <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                  Commencer l&apos;essai gratuit
+                  Inizia la prova gratuita
                 </Link>
               </div>
             </div>
@@ -268,20 +272,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <WaveDivider className="bg-white text-canvas" />
+      <WaveDivider className="bg-surface text-paper" />
 
       <section className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal>
-            <div className="rounded-[2rem] border border-accent/15 bg-gradient-to-br from-accent/10 via-white to-white p-10 text-center shadow-soft sm:p-16">
+            <div className="rounded-[2rem] border border-brand/15 bg-gradient-to-br from-brand/10 via-white to-white p-10 text-center shadow-soft sm:p-16">
               <h2 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-                Prêt à <span className="bg-accent-gradient bg-clip-text text-transparent">digitaliser</span> vos
-                tables ?
+                Pronto a <span className="bg-brand-gradient bg-clip-text text-transparent">digitalizzare</span> i
+                tuoi tavoli?
               </h2>
-              <p className="mt-3 text-slate-500">Créez votre restaurant en quelques minutes, sans engagement.</p>
+              <p className="mt-3 text-muted">Crea il tuo ristorante in pochi minuti, senza impegno.</p>
               <div className="mt-6 flex justify-center">
                 <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                  Créer mon restaurant
+                  Crea il tuo ristorante
                 </Link>
               </div>
             </div>
@@ -289,9 +293,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-sm text-slate-400">
-        © {new Date().getFullYear()} {APP_NAME} — nom de travail, non déposé.
-      </footer>
+      <LandingFooter />
     </main>
   );
 }

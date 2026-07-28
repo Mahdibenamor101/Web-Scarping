@@ -70,7 +70,7 @@ export default function SignupPage() {
             className="input"
           />
         </Field>
-        {error && <p className="text-sm text-rose-600">{error}</p>}
+        {error && <p className="text-sm text-signal">{error}</p>}
         <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
           {loading ? "Création…" : "Créer le compte"}
         </button>
@@ -82,7 +82,7 @@ export default function SignupPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span className="font-medium text-slate-700">{label}</span>
+      <span className="font-medium text-ink/70">{label}</span>
       {children}
     </label>
   );

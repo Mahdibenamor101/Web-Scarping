@@ -18,7 +18,7 @@ export default function AuthShell({
       <div className="w-full max-w-sm animate-bump-in">
         <div className="card-static px-6 py-8">
           <h1 className="text-xl font-extrabold tracking-tight text-ink">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+          {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
           <div className="mt-6">{children}</div>
         </div>
       </div>

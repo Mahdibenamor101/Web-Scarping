@@ -88,7 +88,7 @@ export default function StaffPage() {
       <section className="card-dash overflow-hidden p-0">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/5 bg-white/[0.03] text-left text-xs font-medium uppercase tracking-wide text-slate-400">
+            <tr className="border-b border-white/5 bg-white/[0.03] text-left text-xs font-medium uppercase tracking-wide text-white/40">
               <th className="px-4 py-3">Nom</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Rôle</th>
@@ -100,11 +100,11 @@ export default function StaffPage() {
             {staff.map((m) => (
               <tr key={m.id} className="border-b border-white/5 transition last:border-0 hover:bg-white/[0.03]">
                 <td className="px-4 py-3 font-medium text-white">{m.name}</td>
-                <td className="px-4 py-3 text-slate-400">{m.email}</td>
+                <td className="px-4 py-3 text-white/40">{m.email}</td>
                 <td className="px-4 py-3">
-                  <span className="badge-pill bg-accent/10 text-accent">{m.role}</span>
+                  <span className="badge-pill bg-brand-light/15 text-brand-light">{m.role}</span>
                 </td>
-                <td className="px-4 py-3 text-slate-400">{m.isActive ? "Actif" : "Désactivé"}</td>
+                <td className="px-4 py-3 text-white/40">{m.isActive ? "Actif" : "Désactivé"}</td>
                 <td className="px-4 py-3 text-right">
                   <button onClick={() => toggleActive(m)} className="btn-link-dash">
                     {m.isActive ? "Désactiver" : "Réactiver"}
@@ -120,14 +120,14 @@ export default function StaffPage() {
       {!loading && (
       <section>
         <h2 className="mb-3 text-base font-semibold text-white">Invitations en attente</h2>
-        {invitations.length === 0 && <p className="text-sm text-slate-400">Aucune invitation en attente.</p>}
+        {invitations.length === 0 && <p className="text-sm text-white/40">Aucune invitation en attente.</p>}
         <ul className="flex flex-col gap-2 text-sm">
           {invitations.map((inv) => (
             <li key={inv.id} className="card-dash-static flex justify-between px-4 py-3">
-              <span className="text-slate-300">
-                {inv.email} — <span className="badge-pill bg-accent/10 text-accent">{inv.role}</span>
+              <span className="text-white/60">
+                {inv.email} — <span className="badge-pill bg-brand-light/15 text-brand-light">{inv.role}</span>
               </span>
-              <span className="text-slate-500">expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}</span>
+              <span className="text-white/40">expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}</span>
             </li>
           ))}
         </ul>
@@ -138,7 +138,7 @@ export default function StaffPage() {
         <h2 className="mb-4 text-base font-semibold text-white">Inviter un membre</h2>
         <form onSubmit={onInvite} className="flex max-w-md flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-300">Email</span>
+            <span className="font-medium text-white/60">Email</span>
             <input
               required
               type="email"
@@ -148,7 +148,7 @@ export default function StaffPage() {
             />
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-300">Rôle</span>
+            <span className="font-medium text-white/60">Rôle</span>
             <select
               value={inviteRole}
               onChange={(e) => setInviteRole(e.target.value as (typeof ROLES)[number])}
@@ -161,7 +161,7 @@ export default function StaffPage() {
               ))}
             </select>
           </label>
-          {error && <p className="text-sm text-rose-400">{error}</p>}
+          {error && <p className="text-sm text-signal">{error}</p>}
           {lastInviteUrl && (
             <p className="animate-bump-in break-all rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
               Lien d&apos;invitation (aucun email n&apos;est envoyé pour l&apos;instant — transmettez-le

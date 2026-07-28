@@ -13,7 +13,7 @@ export default function Skeleton({
 }) {
   return (
     <div
-      className={`animate-pulse rounded-lg ${tone === "dash" ? "bg-white/[0.06]" : "bg-slate-200"} ${className}`}
+      className={`animate-pulse rounded-lg ${tone === "dash" ? "bg-white/[0.06]" : "bg-ink/10"} ${className}`}
     />
   );
 }

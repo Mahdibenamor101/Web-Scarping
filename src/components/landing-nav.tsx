@@ -24,7 +24,7 @@ export default function LandingNav() {
   return (
     <nav
       className={`sticky top-0 z-40 border-b transition-all duration-300 ${
-        scrolled ? "border-slate-200 bg-white/80 shadow-sm backdrop-blur-md" : "border-transparent bg-transparent"
+        scrolled ? "border-ink/10 bg-white/80 shadow-soft backdrop-blur-md" : "border-transparent bg-transparent"
       }`}
     >
       <div
@@ -35,24 +35,24 @@ export default function LandingNav() {
         <Logo />
         <div className="hidden items-center gap-7 text-sm font-medium sm:flex">
           <a href="#demo" className="nav-link">
-            Démo
+            Demo
           </a>
           <a href="#apercu" className="nav-link">
-            Aperçu
+            Panoramica
           </a>
           <a href="#fonctionnalites" className="nav-link">
-            Fonctionnalités
+            Funzionalità
           </a>
           <a href="#tarifs" className="nav-link">
-            Tarifs
+            Prezzi
           </a>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="nav-link hidden text-sm font-medium sm:inline">
-            Se connecter
+            Accedi
           </Link>
           <Link href="/signup" className="btn-primary px-4 py-2 text-sm">
-            S&apos;inscrire
+            Iscriviti
           </Link>
         </div>
       </div>

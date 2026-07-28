@@ -44,20 +44,20 @@ export default async function BillingPage({
         </p>
       )}
       {searchParams.checkout === "cancelled" && (
-        <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-slate-400">
+        <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-white/40">
           Paiement annulé, rien n&apos;a été débité.
         </p>
       )}
 
       <div className="card-dash animate-bump-in text-sm">
-        <p className="text-slate-400">
+        <p className="text-white/40">
           Statut :{" "}
-          <span className="badge-pill bg-accent/10 text-accent">
+          <span className="badge-pill bg-brand-light/15 text-brand-light">
             {STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}
           </span>
         </p>
         {organization.subscriptionStatus === "trialing" && trialDaysLeft !== null && (
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-white/40">
             {trialDaysLeft > 0 ? `${trialDaysLeft} jour(s) restant(s) d'essai gratuit.` : "Essai gratuit terminé."}
           </p>
         )}
@@ -72,7 +72,7 @@ export default async function BillingPage({
 
       {stripeConfigured && (isSubscribed ? <ManageBillingButton /> : <SubscribeButton />)}
 
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-white/40">
         Abonnement annuel prépayé (~400 €/an). Gérable à tout moment depuis Stripe : moyen de paiement, factures,
         résiliation.
       </p>

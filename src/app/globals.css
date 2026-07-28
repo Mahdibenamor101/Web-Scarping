@@ -7,61 +7,79 @@ html {
 }
 
 body {
-  @apply bg-canvas text-ink;
+  @apply bg-paper text-ink;
+}
+
+/* DESIGN.md: "prefers-reduced-motion: reduce -> toutes les animations
+   désactivées, contenu immédiatement visible. Ce n'est pas optionnel."
+   Covers every CSS animation/transition in one place; Framer Motion
+   components additionally check useReducedMotion() (see reveal.tsx,
+   live-order-card.tsx) since JS-driven motion isn't touched by this
+   media query. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /*
  * Shared component classes -- every page (marketing or dashboard) draws
  * from this vocabulary instead of repeating Tailwind strings. Values come
- * from src/lib/design-tokens.ts (imported into tailwind.config.ts), so a
- * token change here is a token change everywhere.
+ * from src/lib/design-tokens.ts per DESIGN.md, imported into
+ * tailwind.config.ts, so a token change here is a token change everywhere.
  *
  * Two card variants: `.card` is the light marketing/auth surface,
- * `.card-dash` is the dark dashboard surface (#1A2035 on #0F1420) --
- * deliberately different rooms, not a light/dark toggle of the same one.
+ * `.card-dash` is the dark dashboard surface -- deliberately different
+ * rooms (DESIGN.md: "le dashboard se montre toujours sur fond sombre"),
+ * not a light/dark toggle of the same one.
  */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent-gradient px-5 py-2.5
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5
       text-sm font-semibold text-white shadow-soft transition duration-200 ease-out
-      hover:scale-[1.03] hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100;
+      hover:-translate-y-0.5 hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-slate-300
-      bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition duration-200 ease-out
-      hover:scale-[1.03] hover:border-slate-400 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/15
+      bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:border-ink/30 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   .btn-link {
-    @apply text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-ink hover:underline;
+    @apply text-sm font-medium text-muted underline-offset-2 transition hover:text-ink hover:underline;
   }
 
   .btn-link-danger {
-    @apply text-sm font-medium text-rose-600 underline-offset-2 transition hover:text-rose-700 hover:underline;
+    @apply text-sm font-medium text-signal underline-offset-2 transition hover:brightness-90 hover:underline;
   }
 
   /* Dark-dashboard counterparts of .btn-link / .btn-link-danger. */
   .btn-link-dash {
-    @apply text-sm font-medium text-slate-400 underline-offset-2 transition hover:text-white hover:underline;
+    @apply text-sm font-medium text-white/50 underline-offset-2 transition hover:text-white hover:underline;
   }
 
   .btn-link-dash-danger {
-    @apply text-sm font-medium text-rose-400 underline-offset-2 transition hover:text-rose-300 hover:underline;
+    @apply text-sm font-medium text-signal underline-offset-2 transition hover:brightness-110 hover:underline;
   }
 
   .card {
-    @apply rounded-card border border-slate-200 bg-white p-4 shadow-soft transition duration-200 ease-out
-      hover:-translate-y-1 hover:shadow-softLg;
+    @apply rounded-card border border-ink/[0.06] bg-surface p-4 shadow-soft transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:shadow-softLg;
   }
 
   .card-static {
-    @apply rounded-card border border-slate-200 bg-white p-4 shadow-soft;
+    @apply rounded-card border border-ink/[0.06] bg-surface p-4 shadow-soft;
   }
 
   .card-dash {
     @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark transition duration-200 ease-out
-      hover:-translate-y-1 hover:shadow-dark;
+      hover:-translate-y-0.5 hover:shadow-dark;
   }
 
   .card-dash-static {
@@ -69,19 +87,19 @@ body {
   }
 
   .input {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-ink
-      outline-none transition placeholder:text-slate-400
-      focus:border-accent focus:ring-4 focus:ring-accent/15;
+    @apply w-full rounded-xl border border-ink/15 bg-surface px-3.5 py-2.5 text-sm text-ink
+      outline-none transition placeholder:text-muted
+      focus:border-brand focus:ring-4 focus:ring-brand/15;
   }
 
   .input-dash {
     @apply w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white
-      outline-none transition placeholder:text-slate-500
-      focus:border-accent focus:ring-4 focus:ring-accent/20;
+      outline-none transition placeholder:text-white/40
+      focus:border-brand-light focus:ring-4 focus:ring-brand/20;
   }
 
   .eyebrow {
-    @apply text-[13px] font-semibold uppercase text-accent;
+    @apply text-[14px] font-semibold uppercase text-brand;
     letter-spacing: 3px;
   }
 
@@ -89,41 +107,57 @@ body {
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
   }
 
-  .badge-success {
-    @apply badge-pill bg-success-bg text-success-text;
+  /* Status colors are informational, never decorative (DESIGN.md: "la
+     couleur porte de l'information, jamais de la décoration"). Exactly
+     three: signal=à faire, progress=en cours, brand=prêt/live. */
+  .badge-todo {
+    @apply badge-pill bg-signal/10 text-signal;
   }
 
-  .badge-warning {
-    @apply badge-pill bg-warning-bg text-warning-text;
+  .badge-progress {
+    @apply badge-pill bg-progress/10 text-progress;
   }
 
-  .badge-live {
-    @apply badge-pill bg-live-bg text-live-text;
+  .badge-ready {
+    @apply badge-pill bg-brand/10 text-brand;
+  }
+
+  /* Dark-dashboard counterparts -- `brand` alone fails AA contrast on `ink`
+     (see design-tokens.ts brandLight comment), so the ready/live badge
+     swaps to brand-light there. Signal/progress read fine on ink as-is. */
+  .badge-todo-dash {
+    @apply badge-pill bg-signal/15 text-signal;
+  }
+
+  .badge-progress-dash {
+    @apply badge-pill bg-progress/15 text-progress;
+  }
+
+  .badge-ready-dash {
+    @apply badge-pill bg-brand-light/15 text-brand-light;
   }
 
   .badge-dot {
     @apply h-1.5 w-1.5 rounded-full bg-current;
   }
 
+  /* Pulsing dot: reserved for "flux temps réel actif", nowhere else. */
   .badge-dot-live {
     @apply badge-dot animate-pulse-dot;
   }
 
+  /* Dot-grid texture, light sections only (DESIGN.md: jamais sur le sombre),
+     opacity capped at 4%. */
   .bg-dot-grid {
-    background-image: radial-gradient(rgba(11, 18, 32, 0.05) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(14, 20, 24, 0.04) 1px, transparent 1px);
     background-size: 18px 18px;
   }
 
-  .bg-dot-grid-dark {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-    background-size: 18px 18px;
-  }
-
-  /* Nav link with an accent underline that grows in from the left on hover. */
+  /* Nav link with a brand underline that grows in from the left on hover. */
   .nav-link {
-    @apply relative text-slate-600 transition-colors duration-200 hover:text-accent
+    @apply relative text-muted transition-colors duration-200 hover:text-ink
       after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left
-      after:scale-x-0 after:bg-accent-gradient after:transition-transform after:duration-300 after:ease-out
+      after:scale-x-0 after:bg-brand-gradient after:transition-transform after:duration-300 after:ease-out
       hover:after:scale-x-100;
   }
 }

@@ -55,7 +55,7 @@ export default function AcceptInvitePage() {
   if (loadError) {
     return (
       <AuthShell title="Invitation invalide">
-        <p className="text-sm text-slate-500">Ce lien d&apos;invitation est invalide ou a expiré.</p>
+        <p className="text-sm text-muted">Ce lien d&apos;invitation est invalide ou a expiré.</p>
       </AuthShell>
     );
   }
@@ -71,11 +71,11 @@ export default function AcceptInvitePage() {
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Votre nom</span>
+          <span className="font-medium text-ink/70">Votre nom</span>
           <input required value={name} onChange={(e) => setName(e.target.value)} className="input" />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Mot de passe (10 caractères min.)</span>
+          <span className="font-medium text-ink/70">Mot de passe (10 caractères min.)</span>
           <input
             required
             type="password"
@@ -85,7 +85,7 @@ export default function AcceptInvitePage() {
             className="input"
           />
         </label>
-        {submitError && <p className="text-sm text-rose-600">{submitError}</p>}
+        {submitError && <p className="text-sm text-signal">{submitError}</p>}
         <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
           {loading ? "Activation…" : "Activer mon compte"}
         </button>

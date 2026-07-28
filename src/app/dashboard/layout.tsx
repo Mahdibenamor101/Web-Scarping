@@ -36,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
         <div className="border-t border-white/10 px-2 pt-4">
           <p className="truncate text-sm font-semibold text-white">{organization?.name ?? "—"}</p>
-          <p className="truncate text-xs text-slate-400">
+          <p className="truncate text-xs text-white/40">
             {session.name} · {ROLE_LABEL[session.role]}
           </p>
           <div className="mt-3">

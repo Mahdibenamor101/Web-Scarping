@@ -125,7 +125,7 @@ export default function MenuPage() {
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
+        {error && <p className="mt-2 text-sm text-signal">{error}</p>}
       </section>
 
       {loading &&
@@ -138,7 +138,7 @@ export default function MenuPage() {
         ))}
 
       {!loading && categories.length === 0 && (
-        <p className="text-sm text-slate-400">Aucune catégorie pour l&apos;instant — commencez par en créer une.</p>
+        <p className="text-sm text-white/40">Aucune catégorie pour l&apos;instant — commencez par en créer une.</p>
       )}
 
       {!loading && categories.map((category) => {
@@ -147,7 +147,7 @@ export default function MenuPage() {
           <section key={category.id} className="card-dash animate-bump-in">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold text-white">
-                {category.nameIt} {category.nameEn && <span className="text-slate-500">({category.nameEn})</span>}
+                {category.nameIt} {category.nameEn && <span className="text-white/40">({category.nameEn})</span>}
               </h2>
               <div className="flex gap-4">
                 <button
@@ -187,12 +187,12 @@ export default function MenuPage() {
                   >
                     <div>
                       <p className="font-medium text-white">
-                        {item.nameIt} <span className="text-slate-500">—</span> {item.price.toFixed(2)} €{" "}
-                        {!item.isAvailable && <span className="badge-pill bg-rose-500/10 text-rose-300">indisponible</span>}
+                        {item.nameIt} <span className="text-white/40">—</span> {item.price.toFixed(2)} €{" "}
+                        {!item.isAvailable && <span className="badge-pill bg-signal/10 text-signal">indisponible</span>}
                       </p>
-                      {item.descriptionIt && <p className="text-slate-400">{item.descriptionIt}</p>}
+                      {item.descriptionIt && <p className="text-white/40">{item.descriptionIt}</p>}
                       {item.allergens.length > 0 && (
-                        <p className="mt-1 text-xs text-slate-500">
+                        <p className="mt-1 text-xs text-white/40">
                           Allergènes : {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
                         </p>
                       )}
@@ -212,7 +212,7 @@ export default function MenuPage() {
                 ),
               )}
               {categoryItems.length === 0 && addingItemFor !== category.id && (
-                <p className="text-sm text-slate-500">Aucun plat dans cette catégorie.</p>
+                <p className="text-sm text-white/40">Aucun plat dans cette catégorie.</p>
               )}
             </ul>
 

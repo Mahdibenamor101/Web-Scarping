@@ -11,7 +11,7 @@ export default function LogoutButton() {
         router.push("/login");
         router.refresh();
       }}
-      className="text-sm font-medium text-slate-400 transition hover:text-white"
+      className="text-sm font-medium text-white/40 transition hover:text-white"
     >
       Se déconnecter
     </button>
