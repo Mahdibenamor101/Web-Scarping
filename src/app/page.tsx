@@ -8,6 +8,7 @@ import PricingToggle from "@/components/pricing-toggle";
 import WaveDivider from "@/components/wave-divider";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
+import FaqAccordion from "@/components/faq-accordion";
 
 // Landing copy is in Italian end to end (dashboard and auth stay in
 // French -- see CONTEXT.md). The public menu page has its own separate
@@ -76,6 +77,64 @@ const TRUST_BADGES = [
   { icon: <BoltIcon className="h-4 w-4" />, label: "Operativo in pochi minuti" },
   { icon: <CardIcon className="h-4 w-4" />, label: "Senza carta di credito" },
   { icon: <StarIcon className="h-4 w-4" />, label: "14 giorni di prova gratuita" },
+];
+
+const PERSONAS = [
+  {
+    title: "Trattoria & ristorante",
+    body: "Menu strutturato in categorie, allergeni su ogni piatto, ordini gestiti in cucina in diretta.",
+    icon: <UtensilsIcon />,
+  },
+  {
+    title: "Pizzeria",
+    body: "Impasti e stagionali che cambiano spesso: si aggiornano dal pannello, senza ristampare nulla.",
+    icon: <PizzaIcon />,
+  },
+  {
+    title: "Bar & enoteca",
+    body: "Carta vini o cocktail, ordini rapidi al tavolo, aggiornati al volo quando qualcosa finisce.",
+    icon: <WineIcon />,
+  },
+];
+
+// Real, checkable differences -- not marketing exaggeration. Every line on
+// the "menu di carta" side is a genuine limitation of a printed menu, every
+// line on the QR side is a feature that actually exists in the product.
+const COMPARISON = [
+  { paper: "Cambiare un prezzo: bisogna ristampare tutto", qr: "Si aggiorna in un clic, subito visibile" },
+  { paper: "Allergeni scritti a mano, facili da dimenticare", qr: "Etichettati su ogni piatto, sempre aggiornati" },
+  { paper: "Una stampa diversa per ogni lingua", qr: "Italiano e inglese nello stesso menu" },
+  { paper: "Un piatto finito? Il cameriere lo dice a voce, tavolo per tavolo", qr: "Segnato non disponibile in un tap, sparisce ovunque" },
+  { paper: "L'ordine arriva in cucina scritto a mano", qr: "Arriva in diretta, aggiornato in tempo reale" },
+];
+
+const FAQ_ITEMS = [
+  {
+    question: "Serve un hardware particolare?",
+    answer:
+      "No. Il cliente usa il proprio telefono, in sala/cucina basta un telefono, un tablet o un computer già esistente. Il QR si stampa o si espone su ogni tavolo.",
+  },
+  {
+    question: "Il menu è conforme al regolamento UE sugli allergeni?",
+    answer:
+      "Sì. I 14 allergeni previsti dal Regolamento (UE) n. 1169/2011 sono etichettati piatto per piatto, direttamente dal pannello.",
+  },
+  {
+    question: "Posso modificare il menu da solo, senza assistenza?",
+    answer: "Sì. Categorie, piatti, prezzi e disponibilità si gestiscono dal pannello, in autonomia, in qualsiasi momento.",
+  },
+  {
+    question: "I dati del mio ristorante sono isolati da quelli degli altri clienti?",
+    answer: "Sì, l'isolamento è applicato a livello di database, non solo lato applicazione — vedi la funzionalità \"Isolamento rigoroso\" più sopra.",
+  },
+  {
+    question: "Il menu funziona su tutti gli smartphone?",
+    answer: "Sì, si apre direttamente nel browser dopo la scansione del QR — nessuna app da installare.",
+  },
+  {
+    question: "Posso disdire quando voglio?",
+    answer: "Sì, l'abbonamento si gestisce dal pannello (sezione Abbonamento), in autonomia, in qualsiasi momento.",
+  },
 ];
 
 export default function HomePage() {
@@ -209,7 +268,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-dot-grid py-16 sm:py-20">
+      <section id="per-chi" className="bg-dot-grid py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <Reveal className="text-center">
+            <span className="eyebrow">Per ogni tipo di locale</span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+              Pensato per il tuo <span className="bg-brand-gradient bg-clip-text text-transparent">locale</span>
+            </h2>
+          </Reveal>
+          <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
+            {PERSONAS.map((persona) => (
+              <StaggerItem key={persona.title}>
+                <div className="card h-full">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                    {persona.icon}
+                  </span>
+                  <h3 className="mt-3 text-sm font-semibold text-ink">{persona.title}</h3>
+                  <p className="mt-1 text-sm text-muted">{persona.body}</p>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerGroup>
+        </div>
+      </section>
+
+      <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">In concreto</span>
@@ -227,6 +310,41 @@ export default function HomePage() {
               </StaggerItem>
             ))}
           </StaggerGroup>
+        </div>
+      </section>
+
+      <section className="bg-dot-grid py-16 sm:py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <Reveal className="text-center">
+            <span className="eyebrow">Perché passare al digitale</span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+              Carta o <span className="bg-brand-gradient bg-clip-text text-transparent">QR</span>?
+            </h2>
+          </Reveal>
+          <Reveal className="mt-10 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-card border border-ink/10 bg-surface p-6 shadow-soft">
+              <h3 className="text-sm font-semibold text-muted">Menu di carta</h3>
+              <ul className="mt-4 flex flex-col gap-3">
+                {COMPARISON.map((row) => (
+                  <li key={row.paper} className="flex items-start gap-2 text-sm text-ink/70">
+                    <MinusIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
+                    {row.paper}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-card border border-brand/20 bg-brand/5 p-6 shadow-soft">
+              <h3 className="text-sm font-semibold text-brand">Menu QR mbQr</h3>
+              <ul className="mt-4 flex flex-col gap-3">
+                {COMPARISON.map((row) => (
+                  <li key={row.qr} className="flex items-start gap-2 text-sm text-ink/80">
+                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                    {row.qr}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -268,6 +386,20 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section id="faq" className="bg-surface py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl px-6">
+          <Reveal className="text-center">
+            <span className="eyebrow">Domande frequenti</span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+              Le domande più <span className="bg-brand-gradient bg-clip-text text-transparent">comuni</span>
+            </h2>
+          </Reveal>
+          <Reveal className="mt-10">
+            <FaqAccordion items={FAQ_ITEMS} />
           </Reveal>
         </div>
       </section>
@@ -354,6 +486,41 @@ function CheckIcon({ className }: { className?: string }) {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={className}>
       <path d="M4 12l6 6L20 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function MinusIcon({ className }: { className?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={className}>
+      <path d="M5 12h14" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function UtensilsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 3v7a2 2 0 002 2 2 2 0 002-2V3M8 12v9M17 3c-1.5 0-3 1.5-3 4v4h3M17 3v18" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PizzaIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 4l18 6-9 12L3 4z" strokeLinejoin="round" />
+      <circle cx="11" cy="10" r="1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="14" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function WineIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M7 3h10l-1 6a4 4 0 01-8 0L7 3z" strokeLinejoin="round" />
+      <path d="M12 13v8M8 21h8" strokeLinecap="round" />
     </svg>
   );
 }

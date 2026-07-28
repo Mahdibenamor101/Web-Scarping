@@ -46,6 +46,9 @@ export default function LandingNav() {
           <a href="#tarifs" className="nav-link">
             Prezzi
           </a>
+          <a href="#faq" className="nav-link">
+            FAQ
+          </a>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="nav-link hidden text-sm font-medium sm:inline">
