@@ -5,7 +5,6 @@ import HeroMockup from "@/components/hero-mockup";
 import DemoVideo from "@/components/demo-video";
 import StatCounter from "@/components/stat-counter";
 import PricingToggle from "@/components/pricing-toggle";
-import WaveDivider from "@/components/wave-divider";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
 import FaqAccordion from "@/components/faq-accordion";
@@ -15,17 +14,17 @@ import FaqAccordion from "@/components/faq-accordion";
 // IT/EN toggle and is unrelated to this.
 const STEPS = [
   {
-    n: "1",
+    n: "01",
     title: "Il cliente scansiona",
     body: "Un QR per tavolo. Niente da installare, il menu si apre nel browser.",
   },
   {
-    n: "2",
+    n: "02",
     title: "Ordina dal telefono",
     body: "Menu in italiano e inglese, allergeni indicati su ogni piatto.",
   },
   {
-    n: "3",
+    n: "03",
     title: "Arriva in cucina, in diretta",
     body: "Da fare, in corso, pronto — aggiornato senza ricaricare la pagina.",
   },
@@ -97,6 +96,13 @@ const PERSONAS = [
   },
 ];
 
+// White-label: what the owner controls, in the order they'd set it up.
+const BRANDING_STEPS = [
+  { title: "Carica il tuo logo", body: "Sostituisce il logo mbQr in cima al menu del cliente." },
+  { title: "Scegli uno sfondo", body: "Una foto del locale, dei piatti, o una tinta — quello che preferisci." },
+  { title: "Il tuo nome resta protagonista", body: "mbQr resta invisibile: il cliente vede il tuo locale, non noi." },
+];
+
 // Real, checkable differences -- not marketing exaggeration. Every line on
 // the "menu di carta" side is a genuine limitation of a printed menu, every
 // line on the QR side is a feature that actually exists in the product.
@@ -128,6 +134,10 @@ const FAQ_ITEMS = [
     answer: "Sì, l'isolamento è applicato a livello di database, non solo lato applicazione — vedi la funzionalità \"Isolamento rigoroso\" più sopra.",
   },
   {
+    question: "Posso mettere il mio logo al posto del vostro?",
+    answer: "Sì. Logo e sfondo del menu pubblico sono personalizzabili dal pannello — vedi \"Il tuo marchio, non il nostro\" più sopra.",
+  },
+  {
     question: "Il menu funziona su tutti gli smartphone?",
     answer: "Sì, si apre direttamente nel browser dopo la scansione del QR — nessuna app da installare.",
   },
@@ -142,25 +152,23 @@ export default function HomePage() {
     <main lang="it">
       <LandingNav />
 
-      {/* Hero -- light canvas + dot grid + soft halo behind the floating phone,
-          per the design system: the whole marketing site stays light, only
-          the dashboard goes dark (see src/app/dashboard/layout.tsx). No
-          scroll-linked motion here: DESIGN.md rules out parallax outright
-          ("pas de parallax"), so the hero is static once painted -- the
-          only continuous motion left is the floating cards and the
-          signature live order card inside HeroMockup. */}
+      {/* Hero -- light steel-paper ground, dot texture + soft marigold halo
+          behind the floating phone. No scroll-linked motion (explicit
+          choice, see CONTEXT.md "pas de parallax") -- the continuous
+          movement lives in the floating cards and the signature comanda
+          inside HeroMockup instead. */}
       <div className="relative overflow-hidden bg-dot-grid">
-        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-8 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-16 sm:pt-12">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-10 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-20 sm:pt-14">
           <div className="flex flex-col items-start gap-6 text-left">
             <span className="eyebrow">Menu QR e ordini al tavolo</span>
-            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              Il <span className="bg-brand-gradient bg-clip-text text-transparent">QR</span> sul tavolo.
+            <h1 className="font-display text-6xl font-extrabold leading-[0.98] tracking-tight text-ink sm:text-7xl lg:text-[5.5rem]">
+              Il menu <span className="bg-brand-gradient bg-clip-text text-transparent">parla</span>.
               <br />
-              L&apos;ordine in <span className="bg-brand-gradient bg-clip-text text-transparent">cucina</span>.
+              La cucina <span className="bg-brand-gradient bg-clip-text text-transparent">ascolta</span>.
             </h1>
             <p className="max-w-md text-lg text-muted">
-              Menu multilingue, allergeni conformi, ordini in tempo reale — senza hardware da installare, senza
-              abbonamento a un dispositivo.
+              Ogni ordine diventa una comanda digitale che viaggia dal tavolo alla cucina in tempo reale — senza
+              hardware da installare, senza abbonamento a un dispositivo.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link href="/signup" className="btn-primary px-6 py-3 text-base">
@@ -170,7 +178,7 @@ export default function HomePage() {
                 Guarda il prodotto
               </a>
             </div>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-muted">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs font-medium text-muted">
               {TRUST_BADGES.map((badge) => (
                 <span key={badge.label} className="inline-flex items-center gap-1.5">
                   <span className="text-brand">{badge.icon}</span>
@@ -183,17 +191,17 @@ export default function HomePage() {
           <HeroMockup />
         </div>
 
-        <WaveDivider className="text-surface" />
+        <div className="bg-rail-top h-px w-full" />
       </div>
 
       <section id="demo" className="bg-surface py-16 sm:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <Reveal>
             <span className="eyebrow">Demo</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Guardalo <span className="bg-brand-gradient bg-clip-text text-transparent">funzionare</span>
             </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+            <p className="mx-auto mt-3 max-w-md text-sm text-muted">
               Una vera registrazione dell&apos;applicazione — scansione, menu, carrello, ordine inviato.
             </p>
           </Reveal>
@@ -203,14 +211,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="apercu" className="bg-surface py-16 sm:py-20">
+      <section id="apercu" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Anteprima del prodotto</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Guardalo in <span className="bg-brand-gradient bg-clip-text text-transparent">azione</span>
             </h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted">
+            <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
               Sono vere schermate dell&apos;applicazione — non dei mockup.
             </p>
           </Reveal>
@@ -220,22 +228,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="comment-ca-marche" className="bg-dot-grid py-16 sm:py-20">
+      <section id="comment-ca-marche" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Tre passaggi</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Come <span className="bg-brand-gradient bg-clip-text text-transparent">funziona</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
             {STEPS.map((step) => (
               <StaggerItem key={step.n}>
-                <div className="card h-full">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-sm font-bold text-white">
-                    {step.n}
-                  </span>
-                  <h3 className="mt-4 text-base font-semibold text-ink">{step.title}</h3>
+                <div className="ticket h-full !pt-7">
+                  <span className="font-mono text-xs font-bold tracking-wide text-brand">{step.n}</span>
+                  <h3 className="mt-3 font-display text-xl font-extrabold text-ink">{step.title}</h3>
                   <p className="mt-1 text-sm text-muted">{step.body}</p>
                 </div>
               </StaggerItem>
@@ -244,11 +250,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="fonctionnalites" className="bg-surface py-16 sm:py-20">
+      <section id="fonctionnalites" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Funzionalità</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Pensato per l&apos;<span className="bg-brand-gradient bg-clip-text text-transparent">Italia</span>
             </h2>
           </Reveal>
@@ -259,7 +265,7 @@ export default function HomePage() {
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
                     {feature.icon}
                   </span>
-                  <h3 className="mt-3 text-sm font-semibold text-ink">{feature.title}</h3>
+                  <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{feature.title}</h3>
                   <p className="mt-1 text-sm text-muted">{feature.body}</p>
                 </div>
               </StaggerItem>
@@ -268,11 +274,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="marchio" className="bg-surface py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="grid gap-10 sm:grid-cols-[0.9fr_1.1fr] sm:items-center">
+            <Reveal>
+              <span className="eyebrow">Il tuo marchio</span>
+              <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-4xl">
+                Il menu porta il <span className="bg-brand-gradient bg-clip-text text-transparent">tuo</span> nome,
+                non il nostro.
+              </h2>
+              <p className="mt-3 max-w-md text-sm text-muted">
+                Carica il logo e un&apos;immagine di sfondo del tuo locale dal pannello. Quando un cliente scansiona
+                il QR, arriva su un menu che sembra il tuo — mbQr resta dietro le quinte.
+              </p>
+            </Reveal>
+            <StaggerGroup className="grid gap-4">
+              {BRANDING_STEPS.map((step, i) => (
+                <StaggerItem key={step.title}>
+                  <div className="ticket flex items-start gap-4 !pt-6">
+                    <span className="font-mono text-xs font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3 className="font-display text-base font-extrabold text-ink">{step.title}</h3>
+                      <p className="mt-0.5 text-sm text-muted">{step.body}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerGroup>
+          </div>
+        </div>
+      </section>
+
       <section id="per-chi" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Per ogni tipo di locale</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Pensato per il tuo <span className="bg-brand-gradient bg-clip-text text-transparent">locale</span>
             </h2>
           </Reveal>
@@ -283,7 +320,7 @@ export default function HomePage() {
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
                     {persona.icon}
                   </span>
-                  <h3 className="mt-3 text-sm font-semibold text-ink">{persona.title}</h3>
+                  <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{persona.title}</h3>
                   <p className="mt-1 text-sm text-muted">{persona.body}</p>
                 </div>
               </StaggerItem>
@@ -296,14 +333,14 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">In concreto</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Quello che il prodotto <span className="bg-brand-gradient bg-clip-text text-transparent">fa davvero</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-4">
             {STATS.map((stat) => (
               <StaggerItem key={stat.label} className="text-center">
-                <p className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
+                <p className="font-mono text-4xl font-extrabold tabular-nums tracking-tight text-ink sm:text-5xl">
                   <StatCounter value={stat.value} suffix={stat.suffix} />
                 </p>
                 <p className="mt-2 text-sm text-muted">{stat.label}</p>
@@ -317,13 +354,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Perché passare al digitale</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Carta o <span className="bg-brand-gradient bg-clip-text text-transparent">QR</span>?
             </h2>
           </Reveal>
           <Reveal className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-card border border-ink/10 bg-surface p-6 shadow-soft">
-              <h3 className="text-sm font-semibold text-muted">Menu di carta</h3>
+              <h3 className="font-display text-base font-extrabold text-muted">Menu di carta</h3>
               <ul className="mt-4 flex flex-col gap-3">
                 {COMPARISON.map((row) => (
                   <li key={row.paper} className="flex items-start gap-2 text-sm text-ink/70">
@@ -334,7 +371,7 @@ export default function HomePage() {
               </ul>
             </div>
             <div className="rounded-card border border-brand/20 bg-brand/5 p-6 shadow-soft">
-              <h3 className="text-sm font-semibold text-brand">Menu QR mbQr</h3>
+              <h3 className="font-display text-base font-extrabold text-brand-dark">Menu QR mbQr</h3>
               <ul className="mt-4 flex flex-col gap-3">
                 {COMPARISON.map((row) => (
                   <li key={row.qr} className="flex items-start gap-2 text-sm text-ink/80">
@@ -352,10 +389,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-2xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Prezzi</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Un solo piano. <span className="bg-brand-gradient bg-clip-text text-transparent">Tutto incluso.</span>
             </h2>
-            <p className="mt-2 text-sm text-muted">
+            <p className="mt-3 text-sm text-muted">
               Nessuna offerta &laquo;&nbsp;Base&nbsp;&raquo; contro &laquo;&nbsp;Pro&nbsp;&raquo;: ogni ristorante
               accede a tutta la piattaforma.
             </p>
@@ -364,9 +401,9 @@ export default function HomePage() {
             <PricingToggle />
           </Reveal>
           <Reveal>
-            <div className="mt-8 rounded-[1.75rem] border border-brand/20 bg-brand/5 p-8 shadow-soft">
+            <div className="ticket mt-8 !pt-9 sm:p-8 sm:!pt-10">
               <div className="flex flex-wrap items-baseline justify-center gap-2">
-                <span className="text-4xl font-extrabold text-ink">~33 €</span>
+                <span className="font-mono text-4xl font-extrabold tabular-nums text-ink">~33 €</span>
                 <span className="text-sm text-muted">/ mese, fatturato ~400 € / anno</span>
               </div>
               <p className="mt-2 text-center text-sm text-muted">
@@ -390,11 +427,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="faq" className="bg-surface py-16 sm:py-20">
+      <section id="faq" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-2xl px-6">
           <Reveal className="text-center">
             <span className="eyebrow">Domande frequenti</span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
               Le domande più <span className="bg-brand-gradient bg-clip-text text-transparent">comuni</span>
             </h2>
           </Reveal>
@@ -404,13 +441,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <WaveDivider className="bg-surface text-paper" />
-
-      <section className="bg-dot-grid py-16 sm:py-20">
+      <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal>
-            <div className="rounded-[2rem] border border-brand/15 bg-gradient-to-br from-brand/10 via-white to-white p-10 text-center shadow-soft sm:p-16">
-              <h2 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <div className="rounded-container border border-brand/15 bg-gradient-to-br from-brand/10 via-white to-white p-10 text-center shadow-soft sm:p-16">
+              <h2 className="font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
                 Pronto a <span className="bg-brand-gradient bg-clip-text text-transparent">digitalizzare</span> i
                 tuoi tavoli?
               </h2>

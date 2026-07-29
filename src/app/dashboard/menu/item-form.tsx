@@ -151,7 +151,7 @@ export default function ItemForm({
             />
             {uploading ? "Envoi…" : "ou importer une photo"}
           </label>
-          {uploadError && <span className="text-xs text-signal">{uploadError}</span>}
+          {uploadError && <span className="text-xs text-danger">{uploadError}</span>}
         </label>
       </div>
       <fieldset>
@@ -170,7 +170,7 @@ export default function ItemForm({
           ))}
         </div>
       </fieldset>
-      {error && <p className="text-sm text-signal">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
       <div className="flex items-center gap-4">
         <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "…" : submitLabel}

@@ -40,17 +40,19 @@ function getClient(): S3Client {
 }
 
 /**
- * Uploads one menu-item photo, namespaced by organization so two
- * restaurants' uploads can never collide or overwrite each other even
- * though they share one bucket. Returns the public URL to store as
- * MenuItem.photoUrl -- this function never touches the database itself,
- * so the same route works uniformly whether the item already exists or
- * is still being created client-side (see item-form.tsx).
+ * Uploads one image, namespaced by organization (so two restaurants'
+ * uploads can never collide even sharing one bucket) and by `folder`
+ * (menu-item photos vs. branding logo/background -- same mechanism, kept
+ * visually separable in the bucket). Returns the public URL to store --
+ * this function never touches the database itself, so the same call
+ * works uniformly whether the caller is item-form.tsx or the branding
+ * settings form.
  */
-export async function uploadMenuItemPhoto(opts: {
+export async function uploadImage(opts: {
   organizationId: string;
   contentType: string;
   bytes: Uint8Array;
+  folder: "menu-items" | "branding";
 }): Promise<string> {
   if (!isStorageConfigured()) {
     throw new ApiError(501, "storage_not_configured");
@@ -63,7 +65,7 @@ export async function uploadMenuItemPhoto(opts: {
   }
 
   const ext = opts.contentType === "image/png" ? "png" : opts.contentType === "image/webp" ? "webp" : "jpg";
-  const key = `menu-items/${opts.organizationId}/${crypto.randomUUID()}.${ext}`;
+  const key = `${opts.folder}/${opts.organizationId}/${crypto.randomUUID()}.${ext}`;
 
   await getClient().send(
     new PutObjectCommand({
@@ -71,9 +73,9 @@ export async function uploadMenuItemPhoto(opts: {
       Key: key,
       Body: opts.bytes,
       ContentType: opts.contentType,
-      // Menu photos are meant to be shown on the public menu page --
-      // there's nothing private about a dish photo once a table's QR
-      // exposes the menu itself.
+      // Menu photos and branding images are both meant to be shown on the
+      // public menu page -- there's nothing private about either once a
+      // table's QR exposes the menu itself.
       ACL: "public-read",
     }),
   );

@@ -20,11 +20,11 @@ export function LogoMark({ size = 36, className = "" }: { size?: number; classNa
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={className} aria-hidden="true">
       <defs>
         <linearGradient id="mbqr-logo-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#1E6F52" />
-          <stop offset="1" stopColor="#17593F" />
+          <stop offset="0" stopColor="#E2811F" />
+          <stop offset="1" stopColor="#A85614" />
         </linearGradient>
       </defs>
-      <rect width={40} height={40} rx={11} fill="url(#mbqr-logo-gradient)" />
+      <rect width={40} height={40} rx={8} fill="url(#mbqr-logo-gradient)" />
       <Finder x={5} y={5} />
       <Finder x={24} y={5} />
       <Finder x={5} y={24} />
@@ -35,7 +35,7 @@ export function LogoMark({ size = 36, className = "" }: { size?: number; classNa
 
 export default function Logo({
   size = 28,
-  wordmarkClassName = "text-lg font-bold tracking-tight",
+  wordmarkClassName = "font-display text-xl font-extrabold tracking-tight",
   className = "",
 }: {
   size?: number;

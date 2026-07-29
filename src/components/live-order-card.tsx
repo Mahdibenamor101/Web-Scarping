@@ -1,15 +1,16 @@
 "use client";
 
 /**
- * The signature element (DESIGN.md: "le seul endroit où l'on dépense de
- * l'audace"). A single order card that loops every ~6s: slides in amber
- * "da fare" with a running timer, flips to basil "pronto", slides out,
- * then a new order takes its place. Silent, continuous, isolated to the
- * hero -- nothing else in the app loops like this.
+ * The signature element ("Comanda" direction, see CONTEXT.md: "le seul
+ * endroit où l'on dépense de l'audace"). A single order ticket that loops
+ * every ~6s: slides in marigold "da fare" with a running timer, flips to
+ * moss "pronto", slides out, then a new order takes its place. Silent,
+ * continuous, isolated to the hero -- nothing else in the app loops like
+ * this. Styled as a literal comanda (torn-ticket top edge, stamped
+ * status), not a generic notification card.
  *
- * DESIGN.md prescribes the ~6s cadence but not the internal split; the
- * 3s/2s/1s breakdown below (fare / pronto / gap) is a documented choice,
- * not a hidden invented value.
+ * The ~6s cadence isn't further specified; the 3s/2s/1s breakdown below
+ * (fare / pronto / gap) is a documented choice, not a hidden invented value.
  */
 
 import { useEffect, useState } from "react";
@@ -20,7 +21,7 @@ const TODO_MS = 3000;
 const READY_MS = 2000;
 const GAP_MS = 1000;
 // Slide/scale transition for the card itself entering and leaving --
-// DESIGN.md doesn't prescribe this one, only the ~6s cadence above.
+// not part of the ~6s cadence above, just the UI chrome around it.
 const TRANSITION_SECONDS = 0.5;
 
 const ORDER = { table: "Tavolo 4", items: 3, total: "25,50 €" };
@@ -80,9 +81,9 @@ export default function LiveOrderCard() {
       {phase !== "hidden" && (
         <motion.div
           key="live-order-card"
-          initial={{ opacity: 0, y: 20, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, x: 20, scale: 0.96 }}
+          initial={{ opacity: 0, y: 20, scale: 0.94, rotate: -3 }}
+          animate={{ opacity: 1, y: 0, scale: 1, rotate: -1.5 }}
+          exit={{ opacity: 0, x: 24, scale: 0.94, rotate: 3 }}
           transition={{ duration: reduceMotion ? 0 : TRANSITION_SECONDS, ease: "easeOut" }}
         >
           <CardShell phase={phase} seconds={seconds} />
@@ -96,14 +97,10 @@ function CardShell({ phase, seconds }: { phase: "todo" | "ready"; seconds: numbe
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   return (
-    <div
-      className={`card-static flex w-48 items-center gap-3 !p-3.5 border-l-[3px] ${
-        phase === "todo" ? "border-signal" : "border-brand"
-      }`}
-    >
+    <div className="ticket flex w-52 items-center gap-3 !pt-6">
       <div className="flex-1">
-        <p className="text-[11px] font-semibold text-ink">{ORDER.table}</p>
-        <p className="text-[10px] text-muted">
+        <p className="font-display text-[15px] font-extrabold leading-none text-ink">{ORDER.table}</p>
+        <p className="mt-1 font-mono text-[10px] text-muted">
           {ORDER.items} piatti · {ORDER.total}
         </p>
       </div>

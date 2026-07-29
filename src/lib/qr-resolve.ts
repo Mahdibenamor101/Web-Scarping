@@ -7,6 +7,8 @@ type ResolvedTable = {
   tableLabel: string;
   organizationName: string;
   defaultLanguage: string;
+  logoUrl: string | null;
+  backgroundUrl: string | null;
 };
 
 type ResolveRow = {
@@ -15,6 +17,8 @@ type ResolveRow = {
   table_label: string;
   organization_name: string;
   default_language: string;
+  logo_url: string | null;
+  background_url: string | null;
 };
 
 /**
@@ -22,7 +26,9 @@ type ResolveRow = {
  * QR code's token into an organization + table. See
  * prisma/migrations/*_public_ordering -- everything downstream of this call
  * (reading the menu, inserting the order) goes through withTenant() like
- * any other RLS-scoped operation.
+ * any other RLS-scoped operation. Also hands back logo/background URLs
+ * (prisma/migrations/*_organization_branding) since the public menu page
+ * has no session and needs them for white-label rendering.
  */
 export async function resolveTableByQrToken(qrToken: string): Promise<ResolvedTable> {
   const [row] = await prisma.$queryRaw<ResolveRow[]>`
@@ -35,5 +41,7 @@ export async function resolveTableByQrToken(qrToken: string): Promise<ResolvedTa
     tableLabel: row.table_label,
     organizationName: row.organization_name,
     defaultLanguage: row.default_language,
+    logoUrl: row.logo_url,
+    backgroundUrl: row.background_url,
   };
 }

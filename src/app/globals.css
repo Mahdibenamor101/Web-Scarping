@@ -10,12 +10,11 @@ body {
   @apply bg-paper text-ink;
 }
 
-/* DESIGN.md: "prefers-reduced-motion: reduce -> toutes les animations
-   désactivées, contenu immédiatement visible. Ce n'est pas optionnel."
-   Covers every CSS animation/transition in one place; Framer Motion
-   components additionally check useReducedMotion() (see reveal.tsx,
-   live-order-card.tsx) since JS-driven motion isn't touched by this
-   media query. */
+/* "Comanda" direction (28 juillet 2026, see CONTEXT.md): prefers-reduced-motion
+   disables every CSS animation/transition here in one place; Framer Motion
+   components additionally check useReducedMotion() (reveal.tsx,
+   live-order-card.tsx) since JS-driven motion isn't touched by this query.
+   Not optional. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -28,113 +27,152 @@ body {
 }
 
 /*
- * Shared component classes -- every page (marketing or dashboard) draws
- * from this vocabulary instead of repeating Tailwind strings. Values come
- * from src/lib/design-tokens.ts per DESIGN.md, imported into
- * tailwind.config.ts, so a token change here is a token change everywhere.
+ * Shared component classes -- every page draws from this vocabulary
+ * instead of repeating Tailwind strings. Values come from
+ * src/lib/design-tokens.ts, imported into tailwind.config.ts.
  *
- * Two card variants: `.card` is the light marketing/auth surface,
- * `.card-dash` is the dark dashboard surface -- deliberately different
- * rooms (DESIGN.md: "le dashboard se montre toujours sur fond sombre"),
- * not a light/dark toggle of the same one.
+ * Two card variants: `.card`/`.ticket` are the light marketing/auth
+ * surface, `.card-dash`/`.ticket-dash` are the dark dashboard surface --
+ * deliberately different rooms (dashboard is always dark), not a
+ * light/dark toggle of the same one.
  */
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5
-      text-sm font-semibold text-white shadow-soft transition duration-200 ease-out
+      text-sm font-bold text-white shadow-soft transition duration-200 ease-out
       hover:-translate-y-0.5 hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/15
-      bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition duration-200 ease-out
-      hover:-translate-y-0.5 hover:border-ink/30 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] border-ink/15
+      bg-surface px-5 py-2.5 text-sm font-bold text-ink transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:border-ink/35 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   .btn-link {
-    @apply text-sm font-medium text-muted underline-offset-2 transition hover:text-ink hover:underline;
+    @apply text-sm font-semibold text-muted underline-offset-2 transition hover:text-ink hover:underline;
   }
 
   .btn-link-danger {
-    @apply text-sm font-medium text-signal underline-offset-2 transition hover:brightness-90 hover:underline;
+    @apply text-sm font-semibold text-danger underline-offset-2 transition hover:brightness-90 hover:underline;
   }
 
   /* Dark-dashboard counterparts of .btn-link / .btn-link-danger. */
   .btn-link-dash {
-    @apply text-sm font-medium text-white/50 underline-offset-2 transition hover:text-white hover:underline;
+    @apply text-sm font-semibold text-white/50 underline-offset-2 transition hover:text-white hover:underline;
   }
 
   .btn-link-dash-danger {
-    @apply text-sm font-medium text-signal underline-offset-2 transition hover:brightness-110 hover:underline;
+    @apply text-sm font-semibold text-danger-light underline-offset-2 transition hover:brightness-110 hover:underline;
   }
 
   .card {
-    @apply rounded-card border border-ink/[0.06] bg-surface p-4 shadow-soft transition duration-200 ease-out
-      hover:-translate-y-0.5 hover:shadow-softLg;
+    @apply rounded-card border border-ink/[0.08] bg-surface p-4 shadow-soft transition duration-200 ease-out
+      hover:-translate-y-1 hover:shadow-softLg;
   }
 
   .card-static {
-    @apply rounded-card border border-ink/[0.06] bg-surface p-4 shadow-soft;
+    @apply rounded-card border border-ink/[0.08] bg-surface p-4 shadow-soft;
   }
 
   .card-dash {
     @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark transition duration-200 ease-out
-      hover:-translate-y-0.5 hover:shadow-dark;
+      hover:-translate-y-1 hover:shadow-dark;
   }
 
   .card-dash-static {
     @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark;
   }
 
+  /* The signature motif: a card styled like a kitchen order ticket, torn
+     off at the top. Used for the live order card, the dashboard order
+     board, and anywhere else a "comanda" is shown -- not a generic card
+     variant, a deliberate reference to the physical object. */
+  .ticket {
+    @apply relative rounded-[2px] border border-ink/[0.08] bg-surface p-4 pt-5 shadow-soft;
+  }
+  .ticket::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 12px;
+    right: 12px;
+    height: 12px;
+    background-image: radial-gradient(circle at 8px 6px, transparent 6px, #ffffff 6.5px);
+    background-size: 16px 12px;
+    background-repeat: repeat-x;
+  }
+  .ticket-dash {
+    @apply relative rounded-[2px] border border-white/[0.06] bg-dash-card p-4 pt-5 shadow-dark;
+  }
+  .ticket-dash::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 12px;
+    right: 12px;
+    height: 12px;
+    background-image: radial-gradient(circle at 8px 6px, transparent 6px, theme("colors.dash.card") 6.5px);
+    background-size: 16px 12px;
+    background-repeat: repeat-x;
+  }
+
   .input {
-    @apply w-full rounded-xl border border-ink/15 bg-surface px-3.5 py-2.5 text-sm text-ink
+    @apply w-full rounded-lg border border-ink/15 bg-surface px-3.5 py-2.5 text-sm text-ink
       outline-none transition placeholder:text-muted
       focus:border-brand focus:ring-4 focus:ring-brand/15;
   }
 
   .input-dash {
-    @apply w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white
+    @apply w-full rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white
       outline-none transition placeholder:text-white/40
       focus:border-brand-light focus:ring-4 focus:ring-brand/20;
   }
 
   .eyebrow {
-    @apply text-[14px] font-semibold uppercase text-brand;
-    letter-spacing: 3px;
+    @apply inline-flex w-fit items-center gap-2 rounded-[3px] border-[1.5px] border-brand/30 bg-brand/10
+      px-2.5 py-1 font-mono text-[12px] font-bold uppercase text-brand-dark;
+    letter-spacing: 0.09em;
+    transform: rotate(-1.2deg);
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-1.5 w-1.5 shrink-0 rounded-full bg-brand-dark;
   }
 
   .badge-pill {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 rounded-[3px] border-[1.5px] px-2.5 py-1
+      font-mono text-[11px] font-bold uppercase;
+    letter-spacing: 0.05em;
   }
 
-  /* Status colors are informational, never decorative (DESIGN.md: "la
-     couleur porte de l'information, jamais de la décoration"). Exactly
-     three: signal=à faire, progress=en cours, brand=prêt/live. */
+  /* Status colors are informational, never decorative. Exactly three:
+     brand=à faire (doubles as the marketing accent), progress=en cours,
+     ready=prêt. `danger` is a fourth, separate meaning (destructive
+     actions), never used for status. */
   .badge-todo {
-    @apply badge-pill bg-signal/10 text-signal;
+    @apply badge-pill border-brand/40 bg-brand/10 text-brand-dark;
   }
 
   .badge-progress {
-    @apply badge-pill bg-progress/10 text-progress;
+    @apply badge-pill border-progress/40 bg-progress/10 text-progress;
   }
 
   .badge-ready {
-    @apply badge-pill bg-brand/10 text-brand;
+    @apply badge-pill border-ready/40 bg-ready/10 text-ready;
   }
 
-  /* Dark-dashboard counterparts -- `brand` alone fails AA contrast on `ink`
-     (see design-tokens.ts brandLight comment), so the ready/live badge
-     swaps to brand-light there. Signal/progress read fine on ink as-is. */
+  /* Dark-dashboard counterparts -- light variants for AA contrast on `dash-bg`/`dash-card`. */
   .badge-todo-dash {
-    @apply badge-pill bg-signal/15 text-signal;
+    @apply badge-pill border-brand-light/40 bg-brand-light/15 text-brand-light;
   }
 
   .badge-progress-dash {
-    @apply badge-pill bg-progress/15 text-progress;
+    @apply badge-pill border-progress-light/40 bg-progress-light/15 text-progress-light;
   }
 
   .badge-ready-dash {
-    @apply badge-pill bg-brand-light/15 text-brand-light;
+    @apply badge-pill border-ready-light/40 bg-ready-light/15 text-ready-light;
   }
 
   .badge-dot {
@@ -146,11 +184,19 @@ body {
     @apply badge-dot animate-pulse-dot;
   }
 
-  /* Dot-grid texture, light sections only (DESIGN.md: jamais sur le sombre),
-     opacity capped at 4%. */
+  /* Dot-grid texture, light sections only, opacity capped low. */
   .bg-dot-grid {
-    background-image: radial-gradient(rgba(14, 20, 24, 0.04) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(18, 22, 28, 0.05) 1px, transparent 1px);
     background-size: 18px 18px;
+  }
+
+  /* Horizontal "rail" divider -- a dashed line motif standing in for the
+     generic full-bleed color-block section break. */
+  .bg-rail-top {
+    background-image: repeating-linear-gradient(to right, rgba(18, 22, 28, 0.14) 0 10px, transparent 10px 20px);
+    background-position: top;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
   }
 
   /* Nav link with a brand underline that grows in from the left on hover. */

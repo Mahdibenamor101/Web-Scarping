@@ -5,6 +5,7 @@ import QrCode from "./qr-code";
 import Badge from "@/components/badge";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Skeleton from "@/components/skeleton";
+import HelpTip from "@/components/help-tip";
 
 type Table = { id: string; label: string; qrToken: string; status: "FREE" | "OCCUPIED" };
 
@@ -61,7 +62,15 @@ export default function TablesPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-extrabold tracking-tight text-white">Tables</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Tables</h1>
+        <HelpTip>
+          Chaque table a son propre <strong className="text-white">QR code unique</strong>. Imprimez-le et
+          collez-le sur la table : en le scannant, le client accède directement au menu avec sa table déjà
+          identifiée, sans rien saisir. Vous pouvez régénérer un code à tout moment si un sticker est abîmé ou
+          perdu.
+        </HelpTip>
+      </div>
 
       <section className="card-dash max-w-3xl">
         <h2 className="mb-3 text-base font-semibold text-white">Nouvelle table</h2>
@@ -77,11 +86,11 @@ export default function TablesPage() {
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-signal">{error}</p>}
+        {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       </section>
 
       {deleteError && (
-        <p className="animate-bump-in rounded-xl border border-signal/20 bg-signal/10 px-4 py-2.5 text-sm text-signal">
+        <p className="animate-bump-in rounded-xl border border-danger/20 bg-danger/10 px-4 py-2.5 text-sm text-danger">
           {deleteError}
         </p>
       )}

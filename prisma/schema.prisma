@@ -88,6 +88,9 @@ model Organization {
   city               String?
   phone              String?
   logoUrl            String?   @map("logo_url")
+  /// White-label: shown behind the header on this org's public menu
+  /// (/menu/[qrToken]) when set. See src/app/api/branding/route.ts.
+  backgroundUrl      String?   @map("background_url")
   themeColor         String?   @map("theme_color")
   defaultLanguage    String    @default("it") @map("default_language")
   subscriptionPlan   String    @default("trial") @map("subscription_plan")

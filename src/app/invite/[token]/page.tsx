@@ -85,7 +85,7 @@ export default function AcceptInvitePage() {
             className="input"
           />
         </label>
-        {submitError && <p className="text-sm text-signal">{submitError}</p>}
+        {submitError && <p className="text-sm text-danger">{submitError}</p>}
         <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
           {loading ? "Activation…" : "Activer mon compte"}
         </button>

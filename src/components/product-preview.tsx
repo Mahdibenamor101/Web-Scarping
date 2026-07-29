@@ -84,7 +84,7 @@ export default function ProductPreview() {
               </div>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-ink/10 bg-surface shadow-softLg">
+            <div className="overflow-hidden rounded-card border border-ink/10 bg-surface shadow-softLg">
               {/* Window-chrome dots are decorative (a browser-chrome convention), not
                   status indicators -- kept neutral so they don't borrow the app's
                   semantic colors for something that isn't information. */}

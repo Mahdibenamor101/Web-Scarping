@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Badge from "@/components/badge";
 import Skeleton from "@/components/skeleton";
+import HelpTip from "@/components/help-tip";
 
 type OrderStatus = "PENDING" | "IN_PROGRESS" | "READY" | "SERVED" | "CANCELLED";
 
@@ -25,9 +26,9 @@ const COLUMNS: {
   badge: "todo" | "progress" | "ready";
   borderClass: string;
 }[] = [
-  { status: "PENDING", title: "À faire", next: "IN_PROGRESS", badge: "todo", borderClass: "border-l-signal" },
+  { status: "PENDING", title: "À faire", next: "IN_PROGRESS", badge: "todo", borderClass: "border-l-brand" },
   { status: "IN_PROGRESS", title: "En cours", next: "READY", badge: "progress", borderClass: "border-l-progress" },
-  { status: "READY", title: "Prêt", next: "SERVED", badge: "ready", borderClass: "border-l-brand" },
+  { status: "READY", title: "Prêt", next: "SERVED", badge: "ready", borderClass: "border-l-ready" },
 ];
 
 export default function OrdersPage() {
@@ -80,26 +81,35 @@ export default function OrdersPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold tracking-tight text-white">Commandes</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Comande</h1>
+          <HelpTip>
+            Chaque commande passe par trois colonnes : <strong className="text-white">À faire</strong> dès qu&apos;un
+            client valide sa commande, <strong className="text-white">En cours</strong> une fois que la cuisine a
+            démarré, <strong className="text-white">Prêt</strong> quand elle peut être servie. Cliquez sur le bouton
+            d&apos;une carte pour la faire avancer. La page se met à jour toute seule (badge &laquo;&nbsp;EN
+            DIRECT&nbsp;&raquo;) — aucun rafraîchissement nécessaire.
+          </HelpTip>
+        </div>
         {connected ? (
           <Badge variant="ready" pulse dash>
             EN DIRECT
           </Badge>
         ) : (
-          <span className="text-xs font-medium text-white/40">Connexion…</span>
+          <span className="font-mono text-xs font-medium text-white/40">Connexion…</span>
         )}
       </div>
 
       {staffCalls.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl border-l-[3px] border-l-signal bg-white/[0.03] p-3">
+        <div className="flex flex-col gap-2 rounded-card border-l-[3px] border-l-brand bg-white/[0.03] p-3">
           {staffCalls.map((call) => (
-            <div key={call.id} className="flex items-center justify-between gap-3 text-sm">
+            <div key={call.id} className="flex animate-bump-in items-center justify-between gap-3 text-sm">
               <div className="flex items-center gap-2.5">
                 <Badge variant="todo" dash>
                   {call.table.label}
                 </Badge>
                 <span className="text-white">chiama il cameriere</span>
-                <span className="text-xs text-white/40">
+                <span className="font-mono text-xs text-white/40">
                   {new Date(call.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
@@ -114,7 +124,7 @@ export default function OrdersPage() {
       {loading && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {COLUMNS.map((column) => (
-            <div key={column.status} className="flex flex-col gap-3 rounded-2xl bg-white/[0.03] p-3">
+            <div key={column.status} className="flex flex-col gap-3 rounded-card bg-white/[0.03] p-3">
               <Skeleton className="h-5 w-20" />
               <Skeleton className="h-24 w-full" />
               <Skeleton className="h-24 w-full" />
@@ -130,45 +140,45 @@ export default function OrdersPage() {
               .filter((o) => o.status === column.status)
               .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
             return (
-              <section key={column.status} className="flex flex-col gap-3 rounded-2xl bg-white/[0.03] p-3">
+              <section key={column.status} className="flex flex-col gap-3 rounded-card bg-white/[0.03] p-3">
                 <div className="flex items-center justify-between px-1">
                   <Badge variant={column.badge} dash>
                     {column.title}
                   </Badge>
-                  <span className="text-xs font-medium text-white/40">{columnOrders.length}</span>
+                  <span className="font-mono text-xs font-medium text-white/40">{columnOrders.length}</span>
                 </div>
                 {columnOrders.length === 0 && <p className="px-1 text-xs text-white/40">Rien pour l&apos;instant.</p>}
                 {columnOrders.map((order) => (
                   <div
                     key={order.id}
-                    className={`card-dash flex animate-bump-in flex-col gap-2 border-l-[3px] text-sm ${column.borderClass}`}
+                    className={`ticket-dash flex animate-bump-in flex-col gap-2 border-l-[3px] text-sm ${column.borderClass}`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white">{order.table.label}</span>
+                      <span className="font-display text-base font-extrabold text-white">{order.table.label}</span>
                       <Badge variant={column.badge} dash>
                         {column.title}
                       </Badge>
                     </div>
-                    <span className="text-xs text-white/40">
+                    <span className="font-mono text-xs text-white/40">
                       {new Date(order.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
                     </span>
-                    <ul className="flex flex-col gap-1">
+                    <ul className="flex flex-col gap-1 border-t border-dashed border-white/10 pt-2">
                       {order.items.map((item) => (
                         <li key={item.id} className="text-xs text-white/60">
-                          {item.quantity} × {item.menuItem.nameIt}
+                          <span className="font-mono">{item.quantity}×</span> {item.menuItem.nameIt}
                           {item.notes && <span className="text-white/40"> — {item.notes}</span>}
                         </li>
                       ))}
                     </ul>
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-xs font-semibold text-white" style={{ fontVariantNumeric: "tabular-nums" }}>
+                    <div className="flex items-center justify-between border-t border-dashed border-white/10 pt-2">
+                      <span className="font-mono text-xs font-semibold tabular-nums text-white">
                         {order.totalAmount.toFixed(2)} €
                       </span>
                       <div className="flex items-center gap-3">
                         {column.next && (
                           <button
                             onClick={() => setStatus(order.id, column.next as OrderStatus)}
-                            className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-semibold text-white shadow-soft transition duration-200 hover:-translate-y-0.5"
+                            className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-bold text-white shadow-soft transition duration-200 hover:-translate-y-0.5"
                           >
                             {column.next === "IN_PROGRESS" && "Démarrer"}
                             {column.next === "READY" && "Prêt"}

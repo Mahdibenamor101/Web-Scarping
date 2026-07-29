@@ -22,13 +22,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <aside className="flex w-60 shrink-0 flex-col justify-between border-r border-white/5 bg-dash-card px-4 py-6 text-white">
         <div>
           <div className="px-2">
-            <Logo wordmarkClassName="text-lg font-bold tracking-tight text-white" />
+            <Logo wordmarkClassName="font-display text-xl font-extrabold tracking-tight text-white" />
           </div>
           <nav className="mt-8 flex flex-col gap-1">
             <NavLink href="/dashboard/orders">Commandes</NavLink>
             {canManageStaff(session.role) && <NavLink href="/dashboard/staff">Staff</NavLink>}
             {MENU_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/menu">Menu</NavLink>}
             {TABLE_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/tables">Tables</NavLink>}
+            {MENU_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/branding">Marque</NavLink>}
             {BILLING_MANAGEMENT_ROLES.includes(session.role) && (
               <NavLink href="/dashboard/billing">Abonnement</NavLink>
             )}

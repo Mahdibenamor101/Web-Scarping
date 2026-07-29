@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { withTenant } from "@/lib/db";
 import { getStripeClient } from "@/lib/stripe";
 import { SubscribeButton, ManageBillingButton } from "./actions";
+import HelpTip from "@/components/help-tip";
 
 const STATUS_LABEL: Record<string, string> = {
   trialing: "essai gratuit",
@@ -35,16 +36,23 @@ export default async function BillingPage({
 
   return (
     <div className="flex max-w-md flex-col gap-6">
-      <h1 className="text-2xl font-extrabold tracking-tight text-white">Abonnement</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Abonnement</h1>
+        <HelpTip>
+          Réservé au propriétaire. L&apos;abonnement débloque les tables et commandes illimitées. Le paiement et
+          les factures sont gérés par Stripe : cliquez sur &laquo;&nbsp;Gérer la facturation&nbsp;&raquo; pour
+          changer de carte, télécharger une facture ou annuler à tout moment.
+        </HelpTip>
+      </div>
 
       {searchParams.checkout === "success" && (
-        <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-300">
+        <p className="rounded-card border border-ready-light/20 bg-ready-light/10 p-3 text-sm text-ready-light">
           Paiement en cours de confirmation — le statut ci-dessous se mettra à jour automatiquement dès que Stripe
           nous aura notifiés.
         </p>
       )}
       {searchParams.checkout === "cancelled" && (
-        <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-white/40">
+        <p className="rounded-card border border-white/10 bg-white/[0.03] p-3 text-sm text-white/40">
           Paiement annulé, rien n&apos;a été débité.
         </p>
       )}
@@ -64,7 +72,7 @@ export default async function BillingPage({
       </div>
 
       {!stripeConfigured && (
-        <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-300">
+        <p className="rounded-card border border-danger-light/20 bg-danger-light/10 p-3 text-sm text-danger-light">
           Stripe n&apos;est pas configuré sur cet environnement (variables <code>STRIPE_SECRET_KEY</code> /{" "}
           <code>STRIPE_PRICE_ID</code> absentes) — normal en local sans compte Stripe. Voir <code>.env.example</code>.
         </p>

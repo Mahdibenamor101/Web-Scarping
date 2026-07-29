@@ -5,6 +5,7 @@ import { ALLERGEN_LABELS } from "@/lib/allergens";
 import ItemForm, { type ItemFormValues } from "./item-form";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Skeleton from "@/components/skeleton";
+import HelpTip from "@/components/help-tip";
 
 type Category = { id: string; nameIt: string; nameEn: string | null; sortOrder: number };
 type Item = {
@@ -109,7 +110,15 @@ export default function MenuPage() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-8">
-      <h1 className="text-2xl font-extrabold tracking-tight text-white">Menu</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Menu</h1>
+        <HelpTip>
+          Organisez vos plats par <strong className="text-white">catégories</strong> (Antipasti, Primi…), dans
+          l&apos;ordre où elles doivent apparaître au client. Chaque plat peut avoir une photo, un prix, des
+          allergènes et un interrupteur &laquo;&nbsp;disponible&nbsp;&raquo; pour le retirer temporairement sans le
+          supprimer (rupture de stock, plat du jour épuisé…).
+        </HelpTip>
+      </div>
 
       <section className="card-dash">
         <h2 className="mb-3 text-base font-semibold text-white">Nouvelle catégorie</h2>
@@ -125,7 +134,7 @@ export default function MenuPage() {
             Ajouter
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-signal">{error}</p>}
+        {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       </section>
 
       {loading &&
@@ -188,7 +197,7 @@ export default function MenuPage() {
                     <div>
                       <p className="font-medium text-white">
                         {item.nameIt} <span className="text-white/40">—</span> {item.price.toFixed(2)} €{" "}
-                        {!item.isAvailable && <span className="badge-pill bg-signal/10 text-signal">indisponible</span>}
+                        {!item.isAvailable && <span className="badge-pill bg-danger/10 text-danger">indisponible</span>}
                       </p>
                       {item.descriptionIt && <p className="text-white/40">{item.descriptionIt}</p>}
                       {item.allergens.length > 0 && (

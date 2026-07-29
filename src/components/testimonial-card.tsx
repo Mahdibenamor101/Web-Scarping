@@ -16,7 +16,7 @@ type Testimonial = {
 export default function TestimonialCard({ name, role, quote, initial }: Testimonial) {
   return (
     <div className="card-static flex flex-col gap-4">
-      <div className="flex gap-0.5 text-signal">
+      <div className="flex gap-0.5 text-danger">
         {Array.from({ length: 5 }).map((_, i) => (
           <StarIcon key={i} />
         ))}

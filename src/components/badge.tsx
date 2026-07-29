@@ -13,12 +13,13 @@ const VARIANT_CLASS_DASH: Record<Variant, string> = {
 };
 
 /**
- * Pastel status pill. Exactly three variants (DESIGN.md's strict semantic
- * coding): todo=signal/amber "à faire", progress=slate "en cours",
- * ready=brand/basil "prêt" -- basil also covers "live", so a real-time
- * indicator is `variant="ready" pulse`. The pulsing dot is reserved for
- * that one case ("un point qui pulse = flux temps réel actif, nulle part
- * ailleurs") -- never attach `pulse` to an ordinary status badge.
+ * Stamped status badge ("Comanda" direction, see CONTEXT.md). Exactly
+ * three variants, strict semantic coding: todo=brand/marigold "à faire"
+ * (brand doubles as the marketing accent), progress=denim "en cours",
+ * ready=moss "prêt" -- also covers "live", so a real-time indicator is
+ * `variant="ready" pulse`. The pulsing dot is reserved for that one case
+ * ("un point qui pulse = flux temps réel actif, nulle part ailleurs") --
+ * never attach `pulse` to an ordinary status badge.
  */
 export default function Badge({
   variant,

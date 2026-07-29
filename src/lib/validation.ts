@@ -80,3 +80,11 @@ export const orderStatusSchema = z.enum(["PENDING", "IN_PROGRESS", "READY", "SER
 export const updateOrderStatusSchema = z.object({
   status: orderStatusSchema,
 });
+
+// White-label: null explicitly clears a previously-set image (distinct
+// from omitting the key, which leaves it unchanged) -- see
+// src/app/api/branding/route.ts.
+export const updateBrandingSchema = z.object({
+  logoUrl: z.string().trim().url().max(2000).nullable().optional(),
+  backgroundUrl: z.string().trim().url().max(2000).nullable().optional(),
+});

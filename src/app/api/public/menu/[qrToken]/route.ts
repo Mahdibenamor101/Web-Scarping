@@ -38,6 +38,8 @@ export async function GET(req: NextRequest, { params }: { params: { qrToken: str
       organizationName: table.organizationName,
       tableLabel: table.tableLabel,
       defaultLanguage: table.defaultLanguage,
+      logoUrl: table.logoUrl,
+      backgroundUrl: table.backgroundUrl,
       categories,
       items: items.map(serialize),
     });

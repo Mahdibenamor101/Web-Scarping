@@ -52,7 +52,7 @@ function LoginForm() {
           className="input"
         />
       </label>
-      {error && <p className="text-sm text-signal">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
       <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
         {loading ? "Connexion…" : "Se connecter"}
       </button>

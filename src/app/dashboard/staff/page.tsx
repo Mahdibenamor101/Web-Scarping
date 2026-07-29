@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Skeleton from "@/components/skeleton";
+import HelpTip from "@/components/help-tip";
 
 type StaffMember = {
   id: string;
@@ -76,7 +77,15 @@ export default function StaffPage() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-8">
-      <h1 className="text-2xl font-extrabold tracking-tight text-white">Équipe</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Équipe</h1>
+        <HelpTip>
+          Invitez vos collègues par e-mail avec un <strong className="text-white">rôle</strong> : Manager
+          (accès complet sauf facturation), Serveur (commandes et appels de table) ou Cuisine (commandes
+          uniquement). Chaque invitation envoie un lien à usage unique, valable quelques jours, pour créer leur
+          propre compte.
+        </HelpTip>
+      </div>
 
       {loading && (
         <div className="card-dash-static flex flex-col gap-3">
@@ -163,7 +172,7 @@ export default function StaffPage() {
               ))}
             </select>
           </label>
-          {error && <p className="text-sm text-signal">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           {lastInviteUrl && (
             <p className="animate-bump-in break-all rounded-xl border border-brand/20 bg-brand/10 px-3 py-2 text-sm text-brand-light">
               {lastInviteEmailSent

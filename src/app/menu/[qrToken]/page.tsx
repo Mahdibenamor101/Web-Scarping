@@ -19,6 +19,8 @@ type Item = {
 type MenuData = {
   organizationName: string;
   tableLabel: string;
+  logoUrl: string | null;
+  backgroundUrl: string | null;
   categories: Category[];
   items: Item[];
 };
@@ -142,7 +144,7 @@ export default function PublicMenuPage() {
   if (loadError) {
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-signal">{loadError}</p>
+        <p className="text-danger">{loadError}</p>
       </main>
     );
   }
@@ -179,14 +181,31 @@ export default function PublicMenuPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-md pb-24">
+    <main
+      className="relative mx-auto min-h-screen max-w-md pb-24"
+      style={
+        data.backgroundUrl
+          ? { backgroundImage: `url(${data.backgroundUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+          : undefined
+      }
+    >
+      {/* White-label background: a translucent paper wash keeps menu text
+          legible over an arbitrary owner-uploaded photo, whatever its
+          contrast. Only rendered when an org has actually set one. */}
+      {data.backgroundUrl && <div className="pointer-events-none absolute inset-0 bg-paper/90" />}
       <header className="sticky top-0 z-10 border-b border-ink/10 bg-white/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-bold text-ink">{data.organizationName}</p>
-            <p className="text-xs text-muted">
-              {t.table} : {data.tableLabel}
-            </p>
+          <div className="flex items-center gap-2.5">
+            {data.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- arbitrary owner-uploaded URL
+              <img src={data.logoUrl} alt="" className="h-8 w-8 shrink-0 rounded-[3px] object-cover" />
+            )}
+            <div>
+              <p className="font-display text-base font-extrabold leading-none text-ink">{data.organizationName}</p>
+              <p className="mt-1 text-xs text-muted">
+                {t.table} : {data.tableLabel}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -219,10 +238,10 @@ export default function PublicMenuPage() {
           </div>
         </div>
         {callState === "called" && <p className="mt-1.5 text-xs font-medium text-brand">{t.called}</p>}
-        {callError && <p className="mt-1.5 text-xs text-signal">{callError}</p>}
+        {callError && <p className="mt-1.5 text-xs text-danger">{callError}</p>}
       </header>
 
-      <div className="flex flex-col gap-6 p-4">
+      <div className="relative flex flex-col gap-6 p-4">
         {data.categories.map((category) => {
           const items = data.items.filter((i) => i.categoryId === category.id);
           if (items.length === 0) return null;
@@ -251,7 +270,7 @@ export default function PublicMenuPage() {
                           {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
                         </p>
                       )}
-                      <p className="mt-1 text-sm font-bold text-ink">{item.price.toFixed(2)} €</p>
+                      <p className="mt-1 font-mono text-sm font-bold text-ink">{item.price.toFixed(2)} €</p>
                     </div>
                     <QuantityStepper value={cart[item.id] ?? 0} onChange={(qty) => setQty(item.id, qty)} />
                   </li>
@@ -271,7 +290,7 @@ export default function PublicMenuPage() {
           <span>
             {t.cart} · {cartCount}
           </span>
-          <span>{cartTotal.toFixed(2)} €</span>
+          <span className="font-mono">{cartTotal.toFixed(2)} €</span>
         </button>
       )}
 
@@ -301,7 +320,7 @@ export default function PublicMenuPage() {
               <span>{t.total}</span>
               <span>{cartTotal.toFixed(2)} €</span>
             </div>
-            {submitError && <p className="text-sm text-signal">{submitError}</p>}
+            {submitError && <p className="text-sm text-danger">{submitError}</p>}
             <button onClick={submitOrder} disabled={submitting || cartLines.length === 0} className="btn-primary w-full py-3">
               {submitting ? "…" : t.order}
             </button>
