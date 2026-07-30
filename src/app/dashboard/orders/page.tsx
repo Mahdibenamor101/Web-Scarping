@@ -14,6 +14,10 @@ type Order = {
   status: OrderStatus;
   totalAmount: number;
   createdAt: string;
+  orderingMode: "TABLE" | "COUNTER" | "PICKUP" | "DISPLAY_ONLY";
+  orderNumber: number;
+  pickupName: string | null;
+  paymentStatus: "UNPAID" | "PAID";
   items: { id: string; quantity: number; notes: string | null; menuItem: { nameIt: string; nameEn: string | null } }[];
 };
 
@@ -154,13 +158,16 @@ export default function OrdersPage() {
                     className={`ticket-dash flex animate-bump-in flex-col gap-2 border-l-[3px] text-sm ${column.borderClass}`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-display text-base font-extrabold text-white">{order.table.label}</span>
+                      <span className="font-display text-base font-extrabold text-white">
+                        {order.orderingMode === "TABLE" ? order.table.label : `${order.table.label} · #${order.orderNumber}`}
+                      </span>
                       <Badge variant={column.badge} dash>
                         {column.title}
                       </Badge>
                     </div>
                     <span className="font-mono text-xs text-white/40">
                       {new Date(order.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+                      {order.pickupName && <> · {order.pickupName}</>}
                     </span>
                     <ul className="flex flex-col gap-1 border-t border-dashed border-white/10 pt-2">
                       {order.items.map((item) => (
@@ -171,8 +178,13 @@ export default function OrdersPage() {
                       ))}
                     </ul>
                     <div className="flex items-center justify-between border-t border-dashed border-white/10 pt-2">
-                      <span className="font-mono text-xs font-semibold tabular-nums text-white">
+                      <span className="flex items-center gap-1.5 font-mono text-xs font-semibold tabular-nums text-white">
                         {order.totalAmount.toFixed(2)} €
+                        {order.paymentStatus === "PAID" && (
+                          <span className="rounded-[3px] border border-ready/40 bg-ready/10 px-1 py-0.5 text-[9px] uppercase text-ready">
+                            Payé
+                          </span>
+                        )}
                       </span>
                       <div className="flex items-center gap-3">
                         {column.next && (

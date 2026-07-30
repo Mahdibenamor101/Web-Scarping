@@ -59,6 +59,39 @@ enum StaffCallStatus {
   @@map("staff_call_status")
 }
 
+/// What a table's QR code actually does once scanned. `TABLE` is the
+/// original per-table dine-in flow; the other three are additive ordering
+/// link types (see CONTEXT.md) that reuse the same RestaurantTable row --
+/// a "table" here really means "one ordering endpoint with its own QR",
+/// not necessarily a physical piece of furniture.
+enum OrderingMode {
+  /// Classic per-table dine-in: orders are tagged with a specific table.
+  TABLE
+  /// One shared QR for the whole counter/venue; each order gets a
+  /// sequential number instead of a table label driving delivery.
+  COUNTER
+  /// Take-away: customer gives a name instead of a table, picks up later.
+  PICKUP
+  /// Browse-only -- no cart, no ordering. For window displays / review sites.
+  DISPLAY_ONLY
+
+  @@map("ordering_mode")
+}
+
+enum OAuthProvider {
+  GOOGLE
+  APPLE
+
+  @@map("oauth_provider")
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+
+  @@map("payment_status")
+}
+
 /// The 14 EU-regulated allergens (Regulation (EU) No 1169/2011, Annex II).
 enum Allergen {
   GLUTEN
@@ -104,15 +137,19 @@ model Organization {
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
-  users          User[]
-  invitations    Invitation[]
-  tables         RestaurantTable[]
-  menuCategories MenuCategory[]
-  menuItems      MenuItem[]
-  orders         Order[]
-  orderItems     OrderItem[]
-  staffCalls     StaffCall[]
-  subscriptions  Subscription[]
+  users                 User[]
+  invitations           Invitation[]
+  tables                RestaurantTable[]
+  menuCategories        MenuCategory[]
+  menuItems             MenuItem[]
+  menuItemTranslations  MenuItemTranslation[]
+  orders                Order[]
+  orderItems            OrderItem[]
+  staffCalls            StaffCall[]
+  subscriptions         Subscription[]
+  oauthAccounts         OAuthAccount[]
+  emailVerificationTokens EmailVerificationToken[]
+  menuViews             MenuView[]
 
   @@map("organizations")
 }
@@ -126,17 +163,65 @@ model User {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   email          String       @unique
-  passwordHash   String       @map("password_hash")
+  /// Nullable because an account created purely through Google/Apple
+  /// sign-in (see oauth_authenticate() in the OAuth migration) never sets
+  /// a password. Login rejects password auth outright when this is null
+  /// rather than ever comparing against an empty/placeholder hash.
+  passwordHash   String?      @map("password_hash")
   role           StaffRole    @default(SERVER)
   isActive       Boolean      @default(true) @map("is_active")
+  /// Set on signup (once the verification email link is clicked) or
+  /// immediately on first OAuth sign-in, since Google/Apple already
+  /// vouch for the address. Null = unverified, shown as a dashboard banner.
+  emailVerifiedAt DateTime?   @map("email_verified_at")
   lastActiveAt   DateTime?    @map("last_active_at")
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
-  sentInvitations Invitation[] @relation("InvitedBy")
+  sentInvitations         Invitation[]             @relation("InvitedBy")
+  oauthAccounts            OAuthAccount[]
+  emailVerificationTokens  EmailVerificationToken[]
 
   @@index([organizationId])
   @@map("users")
+}
+
+/// Links a staff account to a Google/Apple identity. See
+/// oauth_authenticate() (OAuth migration): looked up by (provider,
+/// provider_account_id) on every OAuth sign-in, created either alongside a
+/// brand-new organization+owner or attached to an existing password
+/// account sharing the same email (account linking).
+model OAuthAccount {
+  id                String        @id @default(uuid()) @db.Uuid
+  organizationId    String        @map("organization_id") @db.Uuid
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId            String        @map("user_id") @db.Uuid
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          OAuthProvider
+  providerAccountId String        @map("provider_account_id")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  @@unique([provider, providerAccountId])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+/// Single-use link sent by email after signup. verify_email_token()
+/// (see migration) consumes it and sets User.emailVerifiedAt.
+model EmailVerificationToken {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id") @db.Uuid
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String       @unique
+  expiresAt      DateTime     @map("expires_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([userId])
+  @@map("email_verification_tokens")
 }
 
 /// Pending staff invitation. Kept separate from `users` so an unaccepted
@@ -169,11 +254,17 @@ model RestaurantTable {
   label          String
   qrToken        String       @unique @map("qr_token")
   status         TableStatus  @default(FREE)
+  /// What this QR actually does once scanned -- see the OrderingMode enum.
+  /// A row with mode COUNTER/PICKUP/DISPLAY_ONLY isn't necessarily a
+  /// physical table; the "tables" list doubles as the list of ordering
+  /// links, see /dashboard/tables.
+  orderingMode   OrderingMode @default(TABLE) @map("ordering_mode")
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
   orders     Order[]
   staffCalls StaffCall[]
+  menuViews  MenuView[]
 
   @@unique([organizationId, label])
   // Lets child tables (orders, staff_calls) declare a composite FK on
@@ -225,12 +316,39 @@ model MenuItem {
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
-  orderItems OrderItem[]
+  orderItems   OrderItem[]
+  translations MenuItemTranslation[]
 
   @@unique([id, organizationId])
   @@index([organizationId])
   @@index([categoryId])
   @@map("menu_items")
+}
+
+/// Auto-translated name/description for one menu item into one extra
+/// language, beyond the manual name_it/name_en fields on MenuItem itself.
+/// Populated by POST /api/menu/translate (src/lib/translate.ts, DeepL) --
+/// absent entirely for an org that never ran a translation, or for an item
+/// added after the last run, which is why the public menu route falls back
+/// to nameIt/nameEn whenever a translation row is missing for the current
+/// language rather than treating a gap as an error.
+model MenuItemTranslation {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  menuItemId     String       @map("menu_item_id") @db.Uuid
+  menuItem       MenuItem     @relation(fields: [menuItemId, organizationId], references: [id, organizationId], onDelete: Cascade)
+  /// ISO 639-1 code, e.g. "fr", "de", "es", "pt" -- see LANGUAGE_OPTIONS in
+  /// src/lib/translate.ts for the supported set.
+  languageCode   String       @map("language_code")
+  name           String
+  description    String?
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@unique([menuItemId, languageCode])
+  @@index([organizationId])
+  @@map("menu_item_translations")
 }
 
 model Order {
@@ -246,6 +364,22 @@ model Order {
   table          RestaurantTable @relation(fields: [tableId, organizationId], references: [id, organizationId], onDelete: Restrict)
   status         OrderStatus     @default(PENDING)
   totalAmount    Decimal         @default(0) @map("total_amount") @db.Decimal(10, 2)
+  /// Snapshot of the table's OrderingMode at the moment this order was
+  /// placed, not a live join -- so history stays accurate even if the
+  /// owner later repurposes the same QR/table row for a different mode.
+  orderingMode   OrderingMode    @default(TABLE) @map("ordering_mode")
+  /// Set only for PICKUP orders: the name the customer gives at checkout,
+  /// since there's no table to identify them by.
+  pickupName     String?         @map("pickup_name")
+  /// Sequential, global (not per-organization) -- see CONTEXT.md. Shown to
+  /// the customer on COUNTER/PICKUP orders in place of a table label, and
+  /// on the dashboard order card next to the table/link name.
+  orderNumber    Int             @default(autoincrement()) @map("order_number")
+  paymentStatus  PaymentStatus   @default(UNPAID) @map("payment_status")
+  /// Set once the customer starts an online-payment attempt (see
+  /// POST /api/public/orders/[qrToken]/[orderId]/pay); the webhook flips
+  /// paymentStatus to PAID on checkout.session.completed for this id.
+  stripeCheckoutSessionId String? @unique @map("stripe_checkout_session_id")
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
 
@@ -306,4 +440,27 @@ model Subscription {
 
   @@index([organizationId])
   @@map("subscriptions")
+}
+
+/// One row per public menu page load, for /dashboard/analytics. Written
+/// from GET /api/public/menu/[qrToken] inside the same withTenant() call
+/// that reads the menu -- an ordinary RLS-scoped insert, not a
+/// SECURITY DEFINER bypass, since resolveTableByQrToken has already
+/// produced the organizationId by that point. tableId is nullable +
+/// SetNull (not Cascade) so deleting a table/link later doesn't erase the
+/// historical view count, just detaches it from a since-removed row.
+model MenuView {
+  id             String           @id @default(uuid()) @db.Uuid
+  organizationId String           @map("organization_id") @db.Uuid
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tableId        String?          @map("table_id") @db.Uuid
+  // Composite FK (nullable columns leave a MATCH SIMPLE constraint
+  // unenforced for that row, so this is still valid when tableId is null)
+  // -- same reasoning as Order.table above: never let a view record point
+  // at another tenant's table by mistake.
+  table          RestaurantTable? @relation(fields: [tableId, organizationId], references: [id, organizationId], onDelete: SetNull)
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  @@index([organizationId, createdAt])
+  @@map("menu_views")
 }

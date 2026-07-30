@@ -39,7 +39,12 @@ export async function POST(req: NextRequest) {
 
     const table = await withTenant(session.organizationId, (tx) =>
       tx.restaurantTable.create({
-        data: { organizationId: session.organizationId, label: body.label, qrToken },
+        data: {
+          organizationId: session.organizationId,
+          label: body.label,
+          qrToken,
+          orderingMode: body.orderingMode ?? "TABLE",
+        },
       }),
     );
 

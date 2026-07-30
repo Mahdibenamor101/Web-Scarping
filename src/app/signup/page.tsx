@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { friendlyErrorMessage } from "@/lib/client-errors";
 import AuthShell from "@/components/auth-shell";
+import OAuthButtons from "@/components/oauth-buttons";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [organizationName, setOrganizationName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,6 +40,7 @@ export default function SignupPage() {
 
   return (
     <AuthShell title="Créer mon restaurant" subtitle="Essai gratuit, sans carte bancaire.">
+      <OAuthButtons from="signup" error={searchParams.get("oauth_error")} />
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <Field label="Nom du restaurant">
           <input
@@ -76,6 +79,14 @@ export default function SignupPage() {
         </button>
       </form>
     </AuthShell>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupForm />
+    </Suspense>
   );
 }
 

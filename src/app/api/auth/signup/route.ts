@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, withTenant } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { setSessionCookie } from "@/lib/session";
 import { signupSchema } from "@/lib/validation";
 import { uniqueSlug } from "@/lib/slug";
 import { handleApiError, requireRateLimit } from "@/lib/api";
 import { getClientIp } from "@/lib/rate-limit";
+import { sendVerificationEmail } from "@/lib/verification";
 
 const TRIAL_DAYS = 14;
 
@@ -46,6 +47,19 @@ export async function POST(req: NextRequest) {
       email: body.email,
       name: body.ownerName,
     });
+
+    // Best-effort: an owner who never receives/clicks the link still has a
+    // fully working account (see the dashboard banner + "Renvoyer" action,
+    // POST /api/auth/resend-verification) -- verification unlocks nothing
+    // by itself today, it's a nudge, not a gate.
+    await withTenant(result.organization_id, (tx) =>
+      sendVerificationEmail(tx, {
+        organizationId: result.organization_id,
+        userId: result.user_id,
+        email: body.email,
+        origin: req.nextUrl.origin,
+      }),
+    );
 
     return NextResponse.json({ organizationId: result.organization_id }, { status: 201 });
   } catch (error) {

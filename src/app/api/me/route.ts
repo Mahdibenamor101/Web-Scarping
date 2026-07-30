@@ -20,6 +20,7 @@ export async function GET() {
           email: true,
           role: true,
           isActive: true,
+          emailVerifiedAt: true,
           organization: { select: { id: true, name: true, slug: true } },
         },
       }),

@@ -6,6 +6,7 @@ import ItemForm, { type ItemFormValues } from "./item-form";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
+import TranslationsPanel from "./translations-panel";
 
 type Category = { id: string; nameIt: string; nameEn: string | null; sortOrder: number };
 type Item = {
@@ -119,6 +120,8 @@ export default function MenuPage() {
           supprimer (rupture de stock, plat du jour épuisé…).
         </HelpTip>
       </div>
+
+      <TranslationsPanel />
 
       <section className="card-dash">
         <h2 className="mb-3 text-base font-semibold text-white">Nouvelle catégorie</h2>

@@ -7,12 +7,28 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
 
-type Table = { id: string; label: string; qrToken: string; status: "FREE" | "OCCUPIED" };
+type OrderingMode = "TABLE" | "COUNTER" | "PICKUP" | "DISPLAY_ONLY";
+type Table = { id: string; label: string; qrToken: string; status: "FREE" | "OCCUPIED"; orderingMode: OrderingMode };
+
+const MODE_LABEL: Record<OrderingMode, string> = {
+  TABLE: "Table",
+  COUNTER: "Comptoir",
+  PICKUP: "Retrait",
+  DISPLAY_ONLY: "Affichage seul",
+};
+
+const MODE_OPTIONS: { value: OrderingMode; label: string; hint: string }[] = [
+  { value: "TABLE", label: "Table", hint: "Une table physique, service à table classique." },
+  { value: "COUNTER", label: "Comptoir", hint: "Un seul QR pour tout le comptoir, numéro de commande." },
+  { value: "PICKUP", label: "Retrait", hint: "Le client indique son nom, pas de table." },
+  { value: "DISPLAY_ONLY", label: "Affichage seul", hint: "Menu consultable, pas de commande possible." },
+];
 
 export default function TablesPage() {
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
   const [label, setLabel] = useState("");
+  const [orderingMode, setOrderingMode] = useState<OrderingMode>("TABLE");
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -35,7 +51,7 @@ export default function TablesPage() {
     const res = await fetch("/api/tables", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ label }),
+      body: JSON.stringify({ label, orderingMode }),
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
@@ -43,6 +59,7 @@ export default function TablesPage() {
       return;
     }
     setLabel("");
+    setOrderingMode("TABLE");
     load();
   }
 
@@ -65,26 +82,46 @@ export default function TablesPage() {
       <div className="flex items-center gap-2">
         <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Tables</h1>
         <HelpTip>
-          Chaque table a son propre <strong className="text-white">QR code unique</strong>. Imprimez-le et
-          collez-le sur la table : en le scannant, le client accède directement au menu avec sa table déjà
-          identifiée, sans rien saisir. Vous pouvez régénérer un code à tout moment si un sticker est abîmé ou
-          perdu.
+          Chaque lien a son propre <strong className="text-white">QR code unique</strong>. <strong className="text-white">Table</strong>{" "}
+          identifie une table précise ; <strong className="text-white">Comptoir</strong> donne un numéro de
+          commande au lieu d&apos;une table ; <strong className="text-white">Retrait</strong> demande le nom du
+          client ; <strong className="text-white">Affichage seul</strong> montre le menu sans permettre de
+          commander (vitrine, réseaux sociaux).
         </HelpTip>
       </div>
 
       <section className="card-dash max-w-3xl">
-        <h2 className="mb-3 text-base font-semibold text-white">Nouvelle table</h2>
-        <form onSubmit={addTable} className="flex max-w-md gap-2">
-          <input
-            required
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            placeholder="Table 1, Terrasse 3…"
-            className="input-dash flex-1"
-          />
-          <button type="submit" className="btn-primary shrink-0">
-            Ajouter
-          </button>
+        <h2 className="mb-3 text-base font-semibold text-white">Nouveau lien de commande</h2>
+        <form onSubmit={addTable} className="flex flex-col gap-3">
+          <div className="flex max-w-md gap-2">
+            <input
+              required
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Table 1, Comptoir, Retrait…"
+              className="input-dash flex-1"
+            />
+            <button type="submit" className="btn-primary shrink-0">
+              Ajouter
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {MODE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                title={opt.hint}
+                onClick={() => setOrderingMode(opt.value)}
+                className={`badge-pill transition ${
+                  orderingMode === opt.value
+                    ? "border-brand-light/50 bg-brand-light/15 text-brand-light"
+                    : "border-white/15 text-white/40 hover:border-white/30 hover:text-white/70"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </form>
         {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       </section>
@@ -119,9 +156,15 @@ export default function TablesPage() {
               <div key={table.id} className="card-dash flex animate-bump-in flex-col items-center gap-2 text-center">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-white">{table.label}</p>
-                  <Badge variant={table.status === "OCCUPIED" ? "todo" : "ready"} dash>
-                    {table.status === "OCCUPIED" ? "Occupée" : "Libre"}
-                  </Badge>
+                  {table.orderingMode === "TABLE" ? (
+                    <Badge variant={table.status === "OCCUPIED" ? "todo" : "ready"} dash>
+                      {table.status === "OCCUPIED" ? "Occupée" : "Libre"}
+                    </Badge>
+                  ) : (
+                    <Badge variant="progress" dash>
+                      {MODE_LABEL[table.orderingMode]}
+                    </Badge>
+                  )}
                 </div>
                 {url && (
                   <div className="rounded-xl border border-white/10 bg-white p-2">

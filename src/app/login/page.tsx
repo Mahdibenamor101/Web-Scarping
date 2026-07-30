@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { friendlyErrorMessage } from "@/lib/client-errors";
 import AuthShell from "@/components/auth-shell";
+import OAuthButtons from "@/components/oauth-buttons";
 
 function LoginForm() {
   const router = useRouter();
@@ -37,26 +38,29 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1.5 text-sm">
-        <span className="font-medium text-ink/70">Email</span>
-        <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" />
-      </label>
-      <label className="flex flex-col gap-1.5 text-sm">
-        <span className="font-medium text-ink/70">Mot de passe</span>
-        <input
-          required
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="input"
-        />
-      </label>
-      {error && <p className="text-sm text-danger">{error}</p>}
-      <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
-        {loading ? "Connexion…" : "Se connecter"}
-      </button>
-    </form>
+    <div className="flex flex-col gap-4">
+      <OAuthButtons from="login" error={searchParams.get("oauth_error")} />
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-ink/70">Email</span>
+          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" />
+        </label>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-ink/70">Mot de passe</span>
+          <input
+            required
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input"
+          />
+        </label>
+        {error && <p className="text-sm text-danger">{error}</p>}
+        <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
+          {loading ? "Connexion…" : "Se connecter"}
+        </button>
+      </form>
+    </div>
   );
 }
 

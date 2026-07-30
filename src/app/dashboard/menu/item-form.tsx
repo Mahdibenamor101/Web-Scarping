@@ -37,6 +37,7 @@ export default function ItemForm({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -61,6 +62,35 @@ export default function ItemForm({
       setUploadError(err instanceof Error ? err.message : "Échec de l'envoi");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleGenerate() {
+    if (!values.nameIt.trim()) {
+      setUploadError("Renseignez le nom du plat avant de générer une photo.");
+      return;
+    }
+    setGenerating(true);
+    setUploadError(null);
+    try {
+      const res = await fetch("/api/menu/generate-photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nameIt: values.nameIt, descriptionIt: values.descriptionIt || undefined }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          res.status === 501
+            ? "Génération IA non configurée sur cet environnement."
+            : (body.error ?? "Échec de la génération"),
+        );
+      }
+      setValues((v) => ({ ...v, photoUrl: body.url }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Échec de la génération");
+    } finally {
+      setGenerating(false);
     }
   }
 
@@ -141,16 +171,26 @@ export default function ItemForm({
               placeholder="https://…"
             />
           </div>
-          <label className="mt-0.5 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-brand-light transition hover:underline">
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={handleFileChange}
-              disabled={uploading}
-            />
-            {uploading ? "Envoi…" : "ou importer une photo"}
-          </label>
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium">
+            <label className="flex w-fit cursor-pointer items-center gap-1.5 text-brand-light transition hover:underline">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={uploading}
+              />
+              {uploading ? "Envoi…" : "ou importer une photo"}
+            </label>
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={generating}
+              className="text-brand-light transition hover:underline disabled:pointer-events-none disabled:opacity-50"
+            >
+              {generating ? "Génération…" : "ou générer avec l'IA"}
+            </button>
+          </div>
           {uploadError && <span className="text-xs text-danger">{uploadError}</span>}
         </label>
       </div>

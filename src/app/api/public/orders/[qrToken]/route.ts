@@ -20,7 +20,15 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
 
     requireRateLimit(`order:table:${table.tableId}`, { limit: 20, windowMs: 5 * 60 * 1000 });
 
+    if (table.orderingMode === "DISPLAY_ONLY") {
+      throw new ApiError(403, "ordering_disabled");
+    }
+
     const body = createOrderSchema.parse(await req.json());
+
+    if (table.orderingMode === "PICKUP" && !body.pickupName) {
+      throw new ApiError(400, "pickup_name_required");
+    }
 
     const order = await withTenant(table.organizationId, async (tx) => {
       const menuItemIds = [...new Set(body.items.map((i) => i.menuItemId))];
@@ -55,20 +63,31 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
           tableId: table.tableId,
           status: "PENDING",
           totalAmount,
+          // Snapshot, not a live join -- see Order.orderingMode in schema.prisma.
+          orderingMode: table.orderingMode,
+          pickupName: table.orderingMode === "PICKUP" ? body.pickupName : undefined,
           items: { createMany: { data: orderItemsData } },
         },
         include: { items: true },
       });
 
-      // A table with a live order is occupied; freed back up once its last
-      // active order reaches a terminal status -- see PATCH /api/orders/[id].
-      await tx.restaurantTable.update({ where: { id: table.tableId }, data: { status: "OCCUPIED" } });
+      // "Occupied" only means something for a physical dine-in table --
+      // COUNTER/PICKUP links have no FREE/OCCUPIED concept for the
+      // dashboard tables view to show.
+      if (table.orderingMode === "TABLE") {
+        await tx.restaurantTable.update({ where: { id: table.tableId }, data: { status: "OCCUPIED" } });
+      }
 
       return created;
     });
 
     return NextResponse.json(
-      { orderId: order.id, status: order.status, totalAmount: Number(order.totalAmount) },
+      {
+        orderId: order.id,
+        status: order.status,
+        totalAmount: Number(order.totalAmount),
+        orderNumber: order.orderNumber,
+      },
       { status: 201 },
     );
   } catch (error) {

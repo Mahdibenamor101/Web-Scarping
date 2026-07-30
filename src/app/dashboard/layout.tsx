@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { withTenant } from "@/lib/db";
@@ -6,6 +7,7 @@ import Logo from "@/components/logo";
 import LogoutButton from "./logout-button";
 import NavLink from "./nav-link";
 import PageTransition from "./page-transition";
+import EmailVerificationBanner from "@/components/email-verification-banner";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -26,6 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
           <nav className="mt-8 flex flex-col gap-1">
             <NavLink href="/dashboard/orders">Commandes</NavLink>
+            {canManageStaff(session.role) && <NavLink href="/dashboard/analytics">Analytics</NavLink>}
             {canManageStaff(session.role) && <NavLink href="/dashboard/staff">Staff</NavLink>}
             {MENU_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/menu">Menu</NavLink>}
             {TABLE_MANAGEMENT_ROLES.includes(session.role) && <NavLink href="/dashboard/tables">Tables</NavLink>}
@@ -46,6 +49,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
       </aside>
       <main className="flex-1 p-8">
+        <Suspense fallback={null}>
+          <EmailVerificationBanner />
+        </Suspense>
         <PageTransition>{children}</PageTransition>
       </main>
     </div>

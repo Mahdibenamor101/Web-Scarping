@@ -11,7 +11,11 @@ type AuthLookupRow = {
   id: string;
   organization_id: string;
   role: StaffRole;
-  password_hash: string;
+  // Null for an account created purely through Google/Apple sign-in
+  // (see oauth_authenticate() in the growth_features migration) -- it
+  // never set a password, so password login for it always fails below
+  // rather than ever calling bcrypt.compare against a missing hash.
+  password_hash: string | null;
   name: string;
   is_active: boolean;
 };
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
       SELECT * FROM auth_lookup_user(${body.email})
     `;
 
-    if (!user || !user.is_active) {
+    if (!user || !user.is_active || !user.password_hash) {
       throw new ApiError(401, "invalid_credentials");
     }
 

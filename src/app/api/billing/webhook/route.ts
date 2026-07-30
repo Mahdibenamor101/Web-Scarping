@@ -76,7 +76,17 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const organizationId = session.metadata?.organizationId;
-        if (organizationId && typeof session.subscription === "string") {
+        if (session.mode === "payment" && organizationId && session.metadata?.orderId) {
+          // Customer-facing order payment (POST /api/public/orders/[qrToken]/[orderId]/pay),
+          // not the org's own subscription -- distinguished by Checkout
+          // Session mode, not by which fields happen to be present.
+          await withTenant(organizationId, (tx) =>
+            tx.order.update({
+              where: { id: session.metadata!.orderId },
+              data: { paymentStatus: "PAID" },
+            }),
+          );
+        } else if (organizationId && typeof session.subscription === "string") {
           const subscription = await stripe.subscriptions.retrieve(session.subscription);
           await syncSubscription(organizationId, subscription);
         }

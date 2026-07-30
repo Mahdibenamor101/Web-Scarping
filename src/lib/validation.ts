@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Allergen } from "@prisma/client";
+import { LANGUAGE_CODES } from "./translate";
 
 export const signupSchema = z.object({
   organizationName: z.string().trim().min(2).max(120),
@@ -56,13 +57,17 @@ export const createMenuItemSchema = z.object({
 
 export const updateMenuItemSchema = createMenuItemSchema.partial();
 
+export const orderingModeSchema = z.enum(["TABLE", "COUNTER", "PICKUP", "DISPLAY_ONLY"]);
+
 export const createTableSchema = z.object({
   label: z.string().trim().min(1).max(50),
+  orderingMode: orderingModeSchema.optional(),
 });
 
 export const updateTableSchema = z.object({
   label: z.string().trim().min(1).max(50).optional(),
   status: z.enum(["FREE", "OCCUPIED"]).optional(),
+  orderingMode: orderingModeSchema.optional(),
 });
 
 export const createOrderItemSchema = z.object({
@@ -73,6 +78,10 @@ export const createOrderItemSchema = z.object({
 
 export const createOrderSchema = z.object({
   items: z.array(createOrderItemSchema).min(1).max(50),
+  // Required only for PICKUP orders -- enforced in the route once the QR
+  // token resolves to a table, since the schema alone doesn't know the
+  // table's ordering mode yet.
+  pickupName: z.string().trim().min(1).max(120).optional(),
 });
 
 export const orderStatusSchema = z.enum(["PENDING", "IN_PROGRESS", "READY", "SERVED", "CANCELLED"]);
@@ -87,4 +96,16 @@ export const updateOrderStatusSchema = z.object({
 export const updateBrandingSchema = z.object({
   logoUrl: z.string().trim().url().max(2000).nullable().optional(),
   backgroundUrl: z.string().trim().url().max(2000).nullable().optional(),
+});
+
+export const generatePhotoSchema = z.object({
+  nameIt: z.string().trim().min(1).max(150),
+  descriptionIt: z.string().trim().max(1000).optional(),
+});
+
+export const translateMenuSchema = z.object({
+  languageCodes: z
+    .array(z.enum(LANGUAGE_CODES as [string, ...string[]]))
+    .min(1)
+    .max(LANGUAGE_CODES.length),
 });

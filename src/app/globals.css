@@ -49,6 +49,19 @@ body {
       hover:-translate-y-0.5 hover:border-ink/35 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
+  /* Google/Apple sign-in buttons (src/components/oauth-buttons.tsx).
+     Each brand's own guidelines, not the app's marigold accent -- these
+     are third-party identity marks, not our CTAs. */
+  .oauth-btn {
+    @apply inline-flex w-full items-center justify-center gap-2.5 rounded-card border-[1.5px] border-ink/15
+      bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:border-ink/30;
+  }
+
+  .oauth-btn-apple {
+    @apply border-ink bg-ink text-white hover:border-ink hover:bg-ink/90;
+  }
+
   .btn-link {
     @apply text-sm font-semibold text-muted underline-offset-2 transition hover:text-ink hover:underline;
   }

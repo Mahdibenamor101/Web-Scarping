@@ -1,3 +1,4 @@
+import type { OrderingMode } from "@prisma/client";
 import { prisma } from "./db";
 import { ApiError } from "./api";
 
@@ -9,6 +10,7 @@ type ResolvedTable = {
   defaultLanguage: string;
   logoUrl: string | null;
   backgroundUrl: string | null;
+  orderingMode: OrderingMode;
 };
 
 type ResolveRow = {
@@ -19,6 +21,7 @@ type ResolveRow = {
   default_language: string;
   logo_url: string | null;
   background_url: string | null;
+  ordering_mode: OrderingMode;
 };
 
 /**
@@ -43,5 +46,6 @@ export async function resolveTableByQrToken(qrToken: string): Promise<ResolvedTa
     defaultLanguage: row.default_language,
     logoUrl: row.logo_url,
     backgroundUrl: row.background_url,
+    orderingMode: row.ordering_mode,
   };
 }
