@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { StaffRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
-import { setSessionCookie } from "@/lib/session";
+import { setSessionCookie, signSessionToken } from "@/lib/session";
 import { acceptInvitationSchema } from "@/lib/validation";
 import { handleApiError, requireRateLimit } from "@/lib/api";
 import { getClientIp } from "@/lib/rate-limit";
@@ -33,15 +33,19 @@ export async function POST(req: NextRequest) {
       throw new Error("accept_invitation_failed");
     }
 
-    await setSessionCookie({
+    const sessionPayload = {
       userId: result.user_id,
       organizationId: result.organization_id,
       role: result.role,
       email: result.email,
       name: body.name,
-    });
+    };
+    await setSessionCookie(sessionPayload);
 
-    return NextResponse.json({ organizationId: result.organization_id, role: result.role }, { status: 201 });
+    return NextResponse.json(
+      { organizationId: result.organization_id, role: result.role, token: await signSessionToken(sessionPayload) },
+      { status: 201 },
+    );
   } catch (error) {
     return handleApiError(error);
   }

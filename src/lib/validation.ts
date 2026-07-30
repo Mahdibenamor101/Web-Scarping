@@ -103,6 +103,11 @@ export const generatePhotoSchema = z.object({
   descriptionIt: z.string().trim().max(1000).optional(),
 });
 
+export const registerPushTokenSchema = z.object({
+  token: z.string().trim().min(1).max(500),
+  platform: z.enum(["ios", "android"]),
+});
+
 export const translateMenuSchema = z.object({
   languageCodes: z
     .array(z.enum(LANGUAGE_CODES as [string, ...string[]]))

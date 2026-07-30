@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { StaffRole } from "@prisma/client";
 import { prisma, withTenant } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
-import { setSessionCookie } from "@/lib/session";
+import { setSessionCookie, signSessionToken } from "@/lib/session";
 import { loginSchema } from "@/lib/validation";
 import { ApiError, handleApiError, requireRateLimit } from "@/lib/api";
 import { getClientIp } from "@/lib/rate-limit";
@@ -50,13 +50,14 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "invalid_credentials");
     }
 
-    await setSessionCookie({
+    const sessionPayload = {
       userId: user.id,
       organizationId: user.organization_id,
       role: user.role,
       email: body.email,
       name: user.name,
-    });
+    };
+    await setSessionCookie(sessionPayload);
 
     // Now that we're inside a known tenant, this update is a normal
     // RLS-scoped write like any other -- no special-casing needed.
@@ -64,7 +65,12 @@ export async function POST(req: NextRequest) {
       tx.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } }),
     );
 
-    return NextResponse.json({ role: user.role });
+    // The cookie is what the web dashboard actually uses; `token` here is
+    // for the mobile app, which has no cookie jar wired to its fetch
+    // client and instead stores this and sends it back as
+    // `Authorization: Bearer <token>` (see src/lib/session.ts::getSession).
+    // Harmless for the browser client to receive and ignore.
+    return NextResponse.json({ role: user.role, token: await signSessionToken(sessionPayload) });
   } catch (error) {
     return handleApiError(error);
   }

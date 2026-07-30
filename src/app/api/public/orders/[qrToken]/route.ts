@@ -4,6 +4,7 @@ import { resolveTableByQrToken } from "@/lib/qr-resolve";
 import { ApiError, handleApiError, requireRateLimit } from "@/lib/api";
 import { getClientIp } from "@/lib/rate-limit";
 import { createOrderSchema } from "@/lib/validation";
+import { sendPushNotifications } from "@/lib/push";
 
 // Public: no session required (same reasoning as the menu route). Prices
 // are never trusted from the client -- they're re-read from the database,
@@ -80,6 +81,26 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
 
       return created;
     });
+
+    // Fire-and-forget, after the transaction has committed -- a push
+    // failure (or Expo being unreachable) must never turn a successful
+    // order into a failed response. Every staff push token in the org
+    // gets it, same reach as the live order board itself (visible to
+    // owner, manager, server, and kitchen alike, no role filter).
+    withTenant(table.organizationId, (tx) =>
+      tx.pushToken.findMany({ where: { organizationId: table.organizationId }, select: { token: true } }),
+    )
+      .then((rows) =>
+        sendPushNotifications(
+          rows.map((r) => r.token),
+          {
+            title: order.orderingMode === "TABLE" ? `Nouvelle commande — ${table.tableLabel}` : `Nouvelle commande #${order.orderNumber}`,
+            body: `${order.items.length} article${order.items.length > 1 ? "s" : ""} — ${Number(order.totalAmount).toFixed(2)} €`,
+            data: { kind: "order", orderId: order.id },
+          },
+        ),
+      )
+      .catch((err) => console.error("[push] order notification failed", err));
 
     return NextResponse.json(
       {

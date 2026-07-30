@@ -3,6 +3,7 @@ import { withTenant } from "@/lib/db";
 import { resolveTableByQrToken } from "@/lib/qr-resolve";
 import { handleApiError, requireRateLimit } from "@/lib/api";
 import { getClientIp } from "@/lib/rate-limit";
+import { sendPushNotifications } from "@/lib/push";
 
 // Public: no session required, same reasoning as public order creation
 // (src/app/api/public/orders/[qrToken]/route.ts) -- once the QR token
@@ -24,6 +25,23 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
         data: { organizationId: table.organizationId, tableId: table.tableId, status: "PENDING" },
       }),
     );
+
+    // Same fire-and-forget reasoning as the order-creation trigger --
+    // never let a push failure turn a successful call into a failed one.
+    withTenant(table.organizationId, (tx) =>
+      tx.pushToken.findMany({ where: { organizationId: table.organizationId }, select: { token: true } }),
+    )
+      .then((rows) =>
+        sendPushNotifications(
+          rows.map((r) => r.token),
+          {
+            title: `${table.tableLabel} appelle`,
+            body: "Un client demande le serveur.",
+            data: { kind: "staffCall", tableId: table.tableId },
+          },
+        ),
+      )
+      .catch((err) => console.error("[push] staff-call notification failed", err));
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {

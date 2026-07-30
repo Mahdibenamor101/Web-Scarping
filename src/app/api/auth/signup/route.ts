@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, withTenant } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
-import { setSessionCookie } from "@/lib/session";
+import { setSessionCookie, signSessionToken } from "@/lib/session";
 import { signupSchema } from "@/lib/validation";
 import { uniqueSlug } from "@/lib/slug";
 import { handleApiError, requireRateLimit } from "@/lib/api";
@@ -40,13 +40,14 @@ export async function POST(req: NextRequest) {
       throw new Error("signup_failed");
     }
 
-    await setSessionCookie({
+    const sessionPayload = {
       userId: result.user_id,
       organizationId: result.organization_id,
-      role: "OWNER",
+      role: "OWNER" as const,
       email: body.email,
       name: body.ownerName,
-    });
+    };
+    await setSessionCookie(sessionPayload);
 
     // Best-effort: an owner who never receives/clicks the link still has a
     // fully working account (see the dashboard banner + "Renvoyer" action,
@@ -61,7 +62,10 @@ export async function POST(req: NextRequest) {
       }),
     );
 
-    return NextResponse.json({ organizationId: result.organization_id }, { status: 201 });
+    return NextResponse.json(
+      { organizationId: result.organization_id, token: await signSessionToken(sessionPayload) },
+      { status: 201 },
+    );
   } catch (error) {
     return handleApiError(error);
   }

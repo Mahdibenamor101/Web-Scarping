@@ -150,6 +150,7 @@ model Organization {
   oauthAccounts         OAuthAccount[]
   emailVerificationTokens EmailVerificationToken[]
   menuViews             MenuView[]
+  pushTokens            PushToken[]
 
   @@map("organizations")
 }
@@ -181,6 +182,7 @@ model User {
   sentInvitations         Invitation[]             @relation("InvitedBy")
   oauthAccounts            OAuthAccount[]
   emailVerificationTokens  EmailVerificationToken[]
+  pushTokens               PushToken[]
 
   @@index([organizationId])
   @@map("users")
@@ -463,4 +465,29 @@ model MenuView {
 
   @@index([organizationId, createdAt])
   @@map("menu_views")
+}
+
+/// One row per device the mobile app (mobile/) is logged into. `token` is
+/// an Expo push token, not a raw APNs/FCM one -- Expo's push service is
+/// the single HTTP endpoint src/lib/push.ts sends to, which then fans out
+/// to Apple/Google using its own credentials. Unique on the token alone
+/// (not per-user): reinstalling the app / logging in as someone else on
+/// the same device naturally reassigns it via the upsert in
+/// POST /api/push-tokens, rather than leaving a stale row pointing at the
+/// previous account.
+model PushToken {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id") @db.Uuid
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String       @unique
+  /// "ios" | "android" -- informational only today (e.g. for a future
+  /// platform-specific payload tweak), Expo's send API doesn't need it.
+  platform       String
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([userId])
+  @@map("push_tokens")
 }
