@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Card, ErrorText, Screen, ScreenTitle, SecondaryButton } from "@/components/ui";
 import { colors, spacing } from "@/lib/theme";
@@ -12,6 +12,7 @@ export default function BrandingScreen() {
   const [branding, setBranding] = useState<Branding | null>(null);
   const [uploading, setUploading] = useState<Slot | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     setBranding(await apiFetch<Branding>("/api/branding"));
@@ -20,6 +21,12 @@ export default function BrandingScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }
 
   async function pick(slot: Slot) {
     setError(null);
@@ -62,7 +69,10 @@ export default function BrandingScreen() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg }}>
+      <ScrollView
+        contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} />}
+      >
         <View>
           <ScreenTitle>Marque</ScreenTitle>
           <Text style={{ color: colors.white40, fontSize: 12, marginTop: 4 }}>

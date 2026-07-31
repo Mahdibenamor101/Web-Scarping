@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Linking, RefreshControl, ScrollView, Text, View } from "react-native";
 import { Badge, Card, EmptyState, ErrorText, PrimaryButton, Screen, ScreenTitle } from "@/components/ui";
 import { colors, spacing } from "@/lib/theme";
 import { apiFetch, ApiError } from "@/lib/api";
@@ -21,6 +21,7 @@ export default function BillingScreen() {
   const [info, setInfo] = useState<BillingInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     setInfo(await apiFetch<BillingInfo>("/api/billing"));
@@ -29,6 +30,12 @@ export default function BillingScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }
 
   async function openStripe(path: "checkout" | "portal") {
     setError(null);
@@ -57,7 +64,10 @@ export default function BillingScreen() {
 
   return (
     <Screen>
-      <View style={{ padding: spacing.lg, gap: spacing.md }}>
+      <ScrollView
+        contentContainerStyle={{ padding: spacing.lg, gap: spacing.md }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} />}
+      >
         <ScreenTitle>Abonnement</ScreenTitle>
 
         {!info && <EmptyState text="Chargement…" />}
@@ -100,7 +110,7 @@ export default function BillingScreen() {
             </Text>
           </>
         )}
-      </View>
+      </ScrollView>
     </Screen>
   );
 }

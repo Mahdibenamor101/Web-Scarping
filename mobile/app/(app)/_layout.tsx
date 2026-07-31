@@ -1,7 +1,14 @@
 import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, type ColorValue } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuth, canManageStaff } from "@/lib/auth";
 import { colors } from "@/lib/theme";
+
+function tabIcon(name: keyof typeof Ionicons.glyphMap) {
+  return ({ color, size }: { color: ColorValue; size: number }) => (
+    <Ionicons name={name} size={size} color={color as string} />
+  );
+}
 
 // Four tabs, not one per screen: a bottom bar with 7-8 items (Commandes,
 // Analytics, Staff, Menu, Tables, Marque, Abonnement, Profil) would be
@@ -33,10 +40,16 @@ export default function AppLayout() {
         tabBarStyle: { backgroundColor: colors.dashCard, borderTopColor: colors.white10 },
       }}
     >
-      <Tabs.Screen name="orders" options={{ title: "Commandes" }} />
-      <Tabs.Screen name="analytics" options={{ title: "Analytics", href: canManage ? undefined : null }} />
-      <Tabs.Screen name="manage" options={{ title: "Gérer", href: canManage ? undefined : null }} />
-      <Tabs.Screen name="profile" options={{ title: "Profil" }} />
+      <Tabs.Screen name="orders" options={{ title: "Commandes", tabBarIcon: tabIcon("receipt-outline") }} />
+      <Tabs.Screen
+        name="analytics"
+        options={{ title: "Analytics", href: canManage ? undefined : null, tabBarIcon: tabIcon("stats-chart-outline") }}
+      />
+      <Tabs.Screen
+        name="manage"
+        options={{ title: "Gérer", href: canManage ? undefined : null, tabBarIcon: tabIcon("settings-outline") }}
+      />
+      <Tabs.Screen name="profile" options={{ title: "Profil", tabBarIcon: tabIcon("person-circle-outline") }} />
     </Tabs>
   );
 }
