@@ -601,6 +601,14 @@ Le bouton unique "S'abonner" devient quatre boutons (un par durée) sur `/dashbo
 
 Vérifié : `tsc`/`eslint`/`vitest`/`next build` au vert. Jamais exercé contre un vrai compte Stripe (même limite que §12.7) — à dérouler en mode test avant le premier restaurateur pilote payant, sur les quatre durées.
 
+### 12.25 En-tête du menu public : photo de couverture + logo + texte d'accueil (2 août 2026)
+
+Retour du fondateur sur le menu public (`/menu/[qrToken]`) : « c'est pas joli », avec deux demandes concrètes -- l'upload logo/photo de fond (déjà câblé depuis §12.16/§12.17 sur `/dashboard/branding`, jamais mis en valeur côté client) et un texte d'accueil. Diagnostic confirmé par capture (Playwright, org de démo sans branding) : l'en-tête n'était qu'une ligne de texte plate, `backgroundUrl` réduit à un filigrane à 10% d'opacité derrière tout le menu -- aucune des deux images n'avait de vraie présence visuelle.
+
+En-tête reconstruit à la manière d'une page restaurant Uber Eats/Deliveroo : bandeau photo de couverture (`backgroundUrl`, 144px, dégradé sombre en bas pour la lisibilité) surmonté d'un avatar logo carré à coins arrondis qui chevauche le bandeau (`backgroundUrl`/`logoUrl`, tous deux optionnels indépendamment comme avant) ; en dessous, le nom de l'établissement et une phrase d'accueil traduite IT/EN (`t.welcome`, dictionnaire existant). Sans aucune image importée, le bandeau et l'avatar retombent tous deux sur le dégradé de marque avec l'initiale du nom en grand -- l'en-tête a toujours une vraie présence, jamais un espace vide, avant même que le restaurateur touche à `/dashboard/branding`. L'ancien filigrane plein-page est retiré (redondant avec le nouveau bandeau, et nuisait à la lisibilité de la liste de plats). La barre sticky (tavolo/mode de commande, cloche, sélecteur de langue) redescend sous ce nouvel en-tête non collant, inchangée dans son contenu.
+
+Vérifié : `tsc`/`eslint`/`vitest` au vert, capture Playwright avant/après contre l'org de démo, puis avec logo + photo réels temporairement assignés en base (retirés ensuite) pour confirmer le rendu bandeau/avatar avec de vraies images.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Envoi d'email : câblé mais jamais exercé contre un vrai compte** (voir §12.16). `RESEND_API_KEY`/`EMAIL_FROM` non définis dans cet environnement — le lien d'invitation manuel reste le chemin réellement testé. À vérifier en vrai (mode test/sandbox du provider) avant un pilote.
