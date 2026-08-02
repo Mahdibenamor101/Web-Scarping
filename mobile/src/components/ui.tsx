@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View, type ViewStyle } from "react-native";
+import { BlurView } from "expo-blur";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, radius, spacing } from "@/lib/theme";
 
@@ -7,18 +8,27 @@ export function Screen({ children, style }: { children: React.ReactNode; style?:
   return <SafeAreaView style={[styles.screen, style]}>{children}</SafeAreaView>;
 }
 
+/**
+ * Glass card: `expo-blur`'s BlurView gives a real backdrop-blur (not a
+ * translucent-color approximation) the same way the web app's
+ * `backdrop-blur-2xl` classes do -- both surfaces are meant to read as
+ * the same material. `tint="dark"` since every mobile screen lives on
+ * the dashboard's always-dark ground (see theme.ts), never the light
+ * marketing surface.
+ */
 export function Card({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
-  return <View style={[styles.card, style]}>{children}</View>;
+  return (
+    <BlurView intensity={40} tint="dark" style={[styles.card, style]}>
+      {children}
+    </BlurView>
+  );
 }
 
-/** The signature "comanda" motif on web (ticket.tsx) -- a dashed top edge stands in for the CSS perforation here. */
+/** Kept as a name for every existing call site (the order-board/ticket
+ * motif) -- same glass material as `Card` now, the torn-paper look
+ * retired with the "Comanda" direction it belonged to (see CONTEXT.md). */
 export function TicketCard({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
-  return (
-    <View style={[styles.card, styles.ticket, style]}>
-      <View style={styles.ticketPerforation} />
-      {children}
-    </View>
-  );
+  return <Card style={style}>{children}</Card>;
 }
 
 export function ScreenTitle({ children }: { children: React.ReactNode }) {
@@ -27,10 +37,10 @@ export function ScreenTitle({ children }: { children: React.ReactNode }) {
 
 type BadgeVariant = "todo" | "progress" | "ready" | "danger" | "muted";
 const BADGE_COLORS: Record<BadgeVariant, { border: string; bg: string; text: string }> = {
-  todo: { border: colors.brandLight + "66", bg: colors.brandLight + "26", text: colors.brandLight },
-  progress: { border: colors.progressLight + "66", bg: colors.progressLight + "26", text: colors.progressLight },
-  ready: { border: colors.readyLight + "66", bg: colors.readyLight + "26", text: colors.readyLight },
-  danger: { border: colors.dangerLight + "66", bg: colors.dangerLight + "26", text: colors.dangerLight },
+  todo: { border: colors.brandLight + "4d", bg: colors.brandLight + "26", text: colors.brandLight },
+  progress: { border: colors.progressLight + "4d", bg: colors.progressLight + "26", text: colors.progressLight },
+  ready: { border: colors.readyLight + "4d", bg: colors.readyLight + "26", text: colors.readyLight },
+  danger: { border: colors.dangerLight + "4d", bg: colors.dangerLight + "26", text: colors.dangerLight },
   muted: { border: colors.white15, bg: colors.white10, text: colors.white70 },
 };
 
@@ -97,32 +107,21 @@ export function ErrorText({ children }: { children: React.ReactNode }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.dashBg },
   card: {
-    backgroundColor: colors.dashCard,
     borderRadius: radius.card,
     borderWidth: 1,
-    borderColor: colors.white10,
-    padding: spacing.lg,
-  },
-  ticket: { paddingTop: spacing.xl, position: "relative" },
-  ticketPerforation: {
-    position: "absolute",
-    top: 10,
-    left: 12,
-    right: 12,
-    height: 0,
-    borderTopWidth: 2,
-    borderStyle: "dashed",
     borderColor: colors.white15,
+    padding: spacing.lg,
+    overflow: "hidden",
   },
   title: { fontSize: 28, fontWeight: "800", color: "#fff", letterSpacing: -0.5 },
   badge: {
     alignSelf: "flex-start",
-    borderWidth: 1.5,
-    borderRadius: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
-  badgeText: { fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5 },
+  badgeText: { fontSize: 11, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.3 },
   primaryBtn: {
     backgroundColor: colors.brand,
     borderRadius: radius.pill,
@@ -131,17 +130,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  primaryBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  primaryBtnText: { color: "#fff", fontWeight: "600", fontSize: 15 },
   secondaryBtn: { paddingVertical: 8 },
   secondaryBtnText: { color: colors.white70, fontWeight: "600", fontSize: 14 },
   btnDisabled: { opacity: 0.5 },
   btnPressed: { opacity: 0.8 },
   label: { color: colors.white70, fontSize: 13, fontWeight: "600" },
   input: {
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: colors.white10,
     borderWidth: 1,
-    borderColor: colors.white10,
-    borderRadius: 8,
+    borderColor: colors.white15,
+    borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 12,
     color: "#fff",

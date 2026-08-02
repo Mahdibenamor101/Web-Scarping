@@ -31,35 +31,37 @@ body {
  * instead of repeating Tailwind strings. Values come from
  * src/lib/design-tokens.ts, imported into tailwind.config.ts.
  *
- * Two card variants: `.card`/`.ticket` are the light marketing/auth
- * surface, `.card-dash`/`.ticket-dash` are the dark dashboard surface --
- * deliberately different rooms (dashboard is always dark), not a
- * light/dark toggle of the same one.
+ * "Liquid Glass" direction (2 août 2026): translucent surfaces with
+ * backdrop-blur, sitting over a light (`paper`) or true-black (`dashBg`)
+ * ground -- `.card`/`.ticket` are the light marketing/auth glass,
+ * `.card-dash`/`.ticket-dash` the dark dashboard glass. Same two-room
+ * split as the previous "Comanda" system, now expressed as glass over
+ * two different grounds rather than a light/dark toggle of one surface.
  */
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5
-      text-sm font-bold text-white shadow-soft transition duration-200 ease-out
+      text-sm font-semibold text-white shadow-soft backdrop-blur-xl transition duration-200 ease-out
       hover:-translate-y-0.5 hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] border-ink/15
-      bg-surface px-5 py-2.5 text-sm font-bold text-ink transition duration-200 ease-out
-      hover:-translate-y-0.5 hover:border-ink/35 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-glass-light-border
+      bg-glass-light px-5 py-2.5 text-sm font-semibold text-ink shadow-soft backdrop-blur-xl transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:bg-white/80 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   /* Google/Apple sign-in buttons (src/components/oauth-buttons.tsx).
      Each brand's own guidelines, not the app's marigold accent -- these
      are third-party identity marks, not our CTAs. */
   .oauth-btn {
-    @apply inline-flex w-full items-center justify-center gap-2.5 rounded-card border-[1.5px] border-ink/15
-      bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition duration-200 ease-out
-      hover:-translate-y-0.5 hover:border-ink/30;
+    @apply inline-flex w-full items-center justify-center gap-2.5 rounded-2xl border border-glass-light-border
+      bg-glass-light px-4 py-2.5 text-sm font-semibold text-ink backdrop-blur-xl transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:bg-white/80;
   }
 
   .oauth-btn-apple {
-    @apply border-ink bg-ink text-white hover:border-ink hover:bg-ink/90;
+    @apply border-ink/10 bg-ink text-white hover:bg-ink/90;
   }
 
   .btn-link {
@@ -79,84 +81,68 @@ body {
     @apply text-sm font-semibold text-danger-light underline-offset-2 transition hover:brightness-110 hover:underline;
   }
 
+  /* Glass card: translucent fill + backdrop-blur, a soft border catching
+     light at the edge (the signature Liquid Glass "rim"), generous
+     continuous-feeling radius. */
   .card {
-    @apply rounded-card border border-ink/[0.08] bg-surface p-4 shadow-soft transition duration-200 ease-out
-      hover:-translate-y-1 hover:shadow-softLg;
+    @apply rounded-card border border-glass-light-border bg-glass-light p-5 shadow-soft
+      backdrop-blur-2xl transition duration-200 ease-out hover:-translate-y-1 hover:shadow-softLg hover:bg-white/75;
   }
 
   .card-static {
-    @apply rounded-card border border-ink/[0.08] bg-surface p-4 shadow-soft;
+    @apply rounded-card border border-glass-light-border bg-glass-light p-5 shadow-soft backdrop-blur-2xl;
   }
 
   .card-dash {
-    @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark transition duration-200 ease-out
-      hover:-translate-y-1 hover:shadow-dark;
+    @apply rounded-card border border-glass-dark-border bg-glass-dark p-5 shadow-dark
+      backdrop-blur-2xl transition duration-200 ease-out hover:-translate-y-1 hover:bg-white/[0.1];
   }
 
   .card-dash-static {
-    @apply rounded-card border border-white/5 bg-dash-card p-4 shadow-dark;
+    @apply rounded-card border border-glass-dark-border bg-glass-dark p-5 shadow-dark backdrop-blur-2xl;
   }
 
-  /* The signature motif: a card styled like a kitchen order ticket, torn
-     off at the top. Used for the live order card, the dashboard order
-     board, and anywhere else a "comanda" is shown -- not a generic card
-     variant, a deliberate reference to the physical object. */
+  /* Alias kept for every existing "ticket"/"ticket-dash" call site (the
+     order-board/live-order card motif): same glass material as
+     `.card`/`.card-dash` now, the torn-perforation illustration retired
+     with the "Comanda" direction it belonged to. */
   .ticket {
-    @apply relative rounded-[2px] border border-ink/[0.08] bg-surface p-4 pt-5 shadow-soft;
-  }
-  .ticket::before {
-    content: "";
-    position: absolute;
-    top: -6px;
-    left: 12px;
-    right: 12px;
-    height: 12px;
-    background-image: radial-gradient(circle at 8px 6px, transparent 6px, #ffffff 6.5px);
-    background-size: 16px 12px;
-    background-repeat: repeat-x;
+    @apply card;
   }
   .ticket-dash {
-    @apply relative rounded-[2px] border border-white/[0.06] bg-dash-card p-4 pt-5 shadow-dark;
-  }
-  .ticket-dash::before {
-    content: "";
-    position: absolute;
-    top: -6px;
-    left: 12px;
-    right: 12px;
-    height: 12px;
-    background-image: radial-gradient(circle at 8px 6px, transparent 6px, theme("colors.dash.card") 6.5px);
-    background-size: 16px 12px;
-    background-repeat: repeat-x;
+    @apply card-dash;
   }
 
   .input {
-    @apply w-full rounded-lg border border-ink/15 bg-surface px-3.5 py-2.5 text-sm text-ink
-      outline-none transition placeholder:text-muted
+    @apply w-full rounded-2xl border border-ink/10 bg-white/70 px-3.5 py-2.5 text-sm text-ink
+      backdrop-blur-xl outline-none transition placeholder:text-muted
       focus:border-brand focus:ring-4 focus:ring-brand/15;
   }
 
   .input-dash {
-    @apply w-full rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white
-      outline-none transition placeholder:text-white/40
+    @apply w-full rounded-2xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm text-white
+      backdrop-blur-xl outline-none transition placeholder:text-white/40
       focus:border-brand-light focus:ring-4 focus:ring-brand/20;
   }
 
+  /* Small glass capsule label, no more ink-stamp rotation -- a clean
+     tinted pill sitting on the glass surface, iOS "eyebrow" style. */
   .eyebrow {
-    @apply inline-flex w-fit items-center gap-2 rounded-[3px] border-[1.5px] border-brand/30 bg-brand/10
-      px-2.5 py-1 font-mono text-[12px] font-bold uppercase text-brand-dark;
-    letter-spacing: 0.09em;
-    transform: rotate(-1.2deg);
+    @apply inline-flex w-fit items-center gap-2 rounded-full border border-brand/25 bg-brand/10
+      px-3 py-1 text-[12px] font-semibold uppercase text-brand-dark backdrop-blur-xl;
+    letter-spacing: 0.06em;
   }
   .eyebrow::before {
     content: "";
     @apply h-1.5 w-1.5 shrink-0 rounded-full bg-brand-dark;
   }
 
+  /* Capsule status pill -- iOS badge shape (fully rounded), tinted glass
+     fill rather than the previous stamped rectangular badge. */
   .badge-pill {
-    @apply inline-flex items-center gap-1.5 rounded-[3px] border-[1.5px] px-2.5 py-1
-      font-mono text-[11px] font-bold uppercase;
-    letter-spacing: 0.05em;
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1
+      text-[11px] font-semibold uppercase backdrop-blur-xl;
+    letter-spacing: 0.03em;
   }
 
   /* Status colors are informational, never decorative. Exactly three:
@@ -164,28 +150,28 @@ body {
      ready=prêt. `danger` is a fourth, separate meaning (destructive
      actions), never used for status. */
   .badge-todo {
-    @apply badge-pill border-brand/40 bg-brand/10 text-brand-dark;
+    @apply badge-pill border-brand/30 bg-brand/10 text-brand-dark;
   }
 
   .badge-progress {
-    @apply badge-pill border-progress/40 bg-progress/10 text-progress;
+    @apply badge-pill border-progress/30 bg-progress/10 text-progress;
   }
 
   .badge-ready {
-    @apply badge-pill border-ready/40 bg-ready/10 text-ready;
+    @apply badge-pill border-ready/30 bg-ready/10 text-ready;
   }
 
   /* Dark-dashboard counterparts -- light variants for AA contrast on `dash-bg`/`dash-card`. */
   .badge-todo-dash {
-    @apply badge-pill border-brand-light/40 bg-brand-light/15 text-brand-light;
+    @apply badge-pill border-brand-light/30 bg-brand-light/15 text-brand-light;
   }
 
   .badge-progress-dash {
-    @apply badge-pill border-progress-light/40 bg-progress-light/15 text-progress-light;
+    @apply badge-pill border-progress-light/30 bg-progress-light/15 text-progress-light;
   }
 
   .badge-ready-dash {
-    @apply badge-pill border-ready-light/40 bg-ready-light/15 text-ready-light;
+    @apply badge-pill border-ready-light/30 bg-ready-light/15 text-ready-light;
   }
 
   .badge-dot {
@@ -197,16 +183,20 @@ body {
     @apply badge-dot animate-pulse-dot;
   }
 
-  /* Dot-grid texture, light sections only, opacity capped low. */
+  /* Soft color-wash backdrop -- large, low-opacity blurred brand blobs,
+     standing in for the previous dot-grid texture. This is the Apple
+     product-page trick of a glass panel floating over a diffuse color
+     field rather than a printed pattern. */
   .bg-dot-grid {
-    background-image: radial-gradient(rgba(18, 22, 28, 0.05) 1px, transparent 1px);
-    background-size: 18px 18px;
+    background-image: radial-gradient(circle at 15% 20%, rgba(226, 129, 31, 0.12), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(10, 132, 255, 0.08), transparent 40%);
   }
 
-  /* Horizontal "rail" divider -- a dashed line motif standing in for the
-     generic full-bleed color-block section break. */
+  /* Hairline divider -- a plain 1px rule stands in for the previous
+     dashed "rail" motif, which read as a printed-ticket reference the
+     glass direction doesn't carry over. */
   .bg-rail-top {
-    background-image: repeating-linear-gradient(to right, rgba(18, 22, 28, 0.14) 0 10px, transparent 10px 20px);
+    background-image: linear-gradient(to right, rgba(29, 29, 31, 0.1), rgba(29, 29, 31, 0.1));
     background-position: top;
     background-size: 100% 1px;
     background-repeat: no-repeat;
@@ -218,5 +208,13 @@ body {
       after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left
       after:scale-x-0 after:bg-brand-gradient after:transition-transform after:duration-300 after:ease-out
       hover:after:scale-x-100;
+  }
+
+  /* Numeric contexts (prices, timestamps, counters) keep the old
+     monospace class name but now sit on the system font -- tabular
+     figures reproduce the "columns line up" property a typewriter face
+     used to provide, the same way SF Pro's own tabular figures do. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }
