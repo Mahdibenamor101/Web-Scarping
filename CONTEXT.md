@@ -571,6 +571,16 @@ Demande du fondateur : améliorer le design « comme un iPhone 17 Pro ». Questi
 
 **Écart honnête, pas caché** : San Francisco n'est réellement rendue que sur le matériel Apple (iOS Safari/WebKit, et nativement dans l'app mobile) — sur Windows/Android/Linux, la pile `-apple-system` retombe sur Manrope (web) ou Roboto (mobile Android, via la police "System" native), jamais sur une vraie police Apple téléchargée : c'est le même compromis que le propre site apple.com fait pour ses visiteurs non-Apple, pas une limite spécifique à cette implémentation.
 
+### 12.22 Section « pourquoi mbQr » inspirée d'un concurrent, jamais ses chiffres (2 août 2026)
+
+Le fondateur a partagé le site d'un concurrent tunisien (menuqrcode.tn), d'abord en demandant explicitement « le même design et même animation et même tout ». Refusé tel quel : reproduire à l'identique le site d'un concurrent direct pose un vrai problème (plagiat de design, confusion commerciale, risque pour le fondateur lui-même) — distinct d'une inspiration, la même limite qui avait déjà cadré l'usage de la référence QonnectQR (§12.17, "inspiration jamais contenu"). Le fondateur a accepté cette limite et reformulé : inspiration de structure, pas copie.
+
+Leur page combine plusieurs sections construites sur des chiffres d'usage/clients (+200 restaurants partenaires, +100K scans/mois, notes 5 étoiles, logos clients, +20% de ventes) que mbQr ne peut pas avoir honnêtement : aucun pilote n'a encore tourné (§9 Phase A, §13 "pas de témoignages clients... jamais avec des noms inventés"). Plutôt que d'ignorer la demande ou de fabriquer des chiffres, un seul élément structurel a été retenu et adapté honnêtement : une section "trois piliers" juste après le hero (`PILLARS` dans `src/app/page.tsx`) — Efficienza operativa / Esperienza cliente / Meno carta — chaque puce étant une fonctionnalité réelle et vérifiable du produit (même discipline que le tableau `STATS` existant, §12.14), jamais une promesse de résultat business. Le reste de leur structure (bannière CTA finale, section prix, FAQ) existait déjà côté mbQr sous une forme différente — pas dupliqué.
+
+Section positionnée en `bg-dot-grid`, dans la continuité visuelle du hero plutôt qu'en `bg-surface` comme la section suivante ("Demo") — évite une couture visuelle entre deux sections consécutives au même fond tout en conservant l'alternance clair/texture du reste de la page sans devoir retoucher les sections en aval.
+
+Vérifié : `tsc`/`eslint`/`vitest`/`next build` au vert, capture Playwright de la nouvelle section en place.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Envoi d'email : câblé mais jamais exercé contre un vrai compte** (voir §12.16). `RESEND_API_KEY`/`EMAIL_FROM` non définis dans cet environnement — le lien d'invitation manuel reste le chemin réellement testé. À vérifier en vrai (mode test/sandbox du provider) avant un pilote.

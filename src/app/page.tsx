@@ -30,6 +30,39 @@ const STEPS = [
   },
 ];
 
+// Three-pillar "why" overview, positioned right after the hero -- a
+// structural pattern noticed on a competitor's site (menuqrcode.tn,
+// see CONTEXT.md), adapted with mbQr's own real product capabilities.
+// Every bullet is a genuine, checkable feature (same discipline as
+// STATS below), never a business-outcome claim ("+20% di vendite" etc.)
+// that would need real customer data mbQr doesn't have yet.
+const PILLARS = [
+  {
+    title: "Efficienza operativa",
+    icon: <ClockIcon />,
+    points: [
+      "L'ordine arriva in cucina in pochi secondi, senza passare dal cameriere",
+      "Nessuna ristampa: un prezzo o un piatto si aggiorna in un clic",
+    ],
+  },
+  {
+    title: "Esperienza cliente",
+    icon: <PhoneIcon />,
+    points: [
+      "Il menu si apre subito nel browser, senza installare nulla",
+      "Sempre aggiornato: nessun piatto esaurito segnato ancora disponibile",
+    ],
+  },
+  {
+    title: "Meno carta",
+    icon: <LeafIcon />,
+    points: [
+      "Un solo menu digitale al posto di ristampe ad ogni cambio di stagione",
+      "Il QR si stampa una volta sola, per tavolo, non ad ogni modifica",
+    ],
+  },
+] as const;
+
 const FEATURES = [
   {
     title: "14 allergeni UE",
@@ -193,6 +226,37 @@ export default function HomePage() {
 
         <div className="bg-rail-top h-px w-full" />
       </div>
+
+      <section className="bg-dot-grid py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <Reveal className="text-center">
+            <span className="eyebrow">Perché mbQr</span>
+            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
+              Cosa cambia per il tuo <span className="bg-brand-gradient bg-clip-text text-transparent">locale</span>
+            </h2>
+          </Reveal>
+          <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
+            {PILLARS.map((pillar) => (
+              <StaggerItem key={pillar.title}>
+                <div className="card h-full">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                    {pillar.icon}
+                  </span>
+                  <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{pillar.title}</h3>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {pillar.points.map((point) => (
+                      <li key={point} className="flex items-start gap-2 text-sm text-muted">
+                        <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerGroup>
+        </div>
+      </section>
 
       <section id="demo" className="bg-surface py-16 sm:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
@@ -462,6 +526,33 @@ export default function HomePage() {
 
       <LandingFooter />
     </main>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3.5 2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="6" y="2" width="12" height="20" rx="2.5" />
+      <path d="M11 18h2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function LeafIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M5 21c0-9 5-15 14-15 0 9-5 15-14 15z" strokeLinejoin="round" />
+      <path d="M5 21c3-5 6-8 10-11" strokeLinecap="round" />
+    </svg>
   );
 }
 
