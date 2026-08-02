@@ -81,7 +81,8 @@ export default function ProductPreview() {
             {active.frame === "phone" ? (
               <div className="mx-auto w-full max-w-[18rem] rounded-[2.5rem] border-8 border-ink bg-ink p-1.5 shadow-softLg">
                 <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-surface">
-                  <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-ink" />
+                  {/* Dynamic Island, matching hero-mockup.tsx/demo-video.tsx. */}
+                  <div className="absolute left-1/2 top-3 z-10 h-6 w-20 -translate-x-1/2 rounded-full bg-ink" />
                   <Image src={active.src} alt={active.alt} fill sizes="288px" className="object-cover object-top" priority={false} />
                 </div>
               </div>

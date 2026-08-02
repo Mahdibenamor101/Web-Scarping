@@ -31,7 +31,10 @@ export default function HeroMockup() {
         <div className="animate-float">
           <div className="w-[15rem] rounded-[2.75rem] border-[10px] border-ink bg-ink shadow-softLg">
             <div className="relative overflow-hidden rounded-[2.1rem] bg-white">
-              <div className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-ink" />
+              {/* Dynamic Island, not a notch -- current iPhone Pro design
+                  language: a floating capsule offset from the top edge,
+                  fully rounded, rather than a flush pill cut into the bezel. */}
+              <div className="absolute left-1/2 top-2.5 z-10 h-5 w-16 -translate-x-1/2 rounded-full bg-ink" />
               <div className="flex flex-col gap-3 px-4 pb-5 pt-8">
                 <div className="flex items-center justify-between">
                   <div>
