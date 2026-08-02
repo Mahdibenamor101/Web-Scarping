@@ -15,12 +15,13 @@ export async function GET() {
     const organization = await withTenant(session.organizationId, (tx) =>
       tx.organization.findUniqueOrThrow({
         where: { id: session.organizationId },
-        select: { subscriptionStatus: true, trialEndsAt: true },
+        select: { subscriptionStatus: true, subscriptionPlan: true, trialEndsAt: true },
       }),
     );
 
     return NextResponse.json({
       subscriptionStatus: organization.subscriptionStatus,
+      subscriptionPlan: organization.subscriptionPlan,
       trialEndsAt: organization.trialEndsAt,
       stripeConfigured: getStripeClient() !== null,
     });

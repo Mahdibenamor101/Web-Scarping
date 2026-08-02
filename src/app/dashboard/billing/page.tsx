@@ -16,6 +16,13 @@ const STATUS_LABEL: Record<string, string> = {
   paused: "en pause",
 };
 
+const PLAN_LABEL: Record<string, string> = {
+  monthly: "mensuel",
+  quarterly: "3 mois",
+  semiannual: "6 mois",
+  annual: "12 mois",
+};
+
 export default async function BillingPage({
   searchParams,
 }: {
@@ -63,6 +70,15 @@ export default async function BillingPage({
           <span className="badge-pill bg-brand-light/15 text-brand-light">
             {STATUS_LABEL[organization.subscriptionStatus] ?? organization.subscriptionStatus}
           </span>
+          {isSubscribed && (
+            <>
+              {" "}
+              &middot; engagement{" "}
+              <span className="badge-pill bg-brand-light/15 text-brand-light">
+                {PLAN_LABEL[organization.subscriptionPlan] ?? organization.subscriptionPlan}
+              </span>
+            </>
+          )}
         </p>
         {organization.subscriptionStatus === "trialing" && trialDaysLeft !== null && (
           <p className="mt-2 text-white/40">
@@ -73,16 +89,17 @@ export default async function BillingPage({
 
       {!stripeConfigured && (
         <p className="rounded-card border border-danger-light/20 bg-danger-light/10 p-3 text-sm text-danger-light">
-          Stripe n&apos;est pas configuré sur cet environnement (variables <code>STRIPE_SECRET_KEY</code> /{" "}
-          <code>STRIPE_PRICE_ID</code> absentes) — normal en local sans compte Stripe. Voir <code>.env.example</code>.
+          Stripe n&apos;est pas configuré sur cet environnement (variable <code>STRIPE_SECRET_KEY</code> et/ou les
+          variables <code>STRIPE_PRICE_ID_*</code> absentes) — normal en local sans compte Stripe. Voir{" "}
+          <code>.env.example</code>.
         </p>
       )}
 
       {stripeConfigured && (isSubscribed ? <ManageBillingButton /> : <SubscribeButton />)}
 
       <p className="text-xs text-white/40">
-        Abonnement annuel prépayé (~400 €/an). Gérable à tout moment depuis Stripe : moyen de paiement, factures,
-        résiliation.
+        Abonnement prépayé, au choix mensuel, 3 mois, 6 mois ou 12 mois. Gérable à tout moment depuis Stripe : moyen
+        de paiement, factures, résiliation.
       </p>
     </div>
   );
