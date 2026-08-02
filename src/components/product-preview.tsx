@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import MockupFrame, { WindowChromeDots } from "@/components/mockup-frame";
 
 type Tab = {
   id: string;
@@ -70,35 +71,32 @@ export default function ProductPreview() {
         ))}
       </div>
 
-      <div className="mt-10 flex flex-col items-center gap-5">
-        <div
-          key={active.id}
-          className="w-full animate-bump-in"
-          style={{ maxWidth: active.frame === "phone" ? "22rem" : "56rem" }}
-        >
-          {active.frame === "phone" ? (
-            <div className="mx-auto w-full max-w-[22rem] rounded-[2.5rem] border-8 border-ink bg-ink p-1.5 shadow-softLg">
-              <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-surface">
-                <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-ink" />
-                <Image src={active.src} alt={active.alt} fill sizes="352px" className="object-cover object-top" priority={false} />
+      <div className="mt-10 flex flex-col items-center gap-6">
+        <MockupFrame>
+          <div
+            key={active.id}
+            className="w-full animate-bump-in"
+            style={{ maxWidth: active.frame === "phone" ? "18rem" : "52rem" }}
+          >
+            {active.frame === "phone" ? (
+              <div className="mx-auto w-full max-w-[18rem] rounded-[2.5rem] border-8 border-ink bg-ink p-1.5 shadow-softLg">
+                <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-surface">
+                  <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-ink" />
+                  <Image src={active.src} alt={active.alt} fill sizes="288px" className="object-cover object-top" priority={false} />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="overflow-hidden rounded-card border border-ink/10 bg-surface shadow-softLg">
-              {/* Window-chrome dots are decorative (a browser-chrome convention), not
-                  status indicators -- kept neutral so they don't borrow the app's
-                  semantic colors for something that isn't information. */}
-              <div className="flex items-center gap-1.5 border-b border-ink/5 bg-paper px-4 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
-                <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
-                <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
+            ) : (
+              <div className="overflow-hidden rounded-card border border-ink/10 bg-surface shadow-softLg">
+                <div className="flex items-center gap-1.5 border-b border-ink/5 bg-paper px-4 py-2.5">
+                  <WindowChromeDots />
+                </div>
+                <div className="relative aspect-[16/10] w-full">
+                  <Image src={active.src} alt={active.alt} fill sizes="832px" className="object-cover object-top" priority={false} />
+                </div>
               </div>
-              <div className="relative aspect-[16/10] w-full">
-                <Image src={active.src} alt={active.alt} fill sizes="896px" className="object-cover object-top" priority={false} />
-              </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </MockupFrame>
         <p className="max-w-md text-center text-sm text-muted">{active.caption}</p>
       </div>
     </div>
