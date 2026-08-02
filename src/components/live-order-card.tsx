@@ -93,16 +93,29 @@ export default function LiveOrderCard() {
   );
 }
 
+// A push-notification card, not a ticket: bold circular icon + a title
+// line reads at a glance the way a real phone notification does, closer
+// to the reference pulled up during the redesign (design/refs/
+// qonnectqr-hero-mobile.jpg) than the previous thin text-only ticket.
 function CardShell({ phase, seconds }: { phase: "todo" | "ready"; seconds: number }) {
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   return (
-    <div className="ticket flex w-52 items-center gap-3 !pt-6">
-      <div className="flex-1">
-        <p className="font-display text-[15px] font-extrabold leading-none text-ink">{ORDER.table}</p>
-        <p className="mt-1 font-mono text-[10px] text-muted">
-          {ORDER.items} piatti · {ORDER.total}
-        </p>
+    <div className="card flex w-56 items-start gap-3 !p-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white shadow-soft">
+        <BellIcon />
+      </span>
+      <div className="min-w-0 flex-1 pt-0.5">
+        <p className="font-mono text-[9px] font-semibold uppercase tracking-wide text-muted">mbQr · ora</p>
+        <p className="mt-0.5 font-display text-[14px] font-extrabold leading-tight text-ink">Nuovo ordine</p>
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <span className="rounded-full bg-paper px-2 py-0.5 font-mono text-[9px] font-semibold text-ink/70">
+            {ORDER.table}
+          </span>
+          <span className="rounded-full bg-paper px-2 py-0.5 font-mono text-[9px] font-semibold text-ink/70">
+            {ORDER.items} piatti
+          </span>
+        </div>
       </div>
       {phase === "todo" ? (
         <span className="badge-todo shrink-0 tabular-nums">
@@ -112,5 +125,14 @@ function CardShell({ phase, seconds }: { phase: "todo" | "ready"; seconds: numbe
         <span className="badge-ready shrink-0">Pronto</span>
       )}
     </div>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 8a6 6 0 1112 0c0 4 1.5 5.5 2 6.5H4c.5-1 2-2.5 2-6.5z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 19a2 2 0 004 0" strokeLinecap="round" />
+    </svg>
   );
 }

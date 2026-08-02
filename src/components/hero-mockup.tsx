@@ -23,11 +23,14 @@ import LiveOrderCard from "@/components/live-order-card";
 export default function HeroMockup() {
   return (
     <div className="relative mx-auto flex h-[30rem] w-full max-w-sm items-center justify-center sm:h-[34rem]">
-      {/* Soft brand halo behind everything */}
-      <div className="pointer-events-none absolute h-[26rem] w-[26rem] rounded-full bg-brand/20 blur-[90px]" />
+      {/* Soft, low-key halo -- a hint of brand glow, not a loud colored
+          blur: closer to the airy near-white background a Liquid Glass
+          product shot sits on than the previous saturated circle. */}
+      <div className="pointer-events-none absolute h-[24rem] w-[24rem] rounded-full bg-brand/10 blur-[110px]" />
 
-      {/* Phone: static tilt on the outer element, float animation on the inner one */}
-      <div className="-rotate-6">
+      {/* Phone: near-upright (a slight tilt, not a dramatic throw) --
+          reads as a grounded product shot rather than a floating prop. */}
+      <div className="-rotate-2">
         <div className="animate-float">
           <div className="w-[15rem] rounded-[2.75rem] border-[10px] border-ink bg-ink shadow-softLg">
             <div className="relative overflow-hidden rounded-[2.1rem] bg-white">
