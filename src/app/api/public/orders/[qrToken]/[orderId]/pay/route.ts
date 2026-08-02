@@ -3,7 +3,7 @@ import { withTenant } from "@/lib/db";
 import { resolveTableByQrToken } from "@/lib/qr-resolve";
 import { getStripeClient } from "@/lib/stripe";
 import { ApiError, handleApiError, requireRateLimit } from "@/lib/api";
-import { getClientIp } from "@/lib/rate-limit";
+import { getClientIp, getRequestOrigin } from "@/lib/rate-limit";
 
 // Customer-facing payment, distinct from the org's own subscription
 // checkout (POST /api/billing/checkout) -- same Stripe account, a
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, { params }: { params: { qrToken: st
       throw new ApiError(409, "already_paid");
     }
 
-    const origin = req.nextUrl.origin;
+    const origin = getRequestOrigin(req);
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withTenant } from "@/lib/db";
 import { requireSession, handleApiError, ApiError, requireRateLimit } from "@/lib/api";
 import { sendVerificationEmail } from "@/lib/verification";
+import { getRequestOrigin } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
         organizationId: session.organizationId,
         userId: session.userId,
         email: session.email,
-        origin: req.nextUrl.origin,
+        origin: getRequestOrigin(req),
       }),
     );
 

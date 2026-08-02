@@ -3,6 +3,7 @@ import { withTenant } from "@/lib/db";
 import { getStripeClient, getStripePriceId } from "@/lib/stripe";
 import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit } from "@/lib/api";
 import { BILLING_MANAGEMENT_ROLES } from "@/lib/rbac";
+import { getRequestOrigin } from "@/lib/rate-limit";
 
 // Creates (or reuses) a Stripe Customer for the organization, then a
 // Checkout Session for the single annual plan (§8 of CONTEXT.md: ~400€/an
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const origin = req.nextUrl.origin;
+    const origin = getRequestOrigin(req);
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,

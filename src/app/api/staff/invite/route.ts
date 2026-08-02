@@ -5,6 +5,7 @@ import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit
 import { STAFF_MANAGEMENT_ROLES, canInviteRole } from "@/lib/rbac";
 import { inviteStaffSchema } from "@/lib/validation";
 import { sendEmail } from "@/lib/email";
+import { getRequestOrigin } from "@/lib/rate-limit";
 
 const INVITATION_TTL_DAYS = 7;
 
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
     // this route's core behavior (an invite link the owner/manager can
     // hand over manually) working exactly as before if RESEND_API_KEY
     // isn't set, with real delivery as a bonus when it is.
-    const inviteUrl = `${req.nextUrl.origin}/invite/${invitation.token}`;
+    const inviteUrl = `${getRequestOrigin(req)}/invite/${invitation.token}`;
     console.info(`[staff-invite] ${body.email} -> ${inviteUrl}`);
 
     const { sent } = await sendEmail({

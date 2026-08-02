@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { completeOAuthSignIn, googleExchangeCode, isGoogleConfigured } from "@/lib/oauth";
 import { requireRateLimit } from "@/lib/api";
-import { getClientIp } from "@/lib/rate-limit";
+import { getClientIp, getRequestOrigin } from "@/lib/rate-limit";
 
 const STATE_COOKIE = "oauth_state";
 
@@ -13,6 +13,7 @@ export async function GET(req: Request) {
   const from = state?.split(".")[1] === "signup" ? "signup" : "login";
   const expectedState = cookies().get(STATE_COOKIE)?.value;
   cookies().set(STATE_COOKIE, "", { path: "/", maxAge: 0 });
+  const origin = getRequestOrigin(req);
 
   try {
     requireRateLimit(`oauth:ip:${getClientIp(req)}`, { limit: 20, windowMs: 15 * 60 * 1000 });
@@ -21,12 +22,12 @@ export async function GET(req: Request) {
       throw new Error("invalid_oauth_callback");
     }
 
-    const profile = await googleExchangeCode(code, url.origin);
+    const profile = await googleExchangeCode(code, origin);
     await completeOAuthSignIn("GOOGLE", profile);
 
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/dashboard", origin));
   } catch (error) {
     console.error("[oauth:google]", error);
-    return NextResponse.redirect(new URL(`/${from}?oauth_error=google_failed`, req.url));
+    return NextResponse.redirect(new URL(`/${from}?oauth_error=google_failed`, origin));
   }
 }

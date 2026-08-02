@@ -3,6 +3,7 @@ import { withTenant } from "@/lib/db";
 import { getStripeClient } from "@/lib/stripe";
 import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit } from "@/lib/api";
 import { BILLING_MANAGEMENT_ROLES } from "@/lib/rbac";
+import { getRequestOrigin } from "@/lib/rate-limit";
 
 // Stripe's hosted Billing Portal: lets an owner update payment details,
 // view invoices, or cancel -- without this app building any of that UI.
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: organization.stripeCustomerId,
-      return_url: `${req.nextUrl.origin}/dashboard/billing`,
+      return_url: `${getRequestOrigin(req)}/dashboard/billing`,
     });
 
     return NextResponse.json({ url: portalSession.url });

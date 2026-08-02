@@ -7,6 +7,7 @@ import {
   TABLE_MANAGEMENT_ROLES,
   BILLING_MANAGEMENT_ROLES,
 } from "@/lib/rbac";
+import { getRequestOrigin } from "@/lib/rate-limit";
 
 // Defense in depth: this only decides which *page* a role can land on.
 // The real, unbypassable boundary is Row-Level Security in Postgres (see
@@ -29,15 +30,17 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   const session = token ? await verifySessionToken(token) : null;
 
+  const origin = getRequestOrigin(req);
+
   if (!session) {
-    const loginUrl = new URL("/login", req.url);
+    const loginUrl = new URL("/login", origin);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   const restriction = ROLE_ONLY_PREFIXES.find((r) => pathname.startsWith(r.prefix));
   if (restriction && !restriction.roles.includes(session.role)) {
-    return NextResponse.redirect(new URL(ROLE_HOME[session.role], req.url));
+    return NextResponse.redirect(new URL(ROLE_HOME[session.role], origin));
   }
 
   return NextResponse.next();

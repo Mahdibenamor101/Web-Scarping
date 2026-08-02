@@ -58,3 +58,21 @@ export function getClientIp(req: Request): string {
   if (real) return real.trim();
   return "unknown";
 }
+
+/**
+ * Best-effort public origin for building absolute URLs (OAuth redirect_uri,
+ * Stripe success/cancel URLs, invite/verification email links). Same
+ * "trust the proxy's own headers" reasoning as getClientIp above --
+ * `req.url`/`req.nextUrl.origin` reflect the raw incoming request, which
+ * behind a reverse proxy that terminates TLS and forwards to a plain-HTTP
+ * container (Railway, Fly, most self-hosted setups) can be the container's
+ * own internal bind address rather than the public domain. `x-forwarded-*`
+ * is what the proxy itself sets on the way in, so it's what a self-hosted
+ * Next.js app has to trust instead.
+ */
+export function getRequestOrigin(req: Request): string {
+  const forwardedProto = req.headers.get("x-forwarded-proto") ?? "https";
+  const forwardedHost = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+  if (forwardedHost) return `${forwardedProto}://${forwardedHost}`;
+  return new URL(req.url).origin;
+}
