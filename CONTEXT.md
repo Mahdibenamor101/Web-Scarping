@@ -609,6 +609,20 @@ En-tête reconstruit à la manière d'une page restaurant Uber Eats/Deliveroo : 
 
 Vérifié : `tsc`/`eslint`/`vitest` au vert, capture Playwright avant/après contre l'org de démo, puis avec logo + photo réels temporairement assignés en base (retirés ensuite) pour confirmer le rendu bandeau/avatar avec de vraies images.
 
+### 12.26 Trois pages publiques : Prezzi, Chi siamo, Contatti (2 août 2026)
+
+Nouvelle référence à menuqrcode.tn (« je veux un site bien équipé comme ça »), cette fois pas pour son design mais pour sa liste de pages : Packs, Partenaires, À propos, Blog, Contact/Devis, que mbQr n'avait pas. Plutôt que deviner ce qui est voulu, question posée directement au fondateur (choix multiple) : réponse = page Prix dédiée, À propos, Contact. Ni Partenaires ni Blog n'ont été demandés -- Partenaires aurait de toute façon nécessité de vrais partenaires (même limite qu'en §12.22).
+
+**`/prezzi`** -- reprend exactement le contenu de la section « Prezzi » de la landing (`PLAN_FEATURES` extrait dans `src/lib/landing-content.ts`, importé des deux côtés pour que les deux ne puissent jamais diverger), avec plus de place et un lien de retour vers `/contatti` pour les demandes particulières.
+
+**`/chi-siamo`** -- volontairement centrée sur le produit, pas sur une biographie du fondateur : aucun fait biographique n'a été inventé (ville, date de création, histoire de fondation) faute de les connaître réellement. Le contenu retenu est soit vérifiable (isolation des données par ligne, aucun matériel à acheter, un seul prix tout compris), soit une reformulation honnête d'une limite déjà documentée : la section « Stato attuale » transforme l'absence de vrais chiffres clients (§12.22) en argument de transparence assumé plutôt que de la cacher.
+
+**`/contatti`** -- formulaire réel (`POST /api/contact`, `contactMessageSchema`, rate-limité comme toute route publique) qui passe par `sendEmail()` (même dégradation propre que partout ailleurs si `RESEND_API_KEY`/`EMAIL_FROM` ne sont pas configurés -- le formulaire répond toujours succès, le détail d'acheminement reste un problème de logs serveur, jamais exposé au visiteur). Nouvelle variable `CONTACT_EMAIL` (destinataire, optionnelle, repli sur `EMAIL_FROM`). Remplace au passage l'unique usage réel de `CONTACT_EMAIL` de `src/lib/brand.ts` (un `mailto:` dans le footer) -- cette constante était documentée dans son propre commentaire comme une adresse factice, jamais une vraie boîte ; le formulaire est le premier canal de contact réellement fonctionnel du site.
+
+`LandingNav`/`LandingFooter` (réutilisés sur les trois nouvelles pages) : les ancres de la landing (`#demo`, `#tarifs`...) sont passées en `/#demo` etc. pour rester utilisables depuis une autre page -- un `#demo` nu n'aurait rien fait en dehors de `/`. Le lien « Prezzi » de la nav pointe désormais vers `/prezzi` plutôt que vers l'ancre `#tarifs` ; le footer gagne une colonne « Azienda » (Chi siamo/Contatti) à côté de « Prodotto ».
+
+Vérifié : `tsc`/`eslint`/`vitest`/`next build` au vert ; les trois pages capturées (Playwright) ; formulaire de contact rempli et soumis dans un vrai navigateur, confirmé par un `curl` direct sur `POST /api/contact` (`{"received":true}`, 201).
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Envoi d'email : câblé mais jamais exercé contre un vrai compte** (voir §12.16). `RESEND_API_KEY`/`EMAIL_FROM` non définis dans cet environnement — le lien d'invitation manuel reste le chemin réellement testé. À vérifier en vrai (mode test/sandbox du provider) avant un pilote.

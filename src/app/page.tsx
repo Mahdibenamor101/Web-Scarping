@@ -8,6 +8,7 @@ import PricingToggle from "@/components/pricing-toggle";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
 import FaqAccordion from "@/components/faq-accordion";
+import { PLAN_FEATURES } from "@/lib/landing-content";
 
 // Landing copy is in Italian end to end (dashboard and auth stay in
 // French -- see CONTEXT.md). The public menu page has its own separate
@@ -94,15 +95,6 @@ const STATS = [
   { value: 2, suffix: "", label: "Lingue, IT / EN, fin dall'inizio" },
   { value: 100, suffix: "%", label: "Dati isolati per ristorante" },
   { value: 0, suffix: " €", label: "Hardware aggiuntivo da acquistare" },
-];
-
-const PLAN_FEATURES = [
-  "QR code e tavoli illimitati",
-  "Menu multilingue italiano / inglese",
-  "Etichettatura dei 14 allergeni UE",
-  "Ordini in tempo reale, senza ricaricare",
-  "Account staff illimitati (manager, cameriere, cucina)",
-  "Nessun dispositivo né hardware da acquistare",
 ];
 
 const TRUST_BADGES = [
@@ -481,9 +473,12 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-8 flex justify-center">
+              <div className="mt-8 flex flex-col items-center gap-3">
                 <Link href="/signup" className="btn-primary px-6 py-3 text-base">
                   Inizia la prova gratuita
+                </Link>
+                <Link href="/prezzi" className="nav-link text-sm">
+                  Vedi tutti i dettagli →
                 </Link>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/logo";
-import { APP_NAME, CONTACT_EMAIL } from "@/lib/brand";
+import { APP_NAME } from "@/lib/brand";
 
 /**
  * Structure takes the "logo + link columns + contact" shape from the
@@ -23,31 +23,34 @@ export default function LandingFooter() {
 
         <div className="flex flex-col gap-3 text-sm">
           <p className="font-semibold text-ink">Prodotto</p>
-          <a href="#demo" className="nav-link w-fit">
+          <a href="/#demo" className="nav-link w-fit">
             Demo
           </a>
-          <a href="#apercu" className="nav-link w-fit">
+          <a href="/#apercu" className="nav-link w-fit">
             Panoramica
           </a>
-          <a href="#fonctionnalites" className="nav-link w-fit">
+          <a href="/#fonctionnalites" className="nav-link w-fit">
             Funzionalità
           </a>
-          <a href="#tarifs" className="nav-link w-fit">
+          <Link href="/prezzi" className="nav-link w-fit">
             Prezzi
-          </a>
+          </Link>
         </div>
 
         <div className="flex flex-col gap-3 text-sm">
-          <p className="font-semibold text-ink">Account</p>
+          <p className="font-semibold text-ink">Azienda</p>
+          <Link href="/chi-siamo" className="nav-link w-fit">
+            Chi siamo
+          </Link>
+          <Link href="/contatti" className="nav-link w-fit">
+            Contatti
+          </Link>
           <Link href="/login" className="nav-link w-fit">
             Accedi
           </Link>
           <Link href="/signup" className="nav-link w-fit">
             Iscriviti
           </Link>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="nav-link w-fit">
-            {CONTACT_EMAIL}
-          </a>
         </div>
       </div>
 

@@ -34,19 +34,23 @@ export default function LandingNav() {
       >
         <Logo />
         <div className="hidden items-center gap-7 text-sm font-medium sm:flex">
-          <a href="#demo" className="nav-link">
+          {/* Homepage-relative ("/#demo") rather than bare "#demo": this nav
+              is also reused on the standalone /prezzi, /chi-siamo, /contatti
+              pages (see LandingFooter), where a bare hash would just no-op
+              instead of jumping to the homepage section. */}
+          <a href="/#demo" className="nav-link">
             Demo
           </a>
-          <a href="#apercu" className="nav-link">
+          <a href="/#apercu" className="nav-link">
             Panoramica
           </a>
-          <a href="#fonctionnalites" className="nav-link">
+          <a href="/#fonctionnalites" className="nav-link">
             Funzionalità
           </a>
-          <a href="#tarifs" className="nav-link">
+          <Link href="/prezzi" className="nav-link">
             Prezzi
-          </a>
-          <a href="#faq" className="nav-link">
+          </Link>
+          <a href="/#faq" className="nav-link">
             FAQ
           </a>
         </div>
