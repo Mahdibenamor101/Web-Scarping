@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
+import { getRequestOrigin } from "@/lib/rate-limit";
 
 // Public: the link is opened from an email client, which never carries
 // this app's session cookie. verify_email_token() (growth_features
@@ -8,8 +9,9 @@ import { getSession } from "@/lib/session";
 // same pre-tenant-context shape as accept_invitation.
 export async function GET(req: Request) {
   const token = new URL(req.url).searchParams.get("token");
+  const origin = getRequestOrigin(req);
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", origin));
   }
 
   try {
@@ -23,8 +25,8 @@ export async function GET(req: Request) {
     // common case -- clicked from a mail app) land on /login.
     const session = await getSession();
     const destination = session?.userId === result.user_id ? "/dashboard" : "/login";
-    return NextResponse.redirect(new URL(`${destination}?email_verified=1`, req.url));
+    return NextResponse.redirect(new URL(`${destination}?email_verified=1`, origin));
   } catch {
-    return NextResponse.redirect(new URL("/login?email_verified=0", req.url));
+    return NextResponse.redirect(new URL("/login?email_verified=0", origin));
   }
 }

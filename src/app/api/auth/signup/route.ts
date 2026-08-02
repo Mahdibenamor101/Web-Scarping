@@ -5,7 +5,7 @@ import { setSessionCookie, signSessionToken } from "@/lib/session";
 import { signupSchema } from "@/lib/validation";
 import { uniqueSlug } from "@/lib/slug";
 import { handleApiError, requireRateLimit } from "@/lib/api";
-import { getClientIp } from "@/lib/rate-limit";
+import { getClientIp, getRequestOrigin } from "@/lib/rate-limit";
 import { sendVerificationEmail } from "@/lib/verification";
 
 const TRIAL_DAYS = 14;
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         organizationId: result.organization_id,
         userId: result.user_id,
         email: body.email,
-        origin: req.nextUrl.origin,
+        origin: getRequestOrigin(req),
       }),
     );
 
