@@ -62,6 +62,7 @@ function itemDescription(item: Item, lang: Lang): string | null {
 const T = {
   it: {
     title: "Menu",
+    welcome: "Benvenuti! Sfogliate il menu e ordinate direttamente da qui.",
     table: "Tavolo",
     counter: "Ordina al banco",
     pickup: "Ritiro",
@@ -88,6 +89,7 @@ const T = {
   },
   en: {
     title: "Menu",
+    welcome: "Welcome! Browse the menu and order directly from here.",
     table: "Table",
     counter: "Order at the counter",
     pickup: "Pickup",
@@ -231,12 +233,13 @@ function PublicMenuPageInner() {
 
   if (!data) {
     return (
-      <main className="mx-auto min-h-screen max-w-md pb-24">
-        <div className="sticky top-0 z-10 border-b border-ink/10 bg-white/90 px-4 py-3">
-          <Skeleton tone="light" className="h-4 w-32" />
-          <Skeleton tone="light" className="mt-2 h-3 w-20" />
+      <main className="mx-auto min-h-screen max-w-md bg-paper pb-24">
+        <Skeleton tone="light" className="h-36 w-full rounded-none" />
+        <div className="-mt-10 px-4">
+          <Skeleton tone="light" className="h-20 w-20 rounded-2xl border-4 border-white" />
+          <Skeleton tone="light" className="mt-3 h-4 w-40" />
         </div>
-        <div className="flex flex-col gap-3 p-4">
+        <div className="mt-6 flex flex-col gap-3 p-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} tone="light" className="h-20 w-full" />
           ))}
@@ -280,36 +283,48 @@ function PublicMenuPageInner() {
     );
   }
 
+  const initial = data.organizationName.trim().charAt(0).toUpperCase() || "?";
+
   return (
-    <main
-      className="relative mx-auto min-h-screen max-w-md pb-24"
-      style={
-        data.backgroundUrl
-          ? { backgroundImage: `url(${data.backgroundUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-          : undefined
-      }
-    >
-      {/* White-label background: a translucent paper wash keeps menu text
-          legible over an arbitrary owner-uploaded photo, whatever its
-          contrast. Only rendered when an org has actually set one. */}
-      {data.backgroundUrl && <div className="pointer-events-none absolute inset-0 bg-paper/90" />}
-      <header className="sticky top-0 z-10 border-b border-ink/10 bg-white/90 px-4 py-3 backdrop-blur">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            {data.logoUrl && (
+    <main className="relative mx-auto min-h-screen max-w-md bg-paper pb-24">
+      {/* Cover photo + logo avatar, à la Uber Eats/Deliveroo restaurant page --
+          a real welcome even for an org that hasn't uploaded anything: the
+          brand gradient fills both slots so the header never looks empty. */}
+      <div className="relative h-36 w-full overflow-hidden bg-brand-gradient">
+        {data.backgroundUrl && (
+          // eslint-disable-next-line @next/next/no-img-element -- arbitrary owner-uploaded URL
+          <img src={data.backgroundUrl} alt="" className="h-full w-full object-cover" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
+      </div>
+
+      <div className="relative -mt-10 px-4">
+        <div className="flex items-end gap-3">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-brand-gradient shadow-softLg">
+            {data.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- arbitrary owner-uploaded URL
-              <img src={data.logoUrl} alt="" className="h-8 w-8 shrink-0 rounded-[3px] object-cover" />
+              <img src={data.logoUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center font-display text-2xl font-extrabold text-white">
+                {initial}
+              </span>
             )}
-            <div>
-              <p className="font-display text-base font-extrabold leading-none text-ink">{data.organizationName}</p>
-              <p className="mt-1 text-xs text-muted">
-                {data.orderingMode === "TABLE" && `${t.table} : ${data.tableLabel}`}
-                {data.orderingMode === "COUNTER" && t.counter}
-                {data.orderingMode === "PICKUP" && t.pickup}
-                {data.orderingMode === "DISPLAY_ONLY" && t.displayOnly}
-              </p>
-            </div>
           </div>
+          <h1 className="pb-1 font-display text-xl font-extrabold leading-tight tracking-tight text-ink">
+            {data.organizationName}
+          </h1>
+        </div>
+        <p className="mt-3 text-sm text-muted">{t.welcome}</p>
+      </div>
+
+      <header className="sticky top-0 z-10 mt-4 border-y border-ink/10 bg-white/90 px-4 py-2.5 backdrop-blur">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-muted">
+            {data.orderingMode === "TABLE" && `${t.table} : ${data.tableLabel}`}
+            {data.orderingMode === "COUNTER" && t.counter}
+            {data.orderingMode === "PICKUP" && t.pickup}
+            {data.orderingMode === "DISPLAY_ONLY" && t.displayOnly}
+          </p>
           <div className="flex items-center gap-2">
             {data.orderingMode === "TABLE" && (
               <button
@@ -327,10 +342,10 @@ function PublicMenuPageInner() {
               </button>
             )}
             {/* No extra languages (the common case): IT/EN fit inline next to
-                the bell with no risk of cramping the org name. Once a menu has
+                the bell with no risk of cramping the row. Once a menu has
                 been translated, the same two buttons move to their own
-                horizontally-scrollable row below instead of wrapping the
-                header onto three lines. */}
+                horizontally-scrollable row below instead of wrapping onto a
+                second line. */}
             {data.extraLanguages.length === 0 && <LanguagePills lang={lang} setLang={setLang} extraLanguages={[]} />}
           </div>
         </div>
