@@ -16,6 +16,10 @@ export const loginSchema = z.object({
 
 export const staffRoleSchema = z.enum(["OWNER", "MANAGER", "SERVER", "KITCHEN"]);
 
+export const billingCheckoutSchema = z.object({
+  period: z.enum(["monthly", "quarterly", "semiannual", "annual"]),
+});
+
 export const inviteStaffSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(255),
   role: staffRoleSchema,

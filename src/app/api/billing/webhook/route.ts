@@ -24,24 +24,30 @@ async function syncSubscription(organizationId: string, subscription: Stripe.Sub
   // subscription's period.
   const firstItem = subscription.items.data[0];
   const currentPeriodEnd = firstItem ? new Date(firstItem.current_period_end * 1000) : null;
+  // Set by POST /api/billing/checkout on both the Checkout Session and the
+  // subscription it creates -- read back here instead of reverse-mapping a
+  // Stripe price id to one of BILLING_PERIODS. Falls back to "annual" only
+  // for subscriptions created before this field existed.
+  const plan = subscription.metadata?.plan ?? "annual";
 
   await withTenant(organizationId, (tx) =>
     Promise.all([
       tx.organization.update({
         where: { id: organizationId },
-        data: { subscriptionStatus: subscription.status, subscriptionPlan: "annual" },
+        data: { subscriptionStatus: subscription.status, subscriptionPlan: plan },
       }),
       tx.subscription.upsert({
         where: { externalSubscriptionId: subscription.id },
         create: {
           organizationId,
-          plan: "annual",
+          plan,
           status: subscription.status,
           paymentProvider: "stripe",
           externalSubscriptionId: subscription.id,
           currentPeriodEnd,
         },
         update: {
+          plan,
           status: subscription.status,
           currentPeriodEnd,
         },
