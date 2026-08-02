@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { friendlyErrorMessage } from "@/lib/client-errors";
+import AuthShell from "@/components/auth-shell";
+import OAuthButtons from "@/components/oauth-buttons";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [organizationName, setOrganizationName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,8 +27,7 @@ export default function SignupPage() {
         body: JSON.stringify({ organizationName, ownerName, email, password }),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Erreur inconnue");
+        throw new Error(await friendlyErrorMessage(res, "Erreur inconnue"));
       }
       router.push("/dashboard/staff");
       router.refresh();
@@ -36,9 +39,9 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-6">
-      <h1 className="text-xl font-semibold">Créer mon restaurant</h1>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+    <AuthShell title="Créer mon restaurant" subtitle="Essai gratuit, sans carte bancaire.">
+      <OAuthButtons from="signup" error={searchParams.get("oauth_error")} />
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <Field label="Nom du restaurant">
           <input
             required
@@ -70,23 +73,27 @@ export default function SignupPage() {
             className="input"
           />
         </Field>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        {error && <p className="text-sm text-danger">{error}</p>}
+        <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
           {loading ? "Création…" : "Créer le compte"}
         </button>
       </form>
-    </main>
+    </AuthShell>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupForm />
+    </Suspense>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 text-sm">
-      <span className="text-slate-600">{label}</span>
+    <label className="flex flex-col gap-1.5 text-sm">
+      <span className="font-medium text-ink/70">{label}</span>
       {children}
     </label>
   );

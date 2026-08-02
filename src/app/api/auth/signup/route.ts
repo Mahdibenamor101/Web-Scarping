@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, withTenant } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
-import { setSessionCookie } from "@/lib/session";
+import { setSessionCookie, signSessionToken } from "@/lib/session";
 import { signupSchema } from "@/lib/validation";
 import { uniqueSlug } from "@/lib/slug";
-import { handleApiError } from "@/lib/api";
+import { handleApiError, requireRateLimit } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
+import { sendVerificationEmail } from "@/lib/verification";
 
 const TRIAL_DAYS = 14;
 
@@ -16,6 +18,8 @@ const TRIAL_DAYS = 14;
 // bypasses Row-Level Security, narrowly and on the database's terms.
 export async function POST(req: NextRequest) {
   try {
+    requireRateLimit(`signup:ip:${getClientIp(req)}`, { limit: 5, windowMs: 60 * 60 * 1000 });
+
     const body = signupSchema.parse(await req.json());
     const passwordHash = await hashPassword(body.password);
     const slug = uniqueSlug(body.organizationName);
@@ -36,15 +40,32 @@ export async function POST(req: NextRequest) {
       throw new Error("signup_failed");
     }
 
-    await setSessionCookie({
+    const sessionPayload = {
       userId: result.user_id,
       organizationId: result.organization_id,
-      role: "OWNER",
+      role: "OWNER" as const,
       email: body.email,
       name: body.ownerName,
-    });
+    };
+    await setSessionCookie(sessionPayload);
 
-    return NextResponse.json({ organizationId: result.organization_id }, { status: 201 });
+    // Best-effort: an owner who never receives/clicks the link still has a
+    // fully working account (see the dashboard banner + "Renvoyer" action,
+    // POST /api/auth/resend-verification) -- verification unlocks nothing
+    // by itself today, it's a nudge, not a gate.
+    await withTenant(result.organization_id, (tx) =>
+      sendVerificationEmail(tx, {
+        organizationId: result.organization_id,
+        userId: result.user_id,
+        email: body.email,
+        origin: req.nextUrl.origin,
+      }),
+    );
+
+    return NextResponse.json(
+      { organizationId: result.organization_id, token: await signSessionToken(sessionPayload) },
+      { status: 201 },
+    );
   } catch (error) {
     return handleApiError(error);
   }

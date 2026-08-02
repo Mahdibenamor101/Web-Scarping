@@ -107,4 +107,66 @@ describe("tenant isolation (Row-Level Security)", () => {
     expect(users.every((u) => u.organizationId === orgB.organizationId)).toBe(true);
     expect(categories.every((c) => c.organizationId === orgB.organizationId)).toBe(true);
   });
+
+  it("an order can never point at another organization's table, even naming the row directly", async () => {
+    // Composite FK on Order.table (tableId, organizationId) -> (id, organizationId),
+    // see prisma/migrations/*_composite_tenant_foreign_keys. This is a plain
+    // referential-integrity guarantee, not RLS -- it holds even for a write
+    // that (hypothetically) got the right organization_id but the wrong
+    // table_id, which RLS's WITH CHECK alone would not have caught.
+    const tableB = await withTenant(orgB.organizationId, (tx) =>
+      tx.restaurantTable.create({
+        data: { organizationId: orgB.organizationId, label: "Table B1", qrToken: `qr-${Date.now()}` },
+      }),
+    );
+
+    await expect(
+      withTenant(orgA.organizationId, (tx) =>
+        tx.order.create({
+          data: { organizationId: orgA.organizationId, tableId: tableB.id, status: "PENDING", totalAmount: 10 },
+        }),
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("a staff call can never point at another organization's table, and is invisible cross-tenant", async () => {
+    const tableB = await withTenant(orgB.organizationId, (tx) =>
+      tx.restaurantTable.create({
+        data: { organizationId: orgB.organizationId, label: "Call Test B", qrToken: `qr-call-${Date.now()}` },
+      }),
+    );
+
+    await expect(
+      withTenant(orgA.organizationId, (tx) =>
+        tx.staffCall.create({ data: { organizationId: orgA.organizationId, tableId: tableB.id, status: "PENDING" } }),
+      ),
+    ).rejects.toThrow();
+
+    const call = await withTenant(orgB.organizationId, (tx) =>
+      tx.staffCall.create({ data: { organizationId: orgB.organizationId, tableId: tableB.id, status: "PENDING" } }),
+    );
+
+    const fromWrongTenant = await withTenant(orgA.organizationId, (tx) =>
+      tx.staffCall.findUnique({ where: { id: call.id } }),
+    );
+    expect(fromWrongTenant).toBeNull();
+  });
+
+  it("resolve_table_by_qr_token only ever resolves to the table's own organization", async () => {
+    const qrToken = `qr-resolve-${Date.now()}`;
+    const table = await withTenant(orgA.organizationId, (tx) =>
+      tx.restaurantTable.create({ data: { organizationId: orgA.organizationId, label: "Resolve Test", qrToken } }),
+    );
+
+    const [resolved] = await prisma.$queryRaw<{ organization_id: string; table_id: string }[]>`
+      SELECT * FROM resolve_table_by_qr_token(${qrToken})
+    `;
+    expect(resolved?.organization_id).toBe(orgA.organizationId);
+    expect(resolved?.table_id).toBe(table.id);
+
+    const [notFound] = await prisma.$queryRaw<unknown[]>`
+      SELECT * FROM resolve_table_by_qr_token(${"no-such-token"})
+    `;
+    expect(notFound).toBeUndefined();
+  });
 });

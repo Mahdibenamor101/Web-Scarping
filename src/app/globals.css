@@ -2,10 +2,219 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-slate-50 text-slate-900;
+html {
+  scroll-behavior: smooth;
 }
 
-.input {
-  @apply rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500;
+body {
+  @apply bg-paper text-ink;
+}
+
+/* "Comanda" direction (28 juillet 2026, see CONTEXT.md): prefers-reduced-motion
+   disables every CSS animation/transition here in one place; Framer Motion
+   components additionally check useReducedMotion() (reveal.tsx,
+   live-order-card.tsx) since JS-driven motion isn't touched by this query.
+   Not optional. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Shared component classes -- every page draws from this vocabulary
+ * instead of repeating Tailwind strings. Values come from
+ * src/lib/design-tokens.ts, imported into tailwind.config.ts.
+ *
+ * "Liquid Glass" direction (2 août 2026): translucent surfaces with
+ * backdrop-blur, sitting over a light (`paper`) or true-black (`dashBg`)
+ * ground -- `.card`/`.ticket` are the light marketing/auth glass,
+ * `.card-dash`/`.ticket-dash` the dark dashboard glass. Same two-room
+ * split as the previous "Comanda" system, now expressed as glass over
+ * two different grounds rather than a light/dark toggle of one surface.
+ */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5
+      text-sm font-semibold text-white shadow-soft backdrop-blur-xl transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-glass-light-border
+      bg-glass-light px-5 py-2.5 text-sm font-semibold text-ink shadow-soft backdrop-blur-xl transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:bg-white/80 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
+  }
+
+  /* Google/Apple sign-in buttons (src/components/oauth-buttons.tsx).
+     Each brand's own guidelines, not the app's marigold accent -- these
+     are third-party identity marks, not our CTAs. */
+  .oauth-btn {
+    @apply inline-flex w-full items-center justify-center gap-2.5 rounded-2xl border border-glass-light-border
+      bg-glass-light px-4 py-2.5 text-sm font-semibold text-ink backdrop-blur-xl transition duration-200 ease-out
+      hover:-translate-y-0.5 hover:bg-white/80;
+  }
+
+  .oauth-btn-apple {
+    @apply border-ink/10 bg-ink text-white hover:bg-ink/90;
+  }
+
+  .btn-link {
+    @apply text-sm font-semibold text-muted underline-offset-2 transition hover:text-ink hover:underline;
+  }
+
+  .btn-link-danger {
+    @apply text-sm font-semibold text-danger underline-offset-2 transition hover:brightness-90 hover:underline;
+  }
+
+  /* Dark-dashboard counterparts of .btn-link / .btn-link-danger. */
+  .btn-link-dash {
+    @apply text-sm font-semibold text-white/50 underline-offset-2 transition hover:text-white hover:underline;
+  }
+
+  .btn-link-dash-danger {
+    @apply text-sm font-semibold text-danger-light underline-offset-2 transition hover:brightness-110 hover:underline;
+  }
+
+  /* Glass card: translucent fill + backdrop-blur, a soft border catching
+     light at the edge (the signature Liquid Glass "rim"), generous
+     continuous-feeling radius. */
+  .card {
+    @apply rounded-card border border-glass-light-border bg-glass-light p-5 shadow-soft
+      backdrop-blur-2xl transition duration-200 ease-out hover:-translate-y-1 hover:shadow-softLg hover:bg-white/75;
+  }
+
+  .card-static {
+    @apply rounded-card border border-glass-light-border bg-glass-light p-5 shadow-soft backdrop-blur-2xl;
+  }
+
+  .card-dash {
+    @apply rounded-card border border-glass-dark-border bg-glass-dark p-5 shadow-dark
+      backdrop-blur-2xl transition duration-200 ease-out hover:-translate-y-1 hover:bg-white/[0.1];
+  }
+
+  .card-dash-static {
+    @apply rounded-card border border-glass-dark-border bg-glass-dark p-5 shadow-dark backdrop-blur-2xl;
+  }
+
+  /* Alias kept for every existing "ticket"/"ticket-dash" call site (the
+     order-board/live-order card motif): same glass material as
+     `.card`/`.card-dash` now, the torn-perforation illustration retired
+     with the "Comanda" direction it belonged to. */
+  .ticket {
+    @apply card;
+  }
+  .ticket-dash {
+    @apply card-dash;
+  }
+
+  .input {
+    @apply w-full rounded-2xl border border-ink/10 bg-white/70 px-3.5 py-2.5 text-sm text-ink
+      backdrop-blur-xl outline-none transition placeholder:text-muted
+      focus:border-brand focus:ring-4 focus:ring-brand/15;
+  }
+
+  .input-dash {
+    @apply w-full rounded-2xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm text-white
+      backdrop-blur-xl outline-none transition placeholder:text-white/40
+      focus:border-brand-light focus:ring-4 focus:ring-brand/20;
+  }
+
+  /* Small glass capsule label, no more ink-stamp rotation -- a clean
+     tinted pill sitting on the glass surface, iOS "eyebrow" style. */
+  .eyebrow {
+    @apply inline-flex w-fit items-center gap-2 rounded-full border border-brand/25 bg-brand/10
+      px-3 py-1 text-[12px] font-semibold uppercase text-brand-dark backdrop-blur-xl;
+    letter-spacing: 0.06em;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-1.5 w-1.5 shrink-0 rounded-full bg-brand-dark;
+  }
+
+  /* Capsule status pill -- iOS badge shape (fully rounded), tinted glass
+     fill rather than the previous stamped rectangular badge. */
+  .badge-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1
+      text-[11px] font-semibold uppercase backdrop-blur-xl;
+    letter-spacing: 0.03em;
+  }
+
+  /* Status colors are informational, never decorative. Exactly three:
+     brand=à faire (doubles as the marketing accent), progress=en cours,
+     ready=prêt. `danger` is a fourth, separate meaning (destructive
+     actions), never used for status. */
+  .badge-todo {
+    @apply badge-pill border-brand/30 bg-brand/10 text-brand-dark;
+  }
+
+  .badge-progress {
+    @apply badge-pill border-progress/30 bg-progress/10 text-progress;
+  }
+
+  .badge-ready {
+    @apply badge-pill border-ready/30 bg-ready/10 text-ready;
+  }
+
+  /* Dark-dashboard counterparts -- light variants for AA contrast on `dash-bg`/`dash-card`. */
+  .badge-todo-dash {
+    @apply badge-pill border-brand-light/30 bg-brand-light/15 text-brand-light;
+  }
+
+  .badge-progress-dash {
+    @apply badge-pill border-progress-light/30 bg-progress-light/15 text-progress-light;
+  }
+
+  .badge-ready-dash {
+    @apply badge-pill border-ready-light/30 bg-ready-light/15 text-ready-light;
+  }
+
+  .badge-dot {
+    @apply h-1.5 w-1.5 rounded-full bg-current;
+  }
+
+  /* Pulsing dot: reserved for "flux temps réel actif", nowhere else. */
+  .badge-dot-live {
+    @apply badge-dot animate-pulse-dot;
+  }
+
+  /* Soft color-wash backdrop -- large, low-opacity blurred brand blobs,
+     standing in for the previous dot-grid texture. This is the Apple
+     product-page trick of a glass panel floating over a diffuse color
+     field rather than a printed pattern. */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle at 15% 20%, rgba(226, 129, 31, 0.12), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(10, 132, 255, 0.08), transparent 40%);
+  }
+
+  /* Hairline divider -- a plain 1px rule stands in for the previous
+     dashed "rail" motif, which read as a printed-ticket reference the
+     glass direction doesn't carry over. */
+  .bg-rail-top {
+    background-image: linear-gradient(to right, rgba(29, 29, 31, 0.1), rgba(29, 29, 31, 0.1));
+    background-position: top;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+  }
+
+  /* Nav link with a brand underline that grows in from the left on hover. */
+  .nav-link {
+    @apply relative text-muted transition-colors duration-200 hover:text-ink
+      after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left
+      after:scale-x-0 after:bg-brand-gradient after:transition-transform after:duration-300 after:ease-out
+      hover:after:scale-x-100;
+  }
+
+  /* Numeric contexts (prices, timestamps, counters) keep the old
+     monospace class name but now sit on the system font -- tabular
+     figures reproduce the "columns line up" property a typewriter face
+     used to provide, the same way SF Pro's own tabular figures do. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
 }

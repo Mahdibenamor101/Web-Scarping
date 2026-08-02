@@ -4,12 +4,31 @@ import type { StaffRole } from "@prisma/client";
 export const ROLE_HOME: Record<StaffRole, string> = {
   OWNER: "/dashboard/staff",
   MANAGER: "/dashboard/staff",
-  SERVER: "/dashboard/floor",
-  KITCHEN: "/dashboard/kitchen",
+  SERVER: "/dashboard/orders",
+  KITCHEN: "/dashboard/orders",
 };
 
 /** Roles allowed to view/manage staff and organization settings. */
 export const STAFF_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
+
+/**
+ * Roles allowed to edit the menu. Currently the same set as staff
+ * management, kept as a separate list because the two are different
+ * concerns that happen to share an answer today -- a future role (e.g. a
+ * head chef who edits the menu but not staff) shouldn't require touching
+ * staff permissions to add.
+ */
+export const MENU_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
+
+/** Roles allowed to add/remove physical tables and their QR codes. Same set as menu management today, same caveat. */
+export const TABLE_MANAGEMENT_ROLES: StaffRole[] = ["OWNER", "MANAGER"];
+
+/**
+ * Billing is OWNER-only, not MANAGER -- unlike staff/menu/tables. Payment
+ * details and subscription cancellation are the one thing this app treats
+ * as a step above day-to-day restaurant management.
+ */
+export const BILLING_MANAGEMENT_ROLES: StaffRole[] = ["OWNER"];
 
 /**
  * Who is allowed to invite whom. An OWNER can bring in any role, including

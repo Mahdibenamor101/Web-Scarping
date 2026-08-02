@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "mbQr Staff",
+    "slug": "mbqr-staff",
+    "version": "1.0.0",
+    "scheme": "mbqr",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#14181E",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.mbqr.staff",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "package": "app.mbqr.staff",
+      "adaptiveIcon": {
+        "backgroundColor": "#14181E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["NOTIFICATIONS", "CAMERA", "READ_MEDIA_IMAGES"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#E2811F"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "mbQr a besoin d'accéder à vos photos pour illustrer un plat."
+        }
+      ]
+    ],
+    "extra": {
+      "router": {}
+    }
+  }
+}

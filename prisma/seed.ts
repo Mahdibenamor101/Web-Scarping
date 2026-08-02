@@ -4,7 +4,7 @@
 // `accept_invitation`-shaped inserts the app itself uses (scoped by
 // `withTenant`), rather than writing rows directly, so seeding can never
 // drift from what Row-Level Security actually allows.
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -17,20 +17,30 @@ async function withTenant<T>(organizationId: string, fn: (tx: PrismaClient) => P
 }
 
 async function main() {
-  const existing = await prisma.organization.findUnique({ where: { slug: "trattoria-demo" } }).catch(() => null);
-  if (existing) {
-    console.log("Seed org already exists (trattoria-demo), skipping.");
-    return;
-  }
-
   const passwordHash = await bcrypt.hash("password123", 12);
 
-  const [result] = await prisma.$queryRaw<{ organization_id: string; user_id: string }[]>`
-    SELECT * FROM create_organization_and_owner(
-      'Trattoria Demo', 'trattoria-demo', 'Mario Rossi', 'owner@demo.local', ${passwordHash},
-      ${new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)}
-    )
-  `;
+  // No tenant context is set yet at this point, so a plain `findUnique` on
+  // organizations would run under Row-Level Security with no
+  // `app.current_org_id` -- the policy filters that down to zero rows
+  // every time, "existing" or not, making a pre-check unreliable. Instead,
+  // just attempt the insert and treat a unique-violation on the slug as
+  // "already seeded" -- makes re-running `npm run setup` idempotent.
+  let result: { organization_id: string; user_id: string } | undefined;
+  try {
+    [result] = await prisma.$queryRaw<{ organization_id: string; user_id: string }[]>`
+      SELECT * FROM create_organization_and_owner(
+        'Trattoria Demo', 'trattoria-demo', 'Mario Rossi', 'owner@demo.local', ${passwordHash},
+        ${new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)}
+      )
+    `;
+  } catch (err) {
+    const meta = err instanceof Prisma.PrismaClientKnownRequestError ? (err.meta as { code?: string } | undefined) : undefined;
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2010" && meta?.code === "23505") {
+      console.log("Seed org already exists (trattoria-demo), skipping.");
+      return;
+    }
+    throw err;
+  }
   if (!result) throw new Error("seed_failed");
   const orgId = result.organization_id;
 

@@ -1,0 +1,12 @@
+-- Order.orderNumber (growth_features migration) is a SERIAL column, which
+-- implicitly creates its own sequence -- one that ALTER DEFAULT PRIVILEGES
+-- ... ON TABLES (docker/init-roles.sql) never covers, since a sequence
+-- isn't a table. Any database provisioned before this migration (this one
+-- included) has app_user able to INSERT into "orders" but denied on
+-- nextval()/currval() for orders_order_number_seq -- discovered via a real
+-- 500 on the public order-submission route ("permission denied for
+-- sequence orders_order_number_seq"), not caught by review. Fresh
+-- databases going forward are covered by the ALTER DEFAULT PRIVILEGES ...
+-- ON SEQUENCES line added to init-roles.sql alongside this migration; this
+-- is the one-time catch-up grant for every database that predates it.
+GRANT USAGE, SELECT ON SEQUENCE orders_order_number_seq TO app_user;

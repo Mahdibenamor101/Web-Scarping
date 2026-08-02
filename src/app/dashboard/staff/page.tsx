@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Skeleton from "@/components/skeleton";
+import HelpTip from "@/components/help-tip";
 
 type StaffMember = {
   id: string;
@@ -23,9 +25,11 @@ const ROLES = ["OWNER", "MANAGER", "SERVER", "KITCHEN"] as const;
 export default function StaffPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<(typeof ROLES)[number]>("SERVER");
   const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
+  const [lastInviteEmailSent, setLastInviteEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
@@ -35,6 +39,7 @@ export default function StaffPage() {
       setStaff(body.staff);
       setInvitations(body.invitations);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -56,6 +61,7 @@ export default function StaffPage() {
       return;
     }
     setLastInviteUrl(body.inviteUrl);
+    setLastInviteEmailSent(body.emailSent === true);
     setInviteEmail("");
     load();
   }
@@ -70,28 +76,48 @@ export default function StaffPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <section>
-        <h1 className="mb-4 text-lg font-semibold">Équipe</h1>
+    <div className="flex max-w-3xl flex-col gap-8">
+      <div className="flex items-center gap-2">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Équipe</h1>
+        <HelpTip>
+          Invitez vos collègues par e-mail avec un <strong className="text-white">rôle</strong> : Manager
+          (accès complet sauf facturation), Serveur (commandes et appels de table) ou Cuisine (commandes
+          uniquement). Chaque invitation envoie un lien à usage unique, valable quelques jours, pour créer leur
+          propre compte.
+        </HelpTip>
+      </div>
+
+      {loading && (
+        <div className="card-dash-static flex flex-col gap-3">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      )}
+
+      {!loading && (
+      <section className="card-dash overflow-hidden p-0">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b text-left text-slate-500">
-              <th className="py-2">Nom</th>
-              <th>Email</th>
-              <th>Rôle</th>
-              <th>Statut</th>
-              <th />
+            <tr className="border-b border-white/5 bg-white/[0.03] text-left text-xs font-medium uppercase tracking-wide text-white/40">
+              <th className="px-4 py-3">Nom</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Rôle</th>
+              <th className="px-4 py-3">Statut</th>
+              <th className="px-4 py-3" />
             </tr>
           </thead>
           <tbody>
             {staff.map((m) => (
-              <tr key={m.id} className="border-b">
-                <td className="py-2">{m.name}</td>
-                <td>{m.email}</td>
-                <td>{m.role}</td>
-                <td>{m.isActive ? "Actif" : "Désactivé"}</td>
-                <td>
-                  <button onClick={() => toggleActive(m)} className="text-xs text-slate-500 underline">
+              <tr key={m.id} className="border-b border-white/5 transition last:border-0 hover:bg-white/[0.03]">
+                <td className="px-4 py-3 font-medium text-white">{m.name}</td>
+                <td className="px-4 py-3 text-white/40">{m.email}</td>
+                <td className="px-4 py-3">
+                  <span className="badge-pill bg-brand-light/15 text-brand-light">{m.role}</span>
+                </td>
+                <td className="px-4 py-3 text-white/40">{m.isActive ? "Actif" : "Désactivé"}</td>
+                <td className="px-4 py-3 text-right">
+                  <button onClick={() => toggleActive(m)} className="btn-link-dash">
                     {m.isActive ? "Désactiver" : "Réactiver"}
                   </button>
                 </td>
@@ -100,43 +126,44 @@ export default function StaffPage() {
           </tbody>
         </table>
       </section>
+      )}
 
+      {!loading && (
       <section>
-        <h2 className="mb-3 text-base font-semibold">Invitations en attente</h2>
-        {invitations.length === 0 && <p className="text-sm text-slate-500">Aucune invitation en attente.</p>}
+        <h2 className="mb-3 text-base font-semibold text-white">Invitations en attente</h2>
+        {invitations.length === 0 && <p className="text-sm text-white/40">Aucune invitation en attente.</p>}
         <ul className="flex flex-col gap-2 text-sm">
           {invitations.map((inv) => (
-            <li key={inv.id} className="flex justify-between rounded-md border border-slate-200 px-3 py-2">
-              <span>
-                {inv.email} — {inv.role}
+            <li key={inv.id} className="card-dash-static flex justify-between px-4 py-3">
+              <span className="text-white/60">
+                {inv.email} — <span className="badge-pill bg-brand-light/15 text-brand-light">{inv.role}</span>
               </span>
-              <span className="text-slate-400">
-                expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}
-              </span>
+              <span className="text-white/40">expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}</span>
             </li>
           ))}
         </ul>
       </section>
+      )}
 
-      <section>
-        <h2 className="mb-3 text-base font-semibold">Inviter un membre</h2>
-        <form onSubmit={onInvite} className="flex max-w-md flex-col gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-slate-600">Email</span>
+      <section className="card-dash">
+        <h2 className="mb-4 text-base font-semibold text-white">Inviter un membre</h2>
+        <form onSubmit={onInvite} className="flex max-w-md flex-col gap-4">
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-white/60">Email</span>
             <input
               required
               type="email"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="input"
+              className="input-dash"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-slate-600">Rôle</span>
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-white/60">Rôle</span>
             <select
               value={inviteRole}
               onChange={(e) => setInviteRole(e.target.value as (typeof ROLES)[number])}
-              className="input"
+              className="input-dash"
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
@@ -145,17 +172,16 @@ export default function StaffPage() {
               ))}
             </select>
           </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           {lastInviteUrl && (
-            <p className="break-all text-sm text-green-700">
-              Lien d&apos;invitation (aucun email n&apos;est envoyé pour l&apos;instant — transmettez-le
-              manuellement) : {lastInviteUrl}
+            <p className="animate-bump-in break-all rounded-xl border border-brand/20 bg-brand/10 px-3 py-2 text-sm text-brand-light">
+              {lastInviteEmailSent
+                ? "Email envoyé. Lien d'invitation (au cas où) : "
+                : "Aucun envoi d'email configuré pour cet environnement — transmettez ce lien manuellement : "}
+              {lastInviteUrl}
             </p>
           )}
-          <button
-            type="submit"
-            className="w-fit rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-          >
+          <button type="submit" className="btn-primary w-fit">
             Envoyer l&apos;invitation
           </button>
         </form>

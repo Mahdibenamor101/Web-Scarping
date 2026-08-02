@@ -36,3 +36,14 @@ GRANT USAGE ON SCHEMA public TO app_user;
 -- reach the table at all.
 ALTER DEFAULT PRIVILEGES FOR ROLE app_migrator IN SCHEMA public
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_user;
+
+-- Same idea, but for sequences: a `SERIAL`/identity column (e.g.
+-- Order.orderNumber, see the growth_features migration) implicitly owns a
+-- sequence that Postgres does NOT cover under the table grant above --
+-- INSERT on the table alone isn't enough, the role calling nextval() also
+-- needs USAGE (to advance it) and SELECT (Prisma reads it back after
+-- insert) directly on the sequence. Forgotten once already; see the
+-- fix_order_number_sequence_grant migration for the same grant applied to
+-- a database that was already provisioned before this line existed.
+ALTER DEFAULT PRIVILEGES FOR ROLE app_migrator IN SCHEMA public
+  GRANT USAGE, SELECT ON SEQUENCES TO app_user;

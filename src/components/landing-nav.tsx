@@ -1,0 +1,64 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Logo from "@/components/logo";
+
+/**
+ * Sticky nav that stays transparent over the hero and picks up a
+ * blurred white background + shadow once the page scrolls -- the
+ * "does the nav bar stay put and adapt" pattern from apple.com. Lives
+ * outside the hero's `overflow-hidden` wrapper (see page.tsx) so
+ * `position: sticky` isn't clipped once the hero scrolls out of view.
+ */
+export default function LandingNav() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <nav
+      className={`sticky top-0 z-40 border-b transition-all duration-300 ${
+        scrolled ? "border-ink/10 bg-white/80 shadow-soft backdrop-blur-md" : "border-transparent bg-transparent"
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-6xl items-center justify-between px-6 transition-[padding] duration-300 ${
+          scrolled ? "py-3" : "py-6"
+        }`}
+      >
+        <Logo />
+        <div className="hidden items-center gap-7 text-sm font-medium sm:flex">
+          <a href="#demo" className="nav-link">
+            Demo
+          </a>
+          <a href="#apercu" className="nav-link">
+            Panoramica
+          </a>
+          <a href="#fonctionnalites" className="nav-link">
+            Funzionalità
+          </a>
+          <a href="#tarifs" className="nav-link">
+            Prezzi
+          </a>
+          <a href="#faq" className="nav-link">
+            FAQ
+          </a>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="nav-link hidden text-sm font-medium sm:inline">
+            Accedi
+          </Link>
+          <Link href="/signup" className="btn-primary px-4 py-2 text-sm">
+            Iscriviti
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
