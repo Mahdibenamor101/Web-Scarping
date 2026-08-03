@@ -5,10 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { friendlyErrorMessage } from "@/lib/client-errors";
 import AuthShell from "@/components/auth-shell";
 import OAuthButtons from "@/components/oauth-buttons";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { AUTH_DICT } from "@/lib/i18n/dictionaries/auth";
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale("fr");
+  const t = AUTH_DICT[locale];
   const [organizationName, setOrganizationName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,22 +31,22 @@ function SignupForm() {
         body: JSON.stringify({ organizationName, ownerName, email, password }),
       });
       if (!res.ok) {
-        throw new Error(await friendlyErrorMessage(res, "Erreur inconnue"));
+        throw new Error(await friendlyErrorMessage(res, t.signup.genericError));
       }
       router.push("/dashboard/staff");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t.signup.genericError);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <AuthShell title="Créer mon restaurant" subtitle="Essai gratuit, sans carte bancaire.">
-      <OAuthButtons from="signup" error={searchParams.get("oauth_error")} />
+    <AuthShell title={t.signup.title} subtitle={t.signup.subtitle} locale={locale}>
+      <OAuthButtons from="signup" error={searchParams.get("oauth_error")} locale={locale} />
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <Field label="Nom du restaurant">
+        <Field label={t.fields.restaurantName}>
           <input
             required
             value={organizationName}
@@ -51,10 +55,10 @@ function SignupForm() {
             placeholder="Trattoria da Mario"
           />
         </Field>
-        <Field label="Votre nom">
+        <Field label={t.fields.yourName}>
           <input required value={ownerName} onChange={(e) => setOwnerName(e.target.value)} className="input" />
         </Field>
-        <Field label="Email">
+        <Field label={t.fields.email}>
           <input
             required
             type="email"
@@ -63,7 +67,7 @@ function SignupForm() {
             className="input"
           />
         </Field>
-        <Field label="Mot de passe (10 caractères min.)">
+        <Field label={t.fields.passwordMin}>
           <input
             required
             type="password"
@@ -75,7 +79,7 @@ function SignupForm() {
         </Field>
         {error && <p className="text-sm text-danger">{error}</p>}
         <button type="submit" disabled={loading} className="btn-primary mt-1 w-full">
-          {loading ? "Création…" : "Créer le compte"}
+          {loading ? t.signup.submitting : t.signup.submit}
         </button>
       </form>
     </AuthShell>

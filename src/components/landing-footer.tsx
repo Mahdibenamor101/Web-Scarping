@@ -2,6 +2,8 @@ import Link from "next/link";
 import Logo from "@/components/logo";
 import ArabesquePattern from "@/components/arabesque-pattern";
 import { APP_NAME } from "@/lib/brand";
+import { getLocale } from "@/lib/i18n/get-locale";
+import { LANDING_DICT } from "@/lib/i18n/dictionaries/landing";
 
 /**
  * Structure takes the "logo + link columns + contact" shape from the
@@ -17,52 +19,54 @@ import { APP_NAME } from "@/lib/brand";
  * the ivory ground the rest of the site sits on.
  */
 export default function LandingFooter() {
+  const locale = getLocale("it");
+  const t = LANDING_DICT[locale];
+
   return (
     <footer className="relative overflow-hidden bg-brand-dark py-14">
       <ArabesquePattern className="pointer-events-none absolute inset-0 h-full w-full" color="#D4AF37" opacity={0.1} />
       <div className="relative mx-auto grid max-w-5xl gap-10 px-6 sm:grid-cols-[1.4fr_1fr_1fr]">
         <div className="flex flex-col gap-3">
           <Logo wordmarkClassName="font-display text-xl font-extrabold tracking-tight text-paper" />
-          <p className="max-w-xs text-sm text-paper/60">
-            Il menu QR per chi serve ai tavoli — senza hardware, senza abbonamento a un dispositivo.
-          </p>
+          <p className="max-w-xs text-sm text-paper/60">{t.footer.tagline}</p>
         </div>
 
         <div className="flex flex-col gap-3 text-sm">
-          <p className="font-semibold text-gold-light">Prodotto</p>
+          <p className="font-semibold text-gold-light">{t.footer.productHeading}</p>
           <a href="/#demo" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Demo
+            {t.nav.demo}
           </a>
           <a href="/#apercu" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Panoramica
+            {t.nav.overview}
           </a>
           <a href="/#fonctionnalites" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Funzionalità
+            {t.nav.features}
           </a>
           <Link href="/prezzi" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Prezzi
+            {t.nav.pricing}
           </Link>
         </div>
 
         <div className="flex flex-col gap-3 text-sm">
-          <p className="font-semibold text-gold-light">Azienda</p>
+          <p className="font-semibold text-gold-light">{t.footer.companyHeading}</p>
           <Link href="/chi-siamo" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Chi siamo
+            {t.footer.about}
           </Link>
           <Link href="/contatti" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Contatti
+            {t.footer.contact}
           </Link>
           <Link href="/login" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Accedi
+            {t.nav.login}
           </Link>
           <Link href="/signup" className="w-fit text-paper/70 transition hover:text-gold-light">
-            Iscriviti
+            {t.nav.signup}
           </Link>
         </div>
       </div>
 
       <div className="relative mx-auto mt-10 max-w-5xl border-t border-gold/20 px-6 pt-6 text-xs text-paper/50">
-        © {new Date().getFullYear()} {APP_NAME} — nome di lavoro, non depositato.
+        © {new Date().getFullYear()} {APP_NAME}
+        {t.footer.copyrightSuffix}
       </div>
     </footer>
   );

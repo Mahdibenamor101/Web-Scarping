@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-export default function LogoutButton() {
+export default function LogoutButton({ label = "Se déconnecter" }: { label?: string }) {
   const router = useRouter();
   return (
     <button
@@ -13,7 +13,7 @@ export default function LogoutButton() {
       }}
       className="text-sm font-medium text-white/40 transition hover:text-white"
     >
-      Se déconnecter
+      {label}
     </button>
   );
 }
