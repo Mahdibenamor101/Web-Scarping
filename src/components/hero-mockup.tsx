@@ -1,4 +1,5 @@
 import LiveOrderCard from "@/components/live-order-card";
+import PhoneFrame from "@/components/phone-frame";
 
 /**
  * Decorative hero illustration ("Comanda" direction, see CONTEXT.md): a
@@ -31,42 +32,36 @@ export default function HeroMockup() {
       {/* Phone: near-upright (a slight tilt, not a dramatic throw) --
           reads as a grounded product shot rather than a floating prop. */}
       <div className="-rotate-2">
-        <div className="animate-float">
-          <div className="w-[15rem] rounded-[2.75rem] border-[10px] border-ink bg-ink shadow-softLg">
-            <div className="relative overflow-hidden rounded-[2.1rem] bg-white">
-              {/* Dynamic Island, not a notch -- current iPhone Pro design
-                  language: a floating capsule offset from the top edge,
-                  fully rounded, rather than a flush pill cut into the bezel. */}
-              <div className="absolute left-1/2 top-2.5 z-10 h-5 w-16 -translate-x-1/2 rounded-full bg-ink" />
-              <div className="flex flex-col gap-3 px-4 pb-5 pt-8">
-                <div className="flex items-center justify-between">
+        <div className="w-[15rem] animate-float">
+          <PhoneFrame>
+            <div className="flex flex-col gap-3 px-4 pb-5 pt-12">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-display text-[13px] font-extrabold leading-none text-ink">Trattoria da Mario</p>
+                  <p className="mt-1 font-mono text-[9px] text-muted">Tavolo 4</p>
+                </div>
+                <span className="rounded-[3px] bg-brand px-2 py-0.5 font-mono text-[8px] font-bold text-white">IT</span>
+              </div>
+              {[
+                { name: "Bruschetta al pomodoro", price: "6,50 €" },
+                { name: "Tagliatelle al ragù", price: "13,00 €" },
+                { name: "Tiramisù della casa", price: "6,00 €" },
+              ].map((item) => (
+                <div key={item.name} className="flex items-center justify-between rounded-lg bg-paper px-3 py-2.5">
                   <div>
-                    <p className="font-display text-[13px] font-extrabold leading-none text-ink">Trattoria da Mario</p>
-                    <p className="mt-1 font-mono text-[9px] text-muted">Tavolo 4</p>
+                    <p className="text-[10px] font-semibold text-ink">{item.name}</p>
+                    <p className="font-mono text-[9px] tabular-nums text-muted">{item.price}</p>
                   </div>
-                  <span className="rounded-[3px] bg-brand px-2 py-0.5 font-mono text-[8px] font-bold text-white">IT</span>
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold text-white">
+                    +
+                  </span>
                 </div>
-                {[
-                  { name: "Bruschetta al pomodoro", price: "6,50 €" },
-                  { name: "Tagliatelle al ragù", price: "13,00 €" },
-                  { name: "Tiramisù della casa", price: "6,00 €" },
-                ].map((item) => (
-                  <div key={item.name} className="flex items-center justify-between rounded-lg bg-paper px-3 py-2.5">
-                    <div>
-                      <p className="text-[10px] font-semibold text-ink">{item.name}</p>
-                      <p className="font-mono text-[9px] tabular-nums text-muted">{item.price}</p>
-                    </div>
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold text-white">
-                      +
-                    </span>
-                  </div>
-                ))}
-                <div className="mt-1 rounded-full bg-brand-gradient py-2.5 text-center font-mono text-[10px] font-bold tabular-nums text-white shadow-soft">
-                  Ordina · 25,50 €
-                </div>
+              ))}
+              <div className="mt-1 rounded-full bg-brand-gradient py-2.5 text-center font-mono text-[10px] font-bold tabular-nums text-white shadow-soft">
+                Ordina · 25,50 €
               </div>
             </div>
-          </div>
+          </PhoneFrame>
         </div>
       </div>
 
