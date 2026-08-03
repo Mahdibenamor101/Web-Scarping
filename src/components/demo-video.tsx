@@ -12,7 +12,7 @@ export default function DemoVideo() {
   return (
     <div className="mx-auto w-[19rem] sm:w-[21rem]">
       <PhoneFrame>
-        <video className="block w-full" autoPlay muted loop playsInline poster="/videos/demo-poster.jpg">
+        <video className="h-full w-full object-cover" autoPlay muted loop playsInline poster="/videos/demo-poster.jpg">
           <source src="/videos/demo.webm" type="video/webm" />
           <source src="/videos/demo.mp4" type="video/mp4" />
         </video>

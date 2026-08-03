@@ -1,31 +1,59 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 /**
  * Shared iPhone chrome for every phone mockup on the landing page
- * (hero-mockup.tsx, product-preview.tsx, demo-video.tsx) -- previously
- * three near-identical hand-copies of the same bezel that had already
- * drifted slightly out of sync (8px vs 10px border). Modeled on the
- * QonnectQR reference (design/refs/) the founder pointed at: a thin
- * realistic bezel rather than a thick generic one, real Dynamic Island
- * proportions, a real status bar, and side buttons -- not a literal
- * device render, but close enough to read as "a real iPhone" instead of
- * "a rounded rectangle with a black pill."
+ * (hero-mockup.tsx, product-preview.tsx, demo-video.tsx). Previously a
+ * hand-drawn CSS bezel (padding-based border + a drawn Dynamic Island
+ * pill, see git history) -- replaced with an actual device-photo asset
+ * the founder supplied (`public/mockups/iphone-frame.png` +
+ * `iphone-mask.png`, a matched frame/mask pair from a phone-mockup
+ * generator, plus the screen-rect coordinates that shipped alongside them
+ * as `template.json`, hardcoded below as SCREEN_RECT/FRAME_SIZE since
+ * they never change at runtime). Real device photography instead of CSS
+ * approximation -- the frame image itself has an alpha channel that's
+ * transparent everywhere except the physical bezel/button/camera-cutout
+ * pixels, so it composites cleanly over any screen content.
  *
- * Sizing is deliberately left to the caller (a wrapping div with a fixed
- * or responsive width) rather than a `width` prop here -- the three
- * callers need three different sizing strategies (fixed 240px, `w-full
- * max-w-[18rem]`, a breakpoint-responsive width), and this component
- * only needs to fill whatever box it's placed in.
+ * Compositing order (bottom to top):
+ * 1. Screen content (children), absolutely positioned at the screen
+ *    sub-rect within the frame's own coordinate space.
+ * 2. That content wrapper is CSS-masked with iphone-mask.png (white =
+ *    visible, black = hidden) so it gets the screen's real rounded
+ *    corners AND a Dynamic Island-shaped cutout -- without this, a
+ *    screenshot's square corners or a light-colored top edge would show
+ *    through past where the frame's photographed corners/island actually
+ *    are.
+ * 3. iphone-frame.png on top, filling the whole box -- draws the bezel,
+ *    side buttons, and Dynamic Island (with camera dot) as an actual
+ *    photograph, letting the masked content show through the transparent
+ *    screen area.
  *
- * The bezel is a fixed-width `padding` (not a CSS `border`) specifically
- * so the outer and inner corner radii can be set to an exact
- * outer-minus-bezel relationship -- a plain `border` never nests
- * perfectly with its own `border-radius`, which is what made the
- * previous frame's corners look thicker than its straight edges.
+ * The frame has a fixed intrinsic aspect ratio (a real photo, not a
+ * flexible CSS shape) -- the outer box is locked to it via `aspect-[]`,
+ * so callers only need to control width (as before) and height follows
+ * automatically. Sizing is still left to the caller (a wrapping div with
+ * a fixed or responsive width) for the same reason as before: the three
+ * callers need three different sizing strategies.
  */
-const OUTER_RADIUS = 44; // px
-const BEZEL = 9; // px, within the 8-12px range the founder asked for
-const INNER_RADIUS = OUTER_RADIUS - BEZEL;
+const FRAME_SIZE = { width: 1406, height: 2822 };
+const SCREEN_RECT = { x: 100, y: 100, width: 1206, height: 2622 };
+
+const screenStyle = {
+  left: `${(SCREEN_RECT.x / FRAME_SIZE.width) * 100}%`,
+  top: `${(SCREEN_RECT.y / FRAME_SIZE.height) * 100}%`,
+  width: `${(SCREEN_RECT.width / FRAME_SIZE.width) * 100}%`,
+  height: `${(SCREEN_RECT.height / FRAME_SIZE.height) * 100}%`,
+};
+
+const maskStyle = {
+  WebkitMaskImage: "url(/mockups/iphone-mask.png)",
+  maskImage: "url(/mockups/iphone-mask.png)",
+  WebkitMaskSize: "100% 100%",
+  maskSize: "100% 100%",
+  WebkitMaskRepeat: "no-repeat" as const,
+  maskRepeat: "no-repeat" as const,
+};
 
 export default function PhoneFrame({
   children,
@@ -33,43 +61,38 @@ export default function PhoneFrame({
   className = "",
 }: {
   children: ReactNode;
-  /** Extra classes on the screen itself -- e.g. `aspect-[9/17.5]` for a
-      `next/image fill` screenshot, left unset for content that sizes
-      itself naturally (hero-mockup's synthetic UI, demo-video's <video>). */
+  /** Extra classes on the screen content wrapper -- e.g. `object-cover`
+      helpers aren't needed here since the wrapper is already sized exactly
+      to the screen rect; left for callers that want extra styling. */
   screenClassName?: string;
   className?: string;
 }) {
   return (
-    <div
-      className={`relative bg-ink shadow-softLg ${className}`}
-      style={{ borderRadius: OUTER_RADIUS, padding: BEZEL }}
-    >
-      {/* Side buttons -- small flat ticks proud of the frame edge, not
-          functional, just the detail that reads as "real hardware." A
-          lighter fill than the frame itself (not `bg-ink` again) --
-          otherwise they're perfectly camouflaged against it. */}
-      <span className="absolute -right-[1.5px] top-[26%] h-12 w-[3px] rounded-r-sm bg-white/25" />
-      <span className="absolute -left-[1.5px] top-[16%] h-6 w-[3px] rounded-l-sm bg-white/25" />
-      <span className="absolute -left-[1.5px] top-[23%] h-10 w-[3px] rounded-l-sm bg-white/25" />
-
-      <div className={`relative overflow-hidden bg-white ${screenClassName}`} style={{ borderRadius: INNER_RADIUS }}>
-        <StatusBar />
-        <DynamicIsland />
-        {children}
+    <div className={`relative w-full shadow-softLg aspect-[1406/2822] ${className}`}>
+      <div className="absolute inset-0" style={maskStyle}>
+        <div className={`absolute overflow-hidden bg-white ${screenClassName}`} style={screenStyle}>
+          <StatusBar />
+          {children}
+        </div>
       </div>
+      <Image
+        src="/mockups/iphone-frame.png"
+        alt=""
+        aria-hidden="true"
+        fill
+        sizes="(min-width: 640px) 336px, 240px"
+        className="pointer-events-none select-none"
+        priority={false}
+      />
     </div>
   );
 }
 
-/** Centered, real-proportion pill -- ~100x28px on a ~240px-wide frame. */
-function DynamicIsland() {
-  return <div className="absolute left-1/2 top-[10px] z-20 h-[28px] w-[100px] -translate-x-1/2 rounded-full bg-ink" />;
-}
-
-/** Opaque so it cleanly caps whatever screenshot/video sits underneath, the
-    same way a real device-mockup composite works -- time left, iOS's own
-    three-glyph status cluster right. 9:41 is Apple's own marketing-shot
-    convention (every keynote/App Store screenshot uses it). */
+/** Sits inside the masked screen content -- the mask's Dynamic Island
+    cutout naturally clips the middle of this bar, leaving just the time
+    (left) and status icons (right) visible around the real photographed
+    island, the same way a real iOS status bar reads. 9:41 is Apple's own
+    marketing-shot convention (every keynote/App Store screenshot uses it). */
 function StatusBar() {
   return (
     <div className="absolute inset-x-0 top-0 z-10 flex h-11 items-center justify-between bg-white px-6 pt-1.5 text-[13px] font-semibold text-ink">
