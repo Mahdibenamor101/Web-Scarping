@@ -101,7 +101,7 @@ function CardShell({ phase, seconds }: { phase: "todo" | "ready"; seconds: numbe
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   return (
-    <div className="card flex w-56 items-start gap-3 !p-3">
+    <div className="card flex w-48 items-start gap-3 !p-3 sm:w-56">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white shadow-soft">
         <BellIcon />
       </span>
