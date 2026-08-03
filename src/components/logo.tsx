@@ -45,7 +45,7 @@ export default function Logo({
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark size={size} />
-      <span className={wordmarkClassName}>mbQr</span>
+      <span className={wordmarkClassName}>RanoumaQr</span>
     </span>
   );
 }
