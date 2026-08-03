@@ -5,7 +5,7 @@ import LandingFooter from "@/components/landing-footer";
 import PricingCard from "@/components/pricing-card";
 import { getLocale } from "@/lib/i18n/get-locale";
 
-export const metadata = { title: "Prezzi — mbQr" };
+export const metadata = { title: "Prezzi — Tavolino" };
 
 // Dedicated page for the same plan shown on the landing's "#tarifs" section
 // (src/app/page.tsx) -- same PricingCard component so the two can't drift

@@ -1,5 +1,5 @@
 /**
- * Single source of truth for the mbQr design system -- "Oriental Luxury"
+ * Single source of truth for the Tavolino design system -- "Oriental Luxury"
  * direction (3 août 2026), replacing "Liquid Glass". Founder's brief: a
  * traditional Arab/Moorish architectural and decorative language (deep
  * emerald, gold accents, ivory ground, geometric star lattices, ogive

@@ -52,7 +52,7 @@ export default function ContactForm() {
         <span className="eyebrow">Contatti</span>
         <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Parliamone.</h1>
         <p className="mt-3 text-sm text-muted">
-          Domande, richieste particolari, o vuoi solo capire se mbQr fa per il tuo locale — scrivici.
+          Domande, richieste particolari, o vuoi solo capire se Tavolino fa per il tuo locale — scrivici.
         </p>
       </Reveal>
 

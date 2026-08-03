@@ -35,20 +35,11 @@ export default function LoginScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 24 }}>
           <View style={{ alignItems: "center", marginBottom: 32 }}>
-            <View
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 12,
-                backgroundColor: colors.brand,
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 12,
-              }}
-            >
-              <Text style={{ fontSize: 24, fontWeight: "800", color: "#fff" }}>M</Text>
-            </View>
-            <Text style={{ fontSize: 24, fontWeight: "800", color: "#fff" }}>mbQr Staff</Text>
+            <Image
+              source={require("../assets/icon.png")}
+              style={{ width: 56, height: 56, borderRadius: 12, marginBottom: 12 }}
+            />
+            <Text style={{ fontSize: 24, fontWeight: "800", color: "#fff" }}>Tavolino Staff</Text>
             <Text style={{ fontSize: 13, color: colors.white40, marginTop: 4 }}>
               Connectez-vous avec votre compte de l&apos;équipe
             </Text>

@@ -1,8 +1,8 @@
-# mbQr
+# Tavolino
 
 Menu QR digital et commande à table pour restaurants et cafés en Italie. Voir `CONTEXT.md` à la racine pour la vision produit, le positionnement et la roadmap complète — c'est la mémoire du projet, à lire avant toute contribution.
 
-**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe), plus limitation de débit et deux passages de design (nom + identité visuelle, puis système de tokens complet avec dashboard en dark mode). Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant. Le nom "mbQr" n'a pas non plus été vérifié juridiquement (marque, domaine) — voir `CONTEXT.md` §2.
+**Où on en est** : Phase 0 complète (étapes 1 à 5 : fondations + isolation multi-tenant, gestion du menu, QR + commande client, dashboard commandes temps réel, Stripe), plus limitation de débit et deux passages de design (nom + identité visuelle, puis système de tokens complet avec dashboard en dark mode). Stripe est codé mais jamais exercé contre un vrai compte — voir la section Stripe ci-dessous et `CONTEXT.md` §12.7 avant tout pilote payant. Le nom "Tavolino" n'a pas non plus été vérifié juridiquement (marque, domaine) — voir `CONTEXT.md` §2.
 
 ## Stack
 
@@ -84,6 +84,6 @@ Système de design piloté par `src/lib/design-tokens.ts` (source de vérité un
 
 **Animations** : [Framer Motion](https://www.framer.com/motion/) pour les révélations au scroll (`src/components/reveal.tsx`, fondu + translation, stagger 0,08s entre enfants) et les compteurs animés (`src/components/stat-counter.tsx`) ; animations continues (flottement, point qui pulse) en CSS pur (`tailwind.config.ts`) plutôt qu'en JS.
 
-**Logo** (`src/components/logo.tsx`) : mark géométrique en SVG (motifs "finder pattern" de QR code sur trois coins d'un badge dégradé, un point sur le quatrième), produit directement en code plutôt que dans Figma — **aucun connecteur Figma n'est disponible dans cet environnement**. `src/app/icon.svg` réutilise le même dessin comme favicon. Absent volontairement de `/menu/[qrToken]` : cette page montre le nom du restaurant, pas celui de mbQr.
+**Logo** (`src/components/logo.tsx`) : mark géométrique en SVG (motifs "finder pattern" de QR code sur trois coins d'un badge dégradé, un point sur le quatrième), produit directement en code plutôt que dans Figma — **aucun connecteur Figma n'est disponible dans cet environnement**. `src/app/icon.svg` réutilise le même dessin comme favicon. Absent volontairement de `/menu/[qrToken]` : cette page montre le nom du restaurant, pas celui de Tavolino.
 
 **Landing page** : nav sticky (transparente puis floutée au scroll, lien "S'inscrire" toujours visible — `src/components/landing-nav.tsx`), héro avec mockup téléphone flottant (illustration stylisée, pas une capture — `src/components/hero-mockup.tsx`) qui s'estompe légèrement au scroll (`src/components/hero-parallax.tsx`), section "Démo" avec un vrai enregistrement Playwright du parcours client (`public/videos/`, `src/components/demo-video.tsx` — à régénérer si `/menu/[qrToken]` change visuellement, voir `CONTEXT.md` §13), section "aperçu du produit" avec de vraies captures d'écran de l'app (`public/screenshots/`, même limite), section tarifs avec toggle 3/6/12 mois (seul 12 mois est réellement achetable — le mensuel est explicitement hors modèle, voir `CONTEXT.md` §8/§12.11), compteurs animés sur des faits produit réels. Volontairement sans témoignages clients affichés (le composant existe, `src/components/testimonial-card.tsx`, mais n'est pas branché) : aucun pilote réel n'a encore eu lieu, voir `CONTEXT.md` §12.10/§12.11.

@@ -70,12 +70,12 @@ export default function BrandingPage() {
           <HelpTip>
             Formats acceptés : JPG, PNG, WebP. Un logo carré (ex. 512×512) et une image de fond au format
             portrait rendent le mieux sur le téléphone du client. Laissez un champ vide pour revenir à
-            l&apos;habillage mbQr par défaut.
+            l&apos;habillage Tavolino par défaut.
           </HelpTip>
         </div>
         <p className="mt-1 text-sm text-white/50">
           Logo et image de fond affichés sur le menu public de vos clients (<code className="font-mono">/menu/...</code>).
-          Le tableau de bord reste toujours mbQr — cette personnalisation ne concerne que ce que vos clients voient
+          Le tableau de bord reste toujours Tavolino — cette personnalisation ne concerne que ce que vos clients voient
           après avoir scanné le QR.
         </p>
       </div>
@@ -91,7 +91,7 @@ export default function BrandingPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <BrandingSlot
             title="Logo"
-            body="Remplace le logo mbQr en haut du menu du client."
+            body="Remplace le logo Tavolino en haut du menu du client."
             imageUrl={branding?.logoUrl ?? null}
             uploading={uploading === "logo"}
             onUpload={(file) => upload("logo", file)}

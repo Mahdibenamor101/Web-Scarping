@@ -292,7 +292,7 @@ export default function HomePage() {
       {/* Zigzag #2 -- real screenshot left, text right (alternated).
           Same bg-surface as zigzag #1 right above (the pair reads as one
           "product showcase" block) so the dot-grid rhythm resumes cleanly
-          at "per-chi" below, same precedent as the hero/"Perché mbQr" pair
+          at "per-chi" below, same precedent as the hero/"Perché Tavolino" pair
           at the top of the page. */}
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">

@@ -106,7 +106,7 @@ function CardShell({ phase, seconds }: { phase: "todo" | "ready"; seconds: numbe
         <BellIcon />
       </span>
       <div className="min-w-0 flex-1 pt-0.5">
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-wide text-muted">mbQr · ora</p>
+        <p className="font-mono text-[9px] font-semibold uppercase tracking-wide text-muted">Tavolino · ora</p>
         <p className="mt-0.5 font-display text-[14px] font-extrabold leading-tight text-ink">Nuovo ordine</p>
         <div className="mt-1.5 flex items-center gap-1.5">
           <span className="rounded-full bg-paper px-2 py-0.5 font-mono text-[9px] font-semibold text-ink/70">

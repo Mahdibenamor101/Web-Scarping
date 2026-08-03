@@ -1,16 +1,21 @@
 // The mark: a QR "finder pattern" motif (the nested squares every QR code
 // uses to orient a scanner) at three corners, with the fourth corner left
-// as a single dot -- deliberately asymmetric so it reads as a mark, not a
+// as a solid square -- deliberately asymmetric so it reads as a mark, not a
 // literal QR code. Built as inline SVG rather than in Figma: no Figma
 // connector is available in this session (see CONTEXT.md §12.9), and a
 // three-shape geometric mark like this has no real benefit from a visual
 // design tool over precise coordinates in code.
+//
+// Recolored for the Tavolino rebrand (see CONTEXT.md §12.34) to the dark
+// green + gold palette from the supplied logo exports, sampled directly
+// from tavolino-app-icon-dark.png and tavolino-icon-arch.png rather than
+// guessed.
 function Finder({ x, y }: { x: number; y: number }) {
   return (
     <>
-      <rect x={x} y={y} width={11} height={11} rx={3.2} fill="white" />
-      <rect x={x + 2.4} y={y + 2.4} width={6.2} height={6.2} rx={1.8} fill="url(#mbqr-logo-gradient)" />
-      <rect x={x + 4.3} y={y + 4.3} width={2.4} height={2.4} rx={0.7} fill="white" />
+      <rect x={x} y={y} width={11} height={11} rx={3.2} fill="#D8AC5C" />
+      <rect x={x + 2.4} y={y + 2.4} width={6.2} height={6.2} rx={1.8} fill="url(#tavolino-logo-gradient)" />
+      <rect x={x + 4.3} y={y + 4.3} width={2.4} height={2.4} rx={0.7} fill="#D8AC5C" />
     </>
   );
 }
@@ -19,16 +24,16 @@ export function LogoMark({ size = 36, className = "" }: { size?: number; classNa
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={className} aria-hidden="true">
       <defs>
-        <linearGradient id="mbqr-logo-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#D4AF37" />
-          <stop offset="1" stopColor="#A9841C" />
+        <linearGradient id="tavolino-logo-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#274D3B" />
+          <stop offset="1" stopColor="#1D3A2D" />
         </linearGradient>
       </defs>
-      <rect width={40} height={40} rx={8} fill="url(#mbqr-logo-gradient)" />
+      <rect width={40} height={40} rx={8} fill="url(#tavolino-logo-gradient)" />
       <Finder x={5} y={5} />
       <Finder x={24} y={5} />
       <Finder x={5} y={24} />
-      <rect x={26.5} y={26.5} width={8} height={8} rx={2.6} fill="white" />
+      <rect x={26.5} y={26.5} width={8} height={8} rx={2.6} fill="#D8AC5C" />
     </svg>
   );
 }
@@ -45,7 +50,7 @@ export default function Logo({
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark size={size} />
-      <span className={wordmarkClassName}>RanoumaQr</span>
+      <span className={wordmarkClassName}>Tavolino</span>
     </span>
   );
 }

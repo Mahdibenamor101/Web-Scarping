@@ -4,7 +4,7 @@ import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
 import { getLocale } from "@/lib/i18n/get-locale";
 
-export const metadata = { title: "Chi siamo — mbQr" };
+export const metadata = { title: "Chi siamo — Tavolino" };
 
 // Honest "about" page, product-focused rather than founder-biography --
 // no invented founding story or personal history is asserted here, only
@@ -15,7 +15,7 @@ export const metadata = { title: "Chi siamo — mbQr" };
 const PRINCIPLES = [
   {
     title: "Il tuo locale resta protagonista",
-    body: "Il menu che i clienti vedono porta il tuo logo e le tue foto — mbQr resta invisibile, non un marchio in più da spiegare.",
+    body: "Il menu che i clienti vedono porta il tuo logo e le tue foto — Tavolino resta invisibile, non un marchio in più da spiegare.",
     icon: <StoreIcon />,
   },
   {
@@ -48,7 +48,7 @@ export default function AboutPage() {
             in su.
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted">
-            mbQr nasce per dare a ogni ristorante un menu QR e un sistema di ordini in tempo reale, senza hardware
+            Tavolino nasce per dare a ogni ristorante un menu QR e un sistema di ordini in tempo reale, senza hardware
             dedicato né un abbonamento per dispositivo.
           </p>
         </Reveal>
@@ -66,7 +66,7 @@ export default function AboutPage() {
         <Reveal className="mt-16 rounded-container border border-ink/10 bg-surface p-8 text-center sm:p-10">
           <span className="eyebrow">Stato attuale</span>
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted">
-            mbQr è agli inizi: stiamo aprendo le prime collaborazioni con ristoranti reali. Non troverai qui numeri di
+            Tavolino è agli inizi: stiamo aprendo le prime collaborazioni con ristoranti reali. Non troverai qui numeri di
             clienti o di scansioni gonfiati — solo quello che il prodotto sa fare oggi, verificabile in prima persona
             con la prova gratuita di 14 giorni, senza carta di credito.
           </p>

@@ -65,9 +65,9 @@ export async function POST(req: NextRequest) {
 
     const { sent } = await sendEmail({
       to: body.email,
-      subject: `Invitation à rejoindre ${organizationName} sur mbQr`,
+      subject: `Invitation à rejoindre ${organizationName} sur Tavolino`,
       html: `
-        <p>Vous avez été invité·e à rejoindre <strong>${organizationName}</strong> sur mbQr, en tant que ${body.role}.</p>
+        <p>Vous avez été invité·e à rejoindre <strong>${organizationName}</strong> sur Tavolino, en tant que ${body.role}.</p>
         <p><a href="${inviteUrl}">Activer mon compte</a></p>
         <p>Ce lien expire le ${expiresAt.toLocaleDateString("fr-FR")}.</p>
       `,

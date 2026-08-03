@@ -86,7 +86,7 @@ export default function ProfileScreen() {
         <SecondaryButton title="Se déconnecter" onPress={confirmLogout} danger />
 
         <View style={{ flex: 1 }} />
-        <Text style={{ color: colors.white40, fontSize: 11, textAlign: "center" }}>mbQr Staff</Text>
+        <Text style={{ color: colors.white40, fontSize: 11, textAlign: "center" }}>Tavolino Staff</Text>
       </ScrollView>
     </Screen>
   );

@@ -30,9 +30,9 @@ export async function sendVerificationEmail(
 
   return sendEmail({
     to: opts.email,
-    subject: "Confirmez votre adresse email — mbQr",
+    subject: "Confirmez votre adresse email — Tavolino",
     html: `
-      <p>Bienvenue sur mbQr ! Confirmez votre adresse email pour activer pleinement votre compte.</p>
+      <p>Bienvenue sur Tavolino ! Confirmez votre adresse email pour activer pleinement votre compte.</p>
       <p><a href="${verifyUrl}">Confirmer mon email</a></p>
       <p>Ce lien expire dans ${VERIFICATION_TTL_HOURS}h. Si vous n'êtes pas à l'origine de cette création de compte, ignorez cet email.</p>
     `,

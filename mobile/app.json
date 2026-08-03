@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mbQr Staff",
+    "name": "Tavolino Staff",
     "slug": "mbqr-staff",
     "version": "1.0.0",
     "scheme": "mbqr",
@@ -42,7 +42,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "mbQr a besoin d'accéder à vos photos pour illustrer un plat."
+          "photosPermission": "Tavolino a besoin d'accéder à vos photos pour illustrer un plat."
         }
       ]
     ],

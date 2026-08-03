@@ -77,13 +77,13 @@ export default function BrandingScreen() {
           <ScreenTitle>Marque</ScreenTitle>
           <Text style={{ color: colors.white40, fontSize: 12, marginTop: 4 }}>
             Logo et image de fond affichés sur le menu public de vos clients. Le tableau de bord reste toujours
-            mbQr.
+            Tavolino.
           </Text>
         </View>
 
         <BrandingSlot
           title="Logo"
-          body="Remplace le logo mbQr en haut du menu du client."
+          body="Remplace le logo Tavolino en haut du menu du client."
           imageUrl={branding?.logoUrl ?? null}
           uploading={uploading === "logo"}
           onUpload={() => pick("logo")}

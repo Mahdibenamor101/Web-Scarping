@@ -1,4 +1,4 @@
-# mbQr Staff (mobile)
+# Tavolino Staff (mobile)
 
 Android + iOS app for restaurant staff: live order board with push notifications, and
 (for owner/manager) team, menu, tables/QR, analytics, branding and subscription

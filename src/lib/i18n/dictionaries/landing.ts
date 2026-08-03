@@ -168,7 +168,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       trustBadges: ["Operativo in pochi minuti", "Senza carta di credito", "14 giorni di prova gratuita"],
     },
     why: {
-      eyebrow: "Perché mbQr",
+      eyebrow: "Perché Tavolino",
       titlePre: "Cosa cambia per il tuo",
       titleHighlight: "locale",
       pillars: [
@@ -239,12 +239,12 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Il menu porta il",
       titleHighlight: "tuo",
       titleRest: "nome, non il nostro.",
-      body: "Carica il logo e un'immagine di sfondo del tuo locale dal pannello. Quando un cliente scansiona il QR, arriva su un menu che sembra il tuo — mbQr resta dietro le quinte.",
+      body: "Carica il logo e un'immagine di sfondo del tuo locale dal pannello. Quando un cliente scansiona il QR, arriva su un menu che sembra il tuo — Tavolino resta dietro le quinte.",
       advantagesLabel: "Vantaggi",
       steps: [
-        { title: "Carica il tuo logo", body: "Sostituisce il logo mbQr in cima al menu del cliente." },
+        { title: "Carica il tuo logo", body: "Sostituisce il logo Tavolino in cima al menu del cliente." },
         { title: "Scegli uno sfondo", body: "Una foto del locale, dei piatti, o una tinta — quello che preferisci." },
-        { title: "Il tuo nome resta protagonista", body: "mbQr resta invisibile: il cliente vede il tuo locale, non noi." },
+        { title: "Il tuo nome resta protagonista", body: "Tavolino resta invisibile: il cliente vede il tuo locale, non noi." },
       ],
     },
     kitchen: {
@@ -286,7 +286,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titleHighlight: "QR",
       titleRest: "?",
       paperHeading: "Menu di carta",
-      qrHeading: "Menu QR mbQr",
+      qrHeading: "Menu QR Tavolino",
       rows: [
         { paper: "Cambiare un prezzo: bisogna ristampare tutto", qr: "Si aggiorna in un clic, subito visibile" },
         { paper: "Allergeni scritti a mano, facili da dimenticare", qr: "Etichettati su ogni piatto, sempre aggiornati" },
@@ -397,7 +397,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       trustBadges: ["Up and running in minutes", "No credit card required", "14-day free trial"],
     },
     why: {
-      eyebrow: "Why mbQr",
+      eyebrow: "Why Tavolino",
       titlePre: "What changes for your",
       titleHighlight: "restaurant",
       pillars: [
@@ -468,12 +468,12 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "The menu carries",
       titleHighlight: "your",
       titleRest: "name, not ours.",
-      body: "Upload your logo and a background image of your place from the dashboard. When a customer scans the QR code, they land on a menu that looks like yours — mbQr stays behind the scenes.",
+      body: "Upload your logo and a background image of your place from the dashboard. When a customer scans the QR code, they land on a menu that looks like yours — Tavolino stays behind the scenes.",
       advantagesLabel: "Benefits",
       steps: [
-        { title: "Upload your logo", body: "Replaces the mbQr logo at the top of the customer menu." },
+        { title: "Upload your logo", body: "Replaces the Tavolino logo at the top of the customer menu." },
         { title: "Choose a background", body: "A photo of your place, your dishes, or a plain color — whatever you prefer." },
-        { title: "Your name stays front and center", body: "mbQr stays invisible: the customer sees your place, not us." },
+        { title: "Your name stays front and center", body: "Tavolino stays invisible: the customer sees your place, not us." },
       ],
     },
     kitchen: {
@@ -515,7 +515,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titleHighlight: "QR",
       titleRest: "?",
       paperHeading: "Paper menu",
-      qrHeading: "mbQr QR menu",
+      qrHeading: "Tavolino QR menu",
       rows: [
         { paper: "Changing a price means reprinting everything", qr: "Updates in one click, instantly visible" },
         { paper: "Allergens written by hand, easy to forget", qr: "Labelled on every dish, always up to date" },
@@ -626,7 +626,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       trustBadges: ["Opérationnel en quelques minutes", "Sans carte bancaire", "14 jours d'essai gratuit"],
     },
     why: {
-      eyebrow: "Pourquoi mbQr",
+      eyebrow: "Pourquoi Tavolino",
       titlePre: "Ce qui change pour votre",
       titleHighlight: "établissement",
       pillars: [
@@ -697,12 +697,12 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Le menu porte",
       titleHighlight: "votre",
       titleRest: "nom, pas le nôtre.",
-      body: "Chargez votre logo et une image de fond de votre établissement depuis le tableau de bord. Quand un client scanne le QR, il arrive sur un menu qui semble être le vôtre — mbQr reste en coulisses.",
+      body: "Chargez votre logo et une image de fond de votre établissement depuis le tableau de bord. Quand un client scanne le QR, il arrive sur un menu qui semble être le vôtre — Tavolino reste en coulisses.",
       advantagesLabel: "Avantages",
       steps: [
-        { title: "Chargez votre logo", body: "Remplace le logo mbQr en haut du menu client." },
+        { title: "Chargez votre logo", body: "Remplace le logo Tavolino en haut du menu client." },
         { title: "Choisissez un fond", body: "Une photo de votre établissement, de vos plats, ou une couleur — comme vous préférez." },
-        { title: "Votre nom reste au premier plan", body: "mbQr reste invisible : le client voit votre établissement, pas nous." },
+        { title: "Votre nom reste au premier plan", body: "Tavolino reste invisible : le client voit votre établissement, pas nous." },
       ],
     },
     kitchen: {
@@ -744,7 +744,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titleHighlight: "QR",
       titleRest: " ?",
       paperHeading: "Menu papier",
-      qrHeading: "Menu QR mbQr",
+      qrHeading: "Menu QR Tavolino",
       rows: [
         { paper: "Changer un prix : il faut tout réimprimer", qr: "Se met à jour en un clic, visible immédiatement" },
         { paper: "Allergènes écrits à la main, faciles à oublier", qr: "Étiquetés sur chaque plat, toujours à jour" },
@@ -855,7 +855,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       trustBadges: ["Operativo en pocos minutos", "Sin tarjeta de crédito", "14 días de prueba gratuita"],
     },
     why: {
-      eyebrow: "Por qué mbQr",
+      eyebrow: "Por qué Tavolino",
       titlePre: "Qué cambia para tu",
       titleHighlight: "local",
       pillars: [
@@ -926,12 +926,12 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "El menú lleva",
       titleHighlight: "tu",
       titleRest: "nombre, no el nuestro.",
-      body: "Sube tu logo y una imagen de fondo de tu local desde el panel. Cuando un cliente escanea el QR, llega a un menú que parece el tuyo — mbQr queda entre bastidores.",
+      body: "Sube tu logo y una imagen de fondo de tu local desde el panel. Cuando un cliente escanea el QR, llega a un menú que parece el tuyo — Tavolino queda entre bastidores.",
       advantagesLabel: "Ventajas",
       steps: [
-        { title: "Sube tu logo", body: "Sustituye el logo de mbQr en la parte superior del menú del cliente." },
+        { title: "Sube tu logo", body: "Sustituye el logo de Tavolino en la parte superior del menú del cliente." },
         { title: "Elige un fondo", body: "Una foto de tu local, de tus platos, o un color — lo que prefieras." },
-        { title: "Tu nombre sigue siendo el protagonista", body: "mbQr queda invisible: el cliente ve tu local, no a nosotros." },
+        { title: "Tu nombre sigue siendo el protagonista", body: "Tavolino queda invisible: el cliente ve tu local, no a nosotros." },
       ],
     },
     kitchen: {
@@ -973,7 +973,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titleHighlight: "QR",
       titleRest: "?",
       paperHeading: "Menú de papel",
-      qrHeading: "Menú QR mbQr",
+      qrHeading: "Menú QR Tavolino",
       rows: [
         { paper: "Cambiar un precio: hay que reimprimir todo", qr: "Se actualiza en un clic, visible al instante" },
         { paper: "Alérgenos escritos a mano, fáciles de olvidar", qr: "Etiquetados en cada plato, siempre actualizados" },
@@ -1084,7 +1084,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       trustBadges: ["In wenigen Minuten startklar", "Keine Kreditkarte nötig", "14 Tage kostenlos testen"],
     },
     why: {
-      eyebrow: "Warum mbQr",
+      eyebrow: "Warum Tavolino",
       titlePre: "Was sich für Ihr",
       titleHighlight: "Lokal ändert",
       pillars: [
@@ -1155,12 +1155,12 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Die Karte trägt",
       titleHighlight: "Ihren",
       titleRest: "Namen, nicht unseren.",
-      body: "Laden Sie Ihr Logo und ein Hintergrundbild Ihres Lokals über das Dashboard hoch. Scannt ein Gast den QR-Code, landet er auf einer Karte, die wie Ihre eigene aussieht — mbQr bleibt im Hintergrund.",
+      body: "Laden Sie Ihr Logo und ein Hintergrundbild Ihres Lokals über das Dashboard hoch. Scannt ein Gast den QR-Code, landet er auf einer Karte, die wie Ihre eigene aussieht — Tavolino bleibt im Hintergrund.",
       advantagesLabel: "Vorteile",
       steps: [
-        { title: "Logo hochladen", body: "Ersetzt das mbQr-Logo oben auf der Kundenkarte." },
+        { title: "Logo hochladen", body: "Ersetzt das Tavolino-Logo oben auf der Kundenkarte." },
         { title: "Hintergrund wählen", body: "Ein Foto Ihres Lokals, Ihrer Gerichte oder eine Farbe — ganz wie Sie möchten." },
-        { title: "Ihr Name bleibt im Mittelpunkt", body: "mbQr bleibt unsichtbar: der Gast sieht Ihr Lokal, nicht uns." },
+        { title: "Ihr Name bleibt im Mittelpunkt", body: "Tavolino bleibt unsichtbar: der Gast sieht Ihr Lokal, nicht uns." },
       ],
     },
     kitchen: {
@@ -1202,7 +1202,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titleHighlight: "QR",
       titleRest: "?",
       paperHeading: "Papierkarte",
-      qrHeading: "mbQr QR-Karte",
+      qrHeading: "Tavolino QR-Karte",
       rows: [
         { paper: "Einen Preis ändern: alles muss neu gedruckt werden", qr: "Wird mit einem Klick aktualisiert, sofort sichtbar" },
         { paper: "Handgeschriebene Allergene, leicht zu vergessen", qr: "Bei jedem Gericht gekennzeichnet, immer aktuell" },
@@ -1313,7 +1313,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       trustBadges: ["جاهز للعمل خلال دقائق", "دون الحاجة لبطاقة ائتمان", "١٤ يومًا تجربة مجانية"],
     },
     why: {
-      eyebrow: "لماذا mbQr",
+      eyebrow: "لماذا Tavolino",
       titlePre: "ما الذي يتغيّر في",
       titleHighlight: "مطعمك",
       pillars: [
@@ -1384,12 +1384,12 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "القائمة تحمل",
       titleHighlight: "اسمك",
       titleRest: "أنت، لا اسمنا.",
-      body: "ارفع شعارك وصورة خلفية لمطعمك من لوحة التحكم. عندما يمسح العميل رمز QR، يصل إلى قائمة تبدو وكأنها قائمتك أنت — يبقى mbQr خلف الكواليس.",
+      body: "ارفع شعارك وصورة خلفية لمطعمك من لوحة التحكم. عندما يمسح العميل رمز QR، يصل إلى قائمة تبدو وكأنها قائمتك أنت — يبقى Tavolino خلف الكواليس.",
       advantagesLabel: "المزايا",
       steps: [
-        { title: "ارفع شعارك", body: "يحل محل شعار mbQr أعلى قائمة العميل." },
+        { title: "ارفع شعارك", body: "يحل محل شعار Tavolino أعلى قائمة العميل." },
         { title: "اختر خلفية", body: "صورة لمطعمك، لأطباقك، أو لون بسيط — كما تفضل." },
-        { title: "اسمك يبقى في الواجهة", body: "يبقى mbQr غير ظاهر: يرى العميل مطعمك، لا نحن." },
+        { title: "اسمك يبقى في الواجهة", body: "يبقى Tavolino غير ظاهر: يرى العميل مطعمك، لا نحن." },
       ],
     },
     kitchen: {
@@ -1431,7 +1431,7 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titleHighlight: "QR",
       titleRest: "؟",
       paperHeading: "قائمة ورقية",
-      qrHeading: "قائمة QR من mbQr",
+      qrHeading: "قائمة QR من Tavolino",
       rows: [
         { paper: "تغيير سعر: يجب إعادة طباعة كل شيء", qr: "يُحدَّث بنقرة واحدة، ويظهر فورًا" },
         { paper: "مسببات حساسية مكتوبة بخط اليد، يسهل نسيانها", qr: "موسومة على كل طبق، ومحدّثة دائمًا" },
