@@ -5,43 +5,19 @@ const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
-      // One system typeface, not a mix of display/mono families -- the
-      // Apple system-font stack renders as San Francisco on Apple
-      // hardware and a clean native fallback everywhere else, exactly
-      // how apple.com itself sets type. `display` and `mono` keep their
-      // class names (font-display/font-mono are already used in ~70
-      // places across the app) but now resolve to the same stack: San
-      // Francisco differentiates by weight/optical size, not by family,
-      // so no per-callsite edits were needed to adopt this. `mono`
-      // additionally gets tabular figures via a small rule in
-      // globals.css (.font-mono), standing in for what a monospace
-      // face used to do for prices/timestamps.
+      // "Oriental Luxury" direction: an elegant serif for headings
+      // (Playfair Display -- the brief's own suggested Latin equivalent
+      // to Amiri/Reem Kufi for a site whose actual content is Italian,
+      // not Arabic) over a clean, warm sans for everything else
+      // (Poppins, the brief's suggested Latin equivalent to Cairo/
+      // Tajawal). `mono` keeps tabular figures via globals.css
+      // (.font-mono) but otherwise reads as Poppins like the rest of
+      // the body text -- prices/timestamps don't need a separate face,
+      // just alignment.
       fontFamily: {
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "SF Pro Text",
-          "SF Pro Display",
-          "var(--font-manrope)",
-          "system-ui",
-          "sans-serif",
-        ],
-        display: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "SF Pro Display",
-          "var(--font-manrope)",
-          "system-ui",
-          "sans-serif",
-        ],
-        mono: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "SF Pro Text",
-          "var(--font-manrope)",
-          "system-ui",
-          "sans-serif",
-        ],
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        display: ["var(--font-playfair)", "Georgia", "serif"],
+        mono: ["var(--font-poppins)", "system-ui", "sans-serif"],
       },
       fontSize: {
         14: typeScale[14],
@@ -60,6 +36,11 @@ const config: Config = {
           DEFAULT: colors.brand,
           dark: colors.brandDark,
           light: colors.brandLight,
+        },
+        gold: {
+          DEFAULT: colors.gold,
+          dark: colors.goldDark,
+          light: colors.goldLight,
         },
         progress: { DEFAULT: colors.progress, light: colors.progressLight },
         ready: { DEFAULT: colors.ready, light: colors.readyLight },
@@ -84,9 +65,11 @@ const config: Config = {
         soft: shadow.soft,
         softLg: shadow.softLg,
         dark: shadow.dark,
+        gold: shadow.gold,
       },
       backgroundImage: {
         "brand-gradient": `linear-gradient(140deg, ${colors.brand}, ${colors.brandDark})`,
+        "gold-gradient": `linear-gradient(140deg, ${colors.goldLight}, ${colors.gold})`,
       },
       keyframes: {
         float: {

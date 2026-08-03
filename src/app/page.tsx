@@ -9,6 +9,8 @@ import PricingToggle from "@/components/pricing-toggle";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
 import FaqAccordion from "@/components/faq-accordion";
+import ArabesquePattern from "@/components/arabesque-pattern";
+import ArchFrame from "@/components/arch-frame";
 import { PLAN_FEATURES } from "@/lib/landing-content";
 
 // Landing copy is in Italian end to end (dashboard and auth stay in
@@ -184,13 +186,21 @@ export default function HomePage() {
           movement lives in the floating cards and the signature comanda
           inside HeroMockup instead. */}
       <div className="relative overflow-hidden bg-dot-grid">
+        {/* Geometric watermark, gold-on-ivory, low opacity -- the brief's
+            "motifs géométriques islamiques en arrière-plan... en
+            filigrane léger derrière le hero." */}
+        <ArabesquePattern
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          color="#C9A227"
+          opacity={0.1}
+        />
         {/* Decorative depth blobs, asymmetric so they read as background
-            texture rather than a centered halo -- brand tone top-left,
-            progress tone bottom-right, both very low opacity/heavy blur so
+            texture rather than a centered halo -- emerald tone top-left,
+            gold tone bottom-right, both very low opacity/heavy blur so
             they never compete with the text or the phone mockup's own
             halo (src/components/hero-mockup.tsx). */}
         <div className="pointer-events-none absolute -left-32 -top-24 h-[26rem] w-[26rem] rounded-full bg-brand/15 blur-[120px]" />
-        <div className="pointer-events-none absolute -right-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-progress/10 blur-[110px]" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-gold/15 blur-[110px]" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-10 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-20 sm:pt-14">
           <div className="flex flex-col items-start gap-6 text-left">
             <span className="eyebrow">Menu QR e ordini al tavolo</span>
@@ -221,7 +231,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          <HeroMockup />
+          <div className="relative">
+            {/* Ogive arch outline behind the phone, larger than the
+                mockup so it reads as a frame around it, not a shape
+                the phone sits inside of -- the brief's "arc ou ogive
+                comme élément de design autour de l'image principale." */}
+            <ArchFrame className="pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 sm:h-[40rem] sm:w-[33rem]" />
+            <HeroMockup />
+          </div>
         </div>
 
         <div className="bg-rail-top h-px w-full" />
@@ -239,7 +256,7 @@ export default function HomePage() {
             {PILLARS.map((pillar) => (
               <StaggerItem key={pillar.title}>
                 <div className="card h-full">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <span className="icon-badge">
                     {pillar.icon}
                   </span>
                   <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{pillar.title}</h3>
@@ -370,7 +387,7 @@ export default function HomePage() {
             {FEATURES.map((feature) => (
               <StaggerItem key={feature.title}>
                 <div className="card h-full">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <span className="icon-badge">
                     {feature.icon}
                   </span>
                   <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{feature.title}</h3>
@@ -485,7 +502,7 @@ export default function HomePage() {
             {PERSONAS.map((persona) => (
               <StaggerItem key={persona.title}>
                 <div className="card h-full">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <span className="icon-badge">
                     {persona.icon}
                   </span>
                   <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{persona.title}</h3>
@@ -615,14 +632,18 @@ export default function HomePage() {
       {/* Full-bleed, not inset in a max-w container like every other section
           -- the one place on the page that's allowed to feel loud, right
           before the footer closes things out. */}
-      <section className="bg-brand-gradient py-20 sm:py-24">
-        <Reveal className="mx-auto max-w-2xl px-6 text-center">
+      <section className="relative overflow-hidden bg-brand-gradient py-20 sm:py-24">
+        <ArabesquePattern className="pointer-events-none absolute inset-0 h-full w-full" color="#FAF6EE" opacity={0.12} />
+        <Reveal className="relative mx-auto max-w-2xl px-6 text-center">
           <h2 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
             Pronto a digitalizzare i tuoi tavoli?
           </h2>
           <p className="mt-3 text-white/80">Crea il tuo ristorante in pochi minuti, senza impegno.</p>
           <div className="mt-8 flex justify-center">
-            <Link href="/signup" className="rounded-full bg-white px-6 py-3 text-base font-semibold text-brand-dark shadow-softLg transition duration-200 hover:-translate-y-0.5 hover:shadow-soft">
+            <Link
+              href="/signup"
+              className="rounded-full border-2 border-gold bg-white px-6 py-3 text-base font-semibold text-brand-dark shadow-gold transition duration-200 hover:-translate-y-0.5"
+            >
               Crea il tuo ristorante
             </Link>
           </div>

@@ -39,10 +39,15 @@ body {
  * two different grounds rather than a light/dark toggle of one surface.
  */
 @layer components {
+  /* Gold ring, not just a gold-tinted glass border like `.btn-secondary`/
+     `.card` -- the brief's "bouton CTA avec bordure dorée" called out the
+     primary action specifically, so it gets a visibly thicker rim + the
+     dedicated `shadow-gold` glow on hover instead of the plain `softLg`
+     every other raised element uses. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-gold/70 bg-brand-gradient px-5 py-2.5
       text-sm font-semibold text-white shadow-soft backdrop-blur-xl transition duration-200 ease-out
-      hover:-translate-y-0.5 hover:shadow-softLg disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
+      hover:-translate-y-0.5 hover:shadow-gold disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0;
   }
 
   .btn-secondary {
@@ -188,8 +193,8 @@ body {
      product-page trick of a glass panel floating over a diffuse color
      field rather than a printed pattern. */
   .bg-dot-grid {
-    background-image: radial-gradient(circle at 15% 20%, rgba(226, 129, 31, 0.12), transparent 45%),
-      radial-gradient(circle at 85% 0%, rgba(10, 132, 255, 0.08), transparent 40%);
+    background-image: radial-gradient(circle at 15% 20%, rgba(15, 110, 110, 0.1), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(201, 162, 39, 0.1), transparent 40%);
   }
 
   /* Hairline divider -- a plain 1px rule stands in for the previous
@@ -208,6 +213,15 @@ body {
       after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left
       after:scale-x-0 after:bg-brand-gradient after:transition-transform after:duration-300 after:ease-out
       hover:after:scale-x-100;
+  }
+
+  /* Octagonal icon frame -- an eight-sided cut standing in for the
+     brief's "icônes avec fond en forme d'étoile à 8 branches ou
+     hexagone" without hand-drawing a full star per icon. Replaces the
+     plain `rounded-lg` square every feature/pillar/persona icon used. */
+  .icon-badge {
+    @apply inline-flex h-10 w-10 items-center justify-center bg-brand/10 text-brand;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
   }
 
   /* Numeric contexts (prices, timestamps, counters) keep the old
