@@ -623,6 +623,21 @@ Nouvelle référence à menuqrcode.tn (« je veux un site bien équipé comme ç
 
 Vérifié : `tsc`/`eslint`/`vitest`/`next build` au vert ; les trois pages capturées (Playwright) ; formulaire de contact rempli et soumis dans un vrai navigateur, confirmé par un `curl` direct sur `POST /api/contact` (`{"received":true}`, 201).
 
+### 12.27 Landing : richesse visuelle façon menuqrcode.tn, sans les parties fabriquées (2 août 2026)
+
+Troisième référence à menuqrcode.tn, cette fois avec un cahier des charges explicite et détaillé (hero + blobs décoratifs, bandeau stats, 3 colonnes avantages, sections zigzag texte/image, preuve sociale, CTA final plein cadre, footer complet). Audit du fichier avant d'écrire une ligne : la plupart des points existaient déjà (hero, bandeau `STATS`, trois colonnes `PILLARS`, CTA final, footer) depuis les passes précédentes (§12.14, §12.22) — seuls les blobs décoratifs, de vraies sections zigzag avec image, et le CTA final "à fond perdu" manquaient vraiment.
+
+**Ajouté :**
+- Deux formes floues asymétriques derrière le hero (`bg-brand/15`/`bg-progress/10`, `blur-[110-120px]`), en plus du halo existant propre à `HeroMockup`.
+- La section "Il tuo marchio" (texte + liste numérotée) transformée en vrai zigzag texte/capture d'écran réelle (`public-menu.png`), plus une deuxième section zigzag inédite "Ogni ordine arriva in diretta" (texte + `dashboard-orders.png`), alternées et regroupées sous un même fond pour ne pas casser le rythme dot-grid/surface du reste de la page.
+- CTA final remplacé : au lieu d'un encart dégradé pâle dans un conteneur, une section pleine largeur (`bg-brand-gradient`, texte blanc) — la seule du reste de la page à ne pas être contenue dans un `max-w-5xl`.
+
+**Explicitement pas fait, comme en §12.22 :** logos partenaires et témoignages clients avec étoiles — mbQr n'a ni l'un ni l'autre de réel, les fabriquer romprait la discipline anti-fabrication tenue depuis le début de ce document. `TRUST_BADGES` (déjà dans le hero) reste la seule "preuve sociale" affichée, honnête par construction.
+
+**Photos lifestyle** (dix images envoyées par le fondateur en cours de tâche, dites "libres de droits, site gratuit type Unsplash/Pexels" après question directe sur leur origine — aucun moyen de le vérifier soi-même, réponse prise telle quelle comme pour toute affirmation factuelle du fondateur) : trois retenues (les autres étant des doublons ou des montages avec éléments graphiques déjà intégrés qui ne colleraient pas au système de design), enregistrées dans `public/photos/`, assemblées en mosaïque (une grande + deux empilées) juste après la section `PILLARS`. Purement décoratif — jamais présenté comme une photo d'un client mbQr réel, même distinction que QonnectQR (§12.17) : inspiration/texture, jamais un contenu qui prétend être ce qu'il n'est pas.
+
+Vérifié : `tsc`/`eslint`/`vitest`/`next build` au vert. Vérification visuelle en deux temps -- une première capture plein-page a semblé montrer un fond cassé/du contenu manquant sur presque toute la page ; en fait un artefact de la méthode de capture (les sections `<Reveal>` ne passent en visible qu'au passage réel dans le viewport, jamais lors d'un simple redimensionnement plein-page par Playwright, confirmé aussi sur `/prezzi`/`/chi-siamo` en §12.26) -- corrigé en scrollant réellement par incréments avant la capture, qui confirme un rendu correct sur toute la page.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Envoi d'email : câblé mais jamais exercé contre un vrai compte** (voir §12.16). `RESEND_API_KEY`/`EMAIL_FROM` non définis dans cet environnement — le lien d'invitation manuel reste le chemin réellement testé. À vérifier en vrai (mode test/sandbox du provider) avant un pilote.

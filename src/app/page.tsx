@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Reveal, { StaggerGroup, StaggerItem } from "@/components/reveal";
 import ProductPreview from "@/components/product-preview";
 import HeroMockup from "@/components/hero-mockup";
@@ -183,6 +184,13 @@ export default function HomePage() {
           movement lives in the floating cards and the signature comanda
           inside HeroMockup instead. */}
       <div className="relative overflow-hidden bg-dot-grid">
+        {/* Decorative depth blobs, asymmetric so they read as background
+            texture rather than a centered halo -- brand tone top-left,
+            progress tone bottom-right, both very low opacity/heavy blur so
+            they never compete with the text or the phone mockup's own
+            halo (src/components/hero-mockup.tsx). */}
+        <div className="pointer-events-none absolute -left-32 -top-24 h-[26rem] w-[26rem] rounded-full bg-brand/15 blur-[120px]" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-progress/10 blur-[110px]" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-10 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-20 sm:pt-14">
           <div className="flex flex-col items-start gap-6 text-left">
             <span className="eyebrow">Menu QR e ordini al tavolo</span>
@@ -247,6 +255,50 @@ export default function HomePage() {
               </StaggerItem>
             ))}
           </StaggerGroup>
+        </div>
+      </section>
+
+      {/* Lifestyle photography -- royalty-free stock, not staged customer
+          photos of a real mbQr client (see CONTEXT.md): purely decorative
+          texture, same "inspiration/texture, never a fabricated claim"
+          line as everywhere else on this page. Uneven column heights
+          (one tall, two stacked) instead of a plain 3-up grid for a less
+          template-y feel. */}
+      <section className="bg-surface py-16 sm:py-20">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 px-6 sm:grid-cols-[1.1fr_1fr] sm:gap-6">
+          <Reveal className="row-span-2 overflow-hidden rounded-container shadow-softLg">
+            <div className="relative h-full min-h-[16rem]">
+              <Image
+                src="/photos/scan-menu.webp"
+                alt="Cliente che scansiona il QR del menu al tavolo"
+                fill
+                sizes="(min-width: 640px) 420px, 50vw"
+                className="object-cover"
+              />
+            </div>
+          </Reveal>
+          <Reveal className="overflow-hidden rounded-container shadow-softLg">
+            <div className="relative aspect-[4/3]">
+              <Image
+                src="/photos/scan-cafe-friends.webp"
+                alt="Due amiche al tavolo, una scansiona il QR del menu"
+                fill
+                sizes="(min-width: 640px) 380px, 50vw"
+                className="object-cover"
+              />
+            </div>
+          </Reveal>
+          <Reveal className="overflow-hidden rounded-container shadow-softLg">
+            <div className="relative aspect-[4/3]">
+              <Image
+                src="/photos/scan-table-sticker.webp"
+                alt="QR code al tavolo, pronto per essere scansionato"
+                fill
+                sizes="(min-width: 640px) 380px, 50vw"
+                className="object-cover"
+              />
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -330,9 +382,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Zigzag #1 -- text left, real screenshot right. */}
       <section id="marchio" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
-          <div className="grid gap-10 sm:grid-cols-[0.9fr_1.1fr] sm:items-center">
+          <div className="grid gap-10 sm:grid-cols-2 sm:items-center">
             <Reveal>
               <span className="eyebrow">Il tuo marchio</span>
               <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-4xl">
@@ -343,20 +396,79 @@ export default function HomePage() {
                 Carica il logo e un&apos;immagine di sfondo del tuo locale dal pannello. Quando un cliente scansiona
                 il QR, arriva su un menu che sembra il tuo — mbQr resta dietro le quinte.
               </p>
+              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-wide text-muted">Vantaggi</p>
+              <ul className="mt-3 flex flex-col gap-2.5">
+                {BRANDING_STEPS.map((step) => (
+                  <li key={step.title} className="flex items-start gap-2 text-sm text-ink/80">
+                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                    <span>
+                      <strong className="font-semibold text-ink">{step.title}.</strong> {step.body}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </Reveal>
-            <StaggerGroup className="grid gap-4">
-              {BRANDING_STEPS.map((step, i) => (
-                <StaggerItem key={step.title}>
-                  <div className="ticket flex items-start gap-4 !pt-6">
-                    <span className="font-mono text-xs font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
-                    <div>
-                      <h3 className="font-display text-base font-extrabold text-ink">{step.title}</h3>
-                      <p className="mt-0.5 text-sm text-muted">{step.body}</p>
-                    </div>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerGroup>
+            <Reveal>
+              <div className="overflow-hidden rounded-container border border-ink/10 shadow-softLg">
+                <div className="relative aspect-[4/3]">
+                  <Image
+                    src="/screenshots/public-menu.png"
+                    alt="Menu pubblico personalizzato con il logo e l'immagine del locale"
+                    fill
+                    sizes="(min-width: 640px) 480px, 100vw"
+                    className="object-cover object-top"
+                  />
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Zigzag #2 -- real screenshot left, text right (alternated).
+          Same bg-surface as zigzag #1 right above (the pair reads as one
+          "product showcase" block) so the dot-grid rhythm resumes cleanly
+          at "per-chi" below, same precedent as the hero/"Perché mbQr" pair
+          at the top of the page. */}
+      <section className="bg-surface py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="grid gap-10 sm:grid-cols-2 sm:items-center">
+            <Reveal>
+              <div className="overflow-hidden rounded-container border border-ink/10 shadow-softLg">
+                <div className="relative aspect-[4/3]">
+                  <Image
+                    src="/screenshots/dashboard-orders.png"
+                    alt="Bacheca ordini in tre colonne: da fare, in corso, pronto"
+                    fill
+                    sizes="(min-width: 640px) 480px, 100vw"
+                    className="object-cover object-top"
+                  />
+                </div>
+              </div>
+            </Reveal>
+            <Reveal>
+              <span className="eyebrow">Cucina</span>
+              <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-4xl">
+                Ogni ordine arriva <span className="bg-brand-gradient bg-clip-text text-transparent">in diretta</span>.
+              </h2>
+              <p className="mt-3 max-w-md text-sm text-muted">
+                Nessuna carta, nessuna corsa in sala: l&apos;ordine appare in cucina pochi secondi dopo l&apos;invio,
+                aggiornato in tempo reale senza ricaricare la pagina.
+              </p>
+              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-wide text-muted">Vantaggi</p>
+              <ul className="mt-3 flex flex-col gap-2.5">
+                {[
+                  "Da fare, in corso, pronto: tre colonne aggiornate senza ricaricare",
+                  "Ogni membro dello staff vede la stessa bacheca, in diretta",
+                  "Nessun ordine scritto a mano, nessun malinteso in cucina",
+                ].map((point) => (
+                  <li key={point} className="flex items-start gap-2 text-sm text-ink/80">
+                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -500,23 +612,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-surface py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-6">
-          <Reveal>
-            <div className="rounded-container border border-brand/15 bg-gradient-to-br from-brand/10 via-white to-white p-10 text-center shadow-soft sm:p-16">
-              <h2 className="font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-                Pronto a <span className="bg-brand-gradient bg-clip-text text-transparent">digitalizzare</span> i
-                tuoi tavoli?
-              </h2>
-              <p className="mt-3 text-muted">Crea il tuo ristorante in pochi minuti, senza impegno.</p>
-              <div className="mt-6 flex justify-center">
-                <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                  Crea il tuo ristorante
-                </Link>
-              </div>
-            </div>
-          </Reveal>
-        </div>
+      {/* Full-bleed, not inset in a max-w container like every other section
+          -- the one place on the page that's allowed to feel loud, right
+          before the footer closes things out. */}
+      <section className="bg-brand-gradient py-20 sm:py-24">
+        <Reveal className="mx-auto max-w-2xl px-6 text-center">
+          <h2 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            Pronto a digitalizzare i tuoi tavoli?
+          </h2>
+          <p className="mt-3 text-white/80">Crea il tuo ristorante in pochi minuti, senza impegno.</p>
+          <div className="mt-8 flex justify-center">
+            <Link href="/signup" className="rounded-full bg-white px-6 py-3 text-base font-semibold text-brand-dark shadow-softLg transition duration-200 hover:-translate-y-0.5 hover:shadow-soft">
+              Crea il tuo ristorante
+            </Link>
+          </div>
+        </Reveal>
       </section>
 
       <LandingFooter />
