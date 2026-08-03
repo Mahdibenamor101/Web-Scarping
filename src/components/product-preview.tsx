@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import MockupFrame, { WindowChromeDots } from "@/components/mockup-frame";
+import PhoneFrame from "@/components/phone-frame";
 
 type Tab = {
   id: string;
@@ -79,12 +80,10 @@ export default function ProductPreview() {
             style={{ maxWidth: active.frame === "phone" ? "18rem" : "52rem" }}
           >
             {active.frame === "phone" ? (
-              <div className="mx-auto w-full max-w-[18rem] rounded-[2.5rem] border-8 border-ink bg-ink p-1.5 shadow-softLg">
-                <div className="relative aspect-[9/17.5] w-full overflow-hidden rounded-[2rem] bg-surface">
-                  {/* Dynamic Island, matching hero-mockup.tsx/demo-video.tsx. */}
-                  <div className="absolute left-1/2 top-3 z-10 h-6 w-20 -translate-x-1/2 rounded-full bg-ink" />
+              <div className="mx-auto w-full max-w-[18rem]">
+                <PhoneFrame screenClassName="aspect-[9/17.5]">
                   <Image src={active.src} alt={active.alt} fill sizes="288px" className="object-cover object-top" priority={false} />
-                </div>
+                </PhoneFrame>
               </div>
             ) : (
               <div className="overflow-hidden rounded-card border border-ink/10 bg-surface shadow-softLg">
