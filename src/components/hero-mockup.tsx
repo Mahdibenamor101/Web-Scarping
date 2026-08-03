@@ -23,7 +23,7 @@ import PhoneFrame from "@/components/phone-frame";
  */
 export default function HeroMockup() {
   return (
-    <div className="relative mx-auto flex h-[30rem] w-full max-w-sm items-center justify-center sm:h-[34rem]">
+    <div className="relative mx-auto flex h-[30rem] w-full max-w-sm items-center justify-center sm:h-[34rem] sm:max-w-md">
       {/* Soft, low-key halo -- a hint of brand glow, not a loud colored
           blur: closer to the airy near-white background a Liquid Glass
           product shot sits on than the previous saturated circle. */}
@@ -65,15 +65,18 @@ export default function HeroMockup() {
         </div>
       </div>
 
-      {/* Floating cards at different z-depths: live order (front, animated),
-          QR sticker preview (back), revenue + mini-graph (mid). */}
-      <div className="absolute -right-2 top-8 z-20 sm:-right-6">
+      {/* Floating cards, all clear of the phone's own screen content now
+          (see CONTEXT.md) -- each sits outside the phone's footprint with
+          a small, deliberate corner-overlap onto the bezel/halo at most,
+          never across readable text. Live order (front, animated), QR
+          sticker preview (back), revenue + mini-graph (mid). */}
+      <div className="absolute -right-16 -top-16 z-20">
         <LiveOrderCard />
       </div>
-      <div className="animate-float-delayed absolute left-0 top-1/2 z-0 -translate-y-1/2 sm:-left-6">
+      <div className="animate-float-delayed absolute -left-14 top-1/2 z-0 -translate-y-1/2">
         <QrStickerCard />
       </div>
-      <div className="animate-float absolute bottom-6 left-4 z-10 sm:left-0">
+      <div className="animate-float absolute -bottom-4 -left-10 z-10">
         <RevenueCard />
       </div>
     </div>
