@@ -82,7 +82,7 @@ export default function ProductPreview({ locale = "it" }: { locale?: LanguageCod
           >
             {active.frame === "phone" ? (
               <div className="mx-auto w-full max-w-[18rem]">
-                <PhoneFrame screenClassName="aspect-[9/17.5]">
+                <PhoneFrame>
                   <Image src={active.src} alt={active.alt} fill sizes="288px" className="object-cover object-top" priority={false} />
                 </PhoneFrame>
               </div>
