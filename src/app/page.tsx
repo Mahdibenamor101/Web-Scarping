@@ -444,6 +444,15 @@ export default function HomePage() {
                   {t.pricing.ctaSecondary}
                 </Link>
               </div>
+              <div className="mt-6 flex justify-center">
+                <Image
+                  src="/badges/powered-by-stripe.png"
+                  alt="Pagamenti protetti, Powered by Stripe — Visa, Mastercard, American Express"
+                  width={286}
+                  height={85}
+                  className="h-auto w-56"
+                />
+              </div>
             </div>
           </Reveal>
         </div>

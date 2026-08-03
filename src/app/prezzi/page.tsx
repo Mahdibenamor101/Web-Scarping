@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Reveal from "@/components/reveal";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
@@ -55,6 +56,9 @@ export default function PricingPage() {
               <Link href="/signup" className="btn-primary px-6 py-3 text-base">
                 Inizia la prova gratuita
               </Link>
+            </div>
+            <div className="mt-6 flex justify-center">
+              <Image src="/badges/powered-by-stripe.png" alt="Pagamenti protetti, Powered by Stripe — Visa, Mastercard, American Express" width={286} height={85} className="h-auto w-56" />
             </div>
           </div>
         </Reveal>
