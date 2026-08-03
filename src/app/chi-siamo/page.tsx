@@ -2,6 +2,7 @@ import Link from "next/link";
 import Reveal, { StaggerGroup, StaggerItem } from "@/components/reveal";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
+import { getLocale } from "@/lib/i18n/get-locale";
 
 export const metadata = { title: "Chi siamo — mbQr" };
 
@@ -35,9 +36,10 @@ const PRINCIPLES = [
 ];
 
 export default function AboutPage() {
+  const locale = getLocale("it");
   return (
     <div className="min-h-screen bg-paper">
-      <LandingNav />
+      <LandingNav locale={locale} />
       <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
         <Reveal className="text-center">
           <span className="eyebrow">Chi siamo</span>

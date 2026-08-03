@@ -1,5 +1,8 @@
 "use client";
 
+import { AUTH_DICT } from "@/lib/i18n/dictionaries/auth";
+import type { LanguageCode } from "@/lib/i18n/languages";
+
 // Google/Apple sign-in entry points, shown on both /login and /signup --
 // plain <a> links to the GET /api/auth/{provider}/start routes (no client
 // JS needed for the redirect itself), matching each brand's real logo
@@ -8,34 +11,44 @@
 // whether Stripe is configured (src/app/dashboard/billing/page.tsx) --
 // clicking one when the provider isn't configured here just bounces back
 // with the error message below instead of hiding the option entirely.
-export default function OAuthButtons({ from, error }: { from: "login" | "signup"; error?: string | null }) {
+export default function OAuthButtons({
+  from,
+  error,
+  locale = "fr",
+}: {
+  from: "login" | "signup";
+  error?: string | null;
+  locale?: LanguageCode;
+}) {
+  const t = AUTH_DICT[locale].oauth;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2.5">
         <a href={`/api/auth/google/start?from=${from}`} className="oauth-btn">
           <GoogleIcon />
-          Continuer avec Google
+          {t.google}
         </a>
         <a href={`/api/auth/apple/start?from=${from}`} className="oauth-btn oauth-btn-apple">
           <AppleIcon />
-          Continuer avec Apple
+          {t.apple}
         </a>
       </div>
-      {error && <p className="text-center text-xs text-danger">{oauthErrorMessage(error)}</p>}
+      {error && <p className="text-center text-xs text-danger">{oauthErrorMessage(error, locale)}</p>}
       <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-muted">
         <span className="h-px flex-1 bg-ink/10" />
-        ou
+        {t.or}
         <span className="h-px flex-1 bg-ink/10" />
       </div>
     </div>
   );
 }
 
-function oauthErrorMessage(code: string): string {
+function oauthErrorMessage(code: string, locale: LanguageCode): string {
+  const t = AUTH_DICT[locale].oauth;
   if (code === "google_not_configured" || code === "apple_not_configured") {
-    return "Connexion indisponible sur cet environnement (clé API manquante).";
+    return t.notConfigured;
   }
-  return "La connexion a échoué, réessayez ou utilisez votre mot de passe.";
+  return t.failed;
 }
 
 function GoogleIcon() {

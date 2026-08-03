@@ -4,6 +4,7 @@ import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
 import PricingToggle from "@/components/pricing-toggle";
 import { PLAN_FEATURES } from "@/lib/landing-content";
+import { getLocale } from "@/lib/i18n/get-locale";
 
 export const metadata = { title: "Prezzi — mbQr" };
 
@@ -11,10 +12,14 @@ export const metadata = { title: "Prezzi — mbQr" };
 // section (src/app/page.tsx) -- same PLAN_FEATURES import so the two can't
 // drift apart, presented with a bit more room to breathe for anyone who
 // clicks through wanting the full detail before signing up.
+//
+// Body copy stays Italian-only for now (see CONTEXT.md §12.30) -- only the
+// shared nav/footer respect the language switcher here.
 export default function PricingPage() {
+  const locale = getLocale("it");
   return (
     <div className="min-h-screen bg-paper">
-      <LandingNav />
+      <LandingNav locale={locale} />
       <main className="mx-auto max-w-2xl px-6 py-16 sm:py-20">
         <Reveal className="text-center">
           <span className="eyebrow">Prezzi</span>

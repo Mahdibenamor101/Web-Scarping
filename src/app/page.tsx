@@ -11,174 +11,34 @@ import LandingFooter from "@/components/landing-footer";
 import FaqAccordion from "@/components/faq-accordion";
 import ArabesquePattern from "@/components/arabesque-pattern";
 import ArchFrame from "@/components/arch-frame";
-import { PLAN_FEATURES } from "@/lib/landing-content";
+import { getLocale } from "@/lib/i18n/get-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { LANDING_DICT } from "@/lib/i18n/dictionaries/landing";
 
-// Landing copy is in Italian end to end (dashboard and auth stay in
-// French -- see CONTEXT.md). The public menu page has its own separate
-// IT/EN toggle and is unrelated to this.
-const STEPS = [
-  {
-    n: "01",
-    title: "Il cliente scansiona",
-    body: "Un QR per tavolo. Niente da installare, il menu si apre nel browser.",
-  },
-  {
-    n: "02",
-    title: "Ordina dal telefono",
-    body: "Menu in italiano e inglese, allergeni indicati su ogni piatto.",
-  },
-  {
-    n: "03",
-    title: "Arriva in cucina, in diretta",
-    body: "Da fare, in corso, pronto — aggiornato senza ricaricare la pagina.",
-  },
+// Landing copy defaults to Italian (dashboard/auth default to French --
+// see CONTEXT.md) but is now fully translatable via the language switcher
+// in the nav (src/components/language-switcher.tsx) -- see CONTEXT.md
+// §12.30 for the six supported languages and what's still Italian-only
+// (the standalone /prezzi, /chi-siamo, /contatti page bodies).
+const PILLAR_ICONS = [<ClockIcon key="clock" />, <PhoneIcon key="phone" />, <LeafIcon key="leaf" />];
+const FEATURE_ICONS = [<ShieldIcon key="shield" />, <GlobeIcon key="globe" />, <BoltIcon key="bolt" />, <LockIcon key="lock" />];
+const STAT_VALUES: { value: number; suffix: string }[] = [
+  { value: 14, suffix: "" },
+  { value: 2, suffix: "" },
+  { value: 100, suffix: "%" },
+  { value: 0, suffix: " €" },
 ];
-
-// Three-pillar "why" overview, positioned right after the hero -- a
-// structural pattern noticed on a competitor's site (menuqrcode.tn,
-// see CONTEXT.md), adapted with mbQr's own real product capabilities.
-// Every bullet is a genuine, checkable feature (same discipline as
-// STATS below), never a business-outcome claim ("+20% di vendite" etc.)
-// that would need real customer data mbQr doesn't have yet.
-const PILLARS = [
-  {
-    title: "Efficienza operativa",
-    icon: <ClockIcon />,
-    points: [
-      "L'ordine arriva in cucina in pochi secondi, senza passare dal cameriere",
-      "Nessuna ristampa: un prezzo o un piatto si aggiorna in un clic",
-    ],
-  },
-  {
-    title: "Esperienza cliente",
-    icon: <PhoneIcon />,
-    points: [
-      "Il menu si apre subito nel browser, senza installare nulla",
-      "Sempre aggiornato: nessun piatto esaurito segnato ancora disponibile",
-    ],
-  },
-  {
-    title: "Meno carta",
-    icon: <LeafIcon />,
-    points: [
-      "Un solo menu digitale al posto di ristampe ad ogni cambio di stagione",
-      "Il QR si stampa una volta sola, per tavolo, non ad ogni modifica",
-    ],
-  },
-] as const;
-
-const FEATURES = [
-  {
-    title: "14 allergeni UE",
-    body: "Etichettatura conforme al Regolamento (UE) n. 1169/2011, piatto per piatto.",
-    icon: <ShieldIcon />,
-  },
-  {
-    title: "IT / EN",
-    body: "Menu bilingue fin dall'inizio, pensato per una clientela turistica.",
-    icon: <GlobeIcon />,
-  },
-  {
-    title: "Tempo reale",
-    body: "L'ordine arriva in cucina in pochi secondi, senza ricaricare la pagina.",
-    icon: <BoltIcon />,
-  },
-  {
-    title: "Isolamento rigoroso",
-    body: "Ogni ristorante vede solo i propri dati — applicato a livello di database.",
-    icon: <LockIcon />,
-  },
-];
-
-// Genuine, checkable facts about the product itself -- not fabricated usage
-// or customer numbers. No pilot has run yet (CONTEXT.md §9 Phase A), so
-// there is no real "X restaurants" or "X ordini/mese" to show.
-const STATS = [
-  { value: 14, suffix: "", label: "Allergeni UE etichettati" },
-  { value: 2, suffix: "", label: "Lingue, IT / EN, fin dall'inizio" },
-  { value: 100, suffix: "%", label: "Dati isolati per ristorante" },
-  { value: 0, suffix: " €", label: "Hardware aggiuntivo da acquistare" },
-];
-
-const TRUST_BADGES = [
-  { icon: <BoltIcon className="h-4 w-4" />, label: "Operativo in pochi minuti" },
-  { icon: <CardIcon className="h-4 w-4" />, label: "Senza carta di credito" },
-  { icon: <StarIcon className="h-4 w-4" />, label: "14 giorni di prova gratuita" },
-];
-
-const PERSONAS = [
-  {
-    title: "Trattoria & ristorante",
-    body: "Menu strutturato in categorie, allergeni su ogni piatto, ordini gestiti in cucina in diretta.",
-    icon: <UtensilsIcon />,
-  },
-  {
-    title: "Pizzeria",
-    body: "Impasti e stagionali che cambiano spesso: si aggiornano dal pannello, senza ristampare nulla.",
-    icon: <PizzaIcon />,
-  },
-  {
-    title: "Bar & enoteca",
-    body: "Carta vini o cocktail, ordini rapidi al tavolo, aggiornati al volo quando qualcosa finisce.",
-    icon: <WineIcon />,
-  },
-];
-
-// White-label: what the owner controls, in the order they'd set it up.
-const BRANDING_STEPS = [
-  { title: "Carica il tuo logo", body: "Sostituisce il logo mbQr in cima al menu del cliente." },
-  { title: "Scegli uno sfondo", body: "Una foto del locale, dei piatti, o una tinta — quello che preferisci." },
-  { title: "Il tuo nome resta protagonista", body: "mbQr resta invisibile: il cliente vede il tuo locale, non noi." },
-];
-
-// Real, checkable differences -- not marketing exaggeration. Every line on
-// the "menu di carta" side is a genuine limitation of a printed menu, every
-// line on the QR side is a feature that actually exists in the product.
-const COMPARISON = [
-  { paper: "Cambiare un prezzo: bisogna ristampare tutto", qr: "Si aggiorna in un clic, subito visibile" },
-  { paper: "Allergeni scritti a mano, facili da dimenticare", qr: "Etichettati su ogni piatto, sempre aggiornati" },
-  { paper: "Una stampa diversa per ogni lingua", qr: "Italiano e inglese nello stesso menu" },
-  { paper: "Un piatto finito? Il cameriere lo dice a voce, tavolo per tavolo", qr: "Segnato non disponibile in un tap, sparisce ovunque" },
-  { paper: "L'ordine arriva in cucina scritto a mano", qr: "Arriva in diretta, aggiornato in tempo reale" },
-];
-
-const FAQ_ITEMS = [
-  {
-    question: "Serve un hardware particolare?",
-    answer:
-      "No. Il cliente usa il proprio telefono, in sala/cucina basta un telefono, un tablet o un computer già esistente. Il QR si stampa o si espone su ogni tavolo.",
-  },
-  {
-    question: "Il menu è conforme al regolamento UE sugli allergeni?",
-    answer:
-      "Sì. I 14 allergeni previsti dal Regolamento (UE) n. 1169/2011 sono etichettati piatto per piatto, direttamente dal pannello.",
-  },
-  {
-    question: "Posso modificare il menu da solo, senza assistenza?",
-    answer: "Sì. Categorie, piatti, prezzi e disponibilità si gestiscono dal pannello, in autonomia, in qualsiasi momento.",
-  },
-  {
-    question: "I dati del mio ristorante sono isolati da quelli degli altri clienti?",
-    answer: "Sì, l'isolamento è applicato a livello di database, non solo lato applicazione — vedi la funzionalità \"Isolamento rigoroso\" più sopra.",
-  },
-  {
-    question: "Posso mettere il mio logo al posto del vostro?",
-    answer: "Sì. Logo e sfondo del menu pubblico sono personalizzabili dal pannello — vedi \"Il tuo marchio, non il nostro\" più sopra.",
-  },
-  {
-    question: "Il menu funziona su tutti gli smartphone?",
-    answer: "Sì, si apre direttamente nel browser dopo la scansione del QR — nessuna app da installare.",
-  },
-  {
-    question: "Posso disdire quando voglio?",
-    answer: "Sì, l'abbonamento si gestisce dal pannello (sezione Abbonamento), in autonomia, in qualsiasi momento.",
-  },
-];
+const TRUST_BADGE_ICONS = [<BoltIcon key="bolt" className="h-4 w-4" />, <CardIcon key="card" className="h-4 w-4" />, <StarIcon key="star" className="h-4 w-4" />];
+const PERSONA_ICONS = [<UtensilsIcon key="utensils" />, <PizzaIcon key="pizza" />, <WineIcon key="wine" />];
 
 export default function HomePage() {
+  const locale = getLocale("it");
+  const t = LANDING_DICT[locale];
+  const dir = isRtl(locale) ? "rtl" : "ltr";
+
   return (
-    <main lang="it">
-      <LandingNav />
+    <main lang={locale} dir={dir}>
+      <LandingNav locale={locale} />
 
       {/* Hero -- light steel-paper ground, dot texture + soft marigold halo
           behind the floating phone. No scroll-linked motion (explicit
@@ -203,29 +63,26 @@ export default function HomePage() {
         <div className="pointer-events-none absolute -right-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-gold/15 blur-[110px]" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-10 pt-6 sm:grid-cols-2 sm:gap-4 sm:pb-20 sm:pt-14">
           <div className="flex flex-col items-start gap-6 text-left">
-            <span className="eyebrow">Menu QR e ordini al tavolo</span>
+            <span className="eyebrow">{t.hero.eyebrow}</span>
             <h1 className="font-display text-6xl font-extrabold leading-[0.98] tracking-tight text-ink sm:text-7xl lg:text-[5.5rem]">
-              Il menu <span className="bg-brand-gradient bg-clip-text text-transparent">parla</span>.
+              {t.hero.titleLine1} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.hero.titleLine1Highlight}</span>.
               <br />
-              La cucina <span className="bg-brand-gradient bg-clip-text text-transparent">ascolta</span>.
+              {t.hero.titleLine2} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.hero.titleLine2Highlight}</span>.
             </h1>
-            <p className="max-w-md text-lg text-muted">
-              Ogni ordine diventa una comanda digitale che viaggia dal tavolo alla cucina in tempo reale — senza
-              hardware da installare, senza abbonamento a un dispositivo.
-            </p>
+            <p className="max-w-md text-lg text-muted">{t.hero.subtitle}</p>
             <div className="flex flex-wrap items-center gap-3">
               <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                Crea il tuo ristorante
+                {t.hero.ctaPrimary}
               </Link>
               <a href="#apercu" className="btn-secondary px-6 py-3 text-base">
-                Guarda il prodotto
+                {t.hero.ctaSecondary}
               </a>
             </div>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs font-medium text-muted">
-              {TRUST_BADGES.map((badge) => (
-                <span key={badge.label} className="inline-flex items-center gap-1.5">
-                  <span className="text-brand">{badge.icon}</span>
-                  {badge.label}
+              {t.hero.trustBadges.map((label, i) => (
+                <span key={label} className="inline-flex items-center gap-1.5">
+                  <span className="text-brand">{TRUST_BADGE_ICONS[i]}</span>
+                  {label}
                 </span>
               ))}
             </div>
@@ -247,18 +104,16 @@ export default function HomePage() {
       <section className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Perché mbQr</span>
+            <span className="eyebrow">{t.why.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Cosa cambia per il tuo <span className="bg-brand-gradient bg-clip-text text-transparent">locale</span>
+              {t.why.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.why.titleHighlight}</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
-            {PILLARS.map((pillar) => (
+            {t.why.pillars.map((pillar, i) => (
               <StaggerItem key={pillar.title}>
                 <div className="card h-full">
-                  <span className="icon-badge">
-                    {pillar.icon}
-                  </span>
+                  <span className="icon-badge">{PILLAR_ICONS[i]}</span>
                   <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{pillar.title}</h3>
                   <ul className="mt-3 flex flex-col gap-2">
                     {pillar.points.map((point) => (
@@ -322,13 +177,11 @@ export default function HomePage() {
       <section id="demo" className="bg-surface py-16 sm:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <Reveal>
-            <span className="eyebrow">Demo</span>
+            <span className="eyebrow">{t.demoSection.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Guardalo <span className="bg-brand-gradient bg-clip-text text-transparent">funzionare</span>
+              {t.demoSection.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.demoSection.titleHighlight}</span>
             </h2>
-            <p className="mx-auto mt-3 max-w-md text-sm text-muted">
-              Una vera registrazione dell&apos;applicazione — scansione, menu, carrello, ordine inviato.
-            </p>
+            <p className="mx-auto mt-3 max-w-md text-sm text-muted">{t.demoSection.subtitle}</p>
           </Reveal>
           <Reveal className="mt-12">
             <DemoVideo />
@@ -339,16 +192,14 @@ export default function HomePage() {
       <section id="apercu" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Anteprima del prodotto</span>
+            <span className="eyebrow">{t.preview.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Guardalo in <span className="bg-brand-gradient bg-clip-text text-transparent">azione</span>
+              {t.preview.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.preview.titleHighlight}</span>
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-              Sono vere schermate dell&apos;applicazione — non dei mockup.
-            </p>
+            <p className="mx-auto mt-3 max-w-xl text-sm text-muted">{t.preview.subtitle}</p>
           </Reveal>
           <Reveal className="mt-10">
-            <ProductPreview />
+            <ProductPreview locale={locale} />
           </Reveal>
         </div>
       </section>
@@ -356,16 +207,16 @@ export default function HomePage() {
       <section id="comment-ca-marche" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Tre passaggi</span>
+            <span className="eyebrow">{t.steps.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Come <span className="bg-brand-gradient bg-clip-text text-transparent">funziona</span>
+              {t.steps.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.steps.titleHighlight}</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
-            {STEPS.map((step) => (
-              <StaggerItem key={step.n}>
+            {t.steps.items.map((step, i) => (
+              <StaggerItem key={step.title}>
                 <div className="ticket h-full !pt-7">
-                  <span className="font-mono text-xs font-bold tracking-wide text-brand">{step.n}</span>
+                  <span className="font-mono text-xs font-bold tracking-wide text-brand">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="mt-3 font-display text-xl font-extrabold text-ink">{step.title}</h3>
                   <p className="mt-1 text-sm text-muted">{step.body}</p>
                 </div>
@@ -378,18 +229,17 @@ export default function HomePage() {
       <section id="fonctionnalites" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Funzionalità</span>
+            <span className="eyebrow">{t.features.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Pensato per l&apos;<span className="bg-brand-gradient bg-clip-text text-transparent">Italia</span>
+              {t.features.titlePre}
+              <span className="bg-brand-gradient bg-clip-text text-transparent">{t.features.titleHighlight}</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((feature) => (
+            {t.features.items.map((feature, i) => (
               <StaggerItem key={feature.title}>
                 <div className="card h-full">
-                  <span className="icon-badge">
-                    {feature.icon}
-                  </span>
+                  <span className="icon-badge">{FEATURE_ICONS[i]}</span>
                   <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{feature.title}</h3>
                   <p className="mt-1 text-sm text-muted">{feature.body}</p>
                 </div>
@@ -404,18 +254,15 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl px-6">
           <div className="grid gap-10 sm:grid-cols-2 sm:items-center">
             <Reveal>
-              <span className="eyebrow">Il tuo marchio</span>
+              <span className="eyebrow">{t.branding.eyebrow}</span>
               <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-4xl">
-                Il menu porta il <span className="bg-brand-gradient bg-clip-text text-transparent">tuo</span> nome,
-                non il nostro.
+                {t.branding.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.branding.titleHighlight}</span>{" "}
+                {t.branding.titleRest}
               </h2>
-              <p className="mt-3 max-w-md text-sm text-muted">
-                Carica il logo e un&apos;immagine di sfondo del tuo locale dal pannello. Quando un cliente scansiona
-                il QR, arriva su un menu che sembra il tuo — mbQr resta dietro le quinte.
-              </p>
-              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-wide text-muted">Vantaggi</p>
+              <p className="mt-3 max-w-md text-sm text-muted">{t.branding.body}</p>
+              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-wide text-muted">{t.branding.advantagesLabel}</p>
               <ul className="mt-3 flex flex-col gap-2.5">
-                {BRANDING_STEPS.map((step) => (
+                {t.branding.steps.map((step) => (
                   <li key={step.title} className="flex items-start gap-2 text-sm text-ink/80">
                     <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                     <span>
@@ -464,21 +311,14 @@ export default function HomePage() {
               </div>
             </Reveal>
             <Reveal>
-              <span className="eyebrow">Cucina</span>
+              <span className="eyebrow">{t.kitchen.eyebrow}</span>
               <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-4xl">
-                Ogni ordine arriva <span className="bg-brand-gradient bg-clip-text text-transparent">in diretta</span>.
+                {t.kitchen.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.kitchen.titleHighlight}</span>.
               </h2>
-              <p className="mt-3 max-w-md text-sm text-muted">
-                Nessuna carta, nessuna corsa in sala: l&apos;ordine appare in cucina pochi secondi dopo l&apos;invio,
-                aggiornato in tempo reale senza ricaricare la pagina.
-              </p>
-              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-wide text-muted">Vantaggi</p>
+              <p className="mt-3 max-w-md text-sm text-muted">{t.kitchen.body}</p>
+              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-wide text-muted">{t.kitchen.advantagesLabel}</p>
               <ul className="mt-3 flex flex-col gap-2.5">
-                {[
-                  "Da fare, in corso, pronto: tre colonne aggiornate senza ricaricare",
-                  "Ogni membro dello staff vede la stessa bacheca, in diretta",
-                  "Nessun ordine scritto a mano, nessun malinteso in cucina",
-                ].map((point) => (
+                {t.kitchen.points.map((point) => (
                   <li key={point} className="flex items-start gap-2 text-sm text-ink/80">
                     <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                     {point}
@@ -493,18 +333,16 @@ export default function HomePage() {
       <section id="per-chi" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Per ogni tipo di locale</span>
+            <span className="eyebrow">{t.personas.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Pensato per il tuo <span className="bg-brand-gradient bg-clip-text text-transparent">locale</span>
+              {t.personas.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.personas.titleHighlight}</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-3">
-            {PERSONAS.map((persona) => (
+            {t.personas.items.map((persona, i) => (
               <StaggerItem key={persona.title}>
                 <div className="card h-full">
-                  <span className="icon-badge">
-                    {persona.icon}
-                  </span>
+                  <span className="icon-badge">{PERSONA_ICONS[i]}</span>
                   <h3 className="mt-3 font-display text-lg font-extrabold text-ink">{persona.title}</h3>
                   <p className="mt-1 text-sm text-muted">{persona.body}</p>
                 </div>
@@ -517,18 +355,18 @@ export default function HomePage() {
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">In concreto</span>
+            <span className="eyebrow">{t.stats.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Quello che il prodotto <span className="bg-brand-gradient bg-clip-text text-transparent">fa davvero</span>
+              {t.stats.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.stats.titleHighlight}</span>
             </h2>
           </Reveal>
           <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-4">
-            {STATS.map((stat) => (
-              <StaggerItem key={stat.label} className="text-center">
+            {t.stats.labels.map((label, i) => (
+              <StaggerItem key={label} className="text-center">
                 <p className="font-mono text-4xl font-extrabold tabular-nums tracking-tight text-ink sm:text-5xl">
-                  <StatCounter value={stat.value} suffix={stat.suffix} />
+                  <StatCounter value={STAT_VALUES[i]!.value} suffix={STAT_VALUES[i]!.suffix} />
                 </p>
-                <p className="mt-2 text-sm text-muted">{stat.label}</p>
+                <p className="mt-2 text-sm text-muted">{label}</p>
               </StaggerItem>
             ))}
           </StaggerGroup>
@@ -538,16 +376,17 @@ export default function HomePage() {
       <section className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Perché passare al digitale</span>
+            <span className="eyebrow">{t.comparison.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Carta o <span className="bg-brand-gradient bg-clip-text text-transparent">QR</span>?
+              {t.comparison.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.comparison.titleHighlight}</span>
+              {t.comparison.titleRest}
             </h2>
           </Reveal>
           <Reveal className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-card border border-ink/10 bg-surface p-6 shadow-soft">
-              <h3 className="font-display text-base font-extrabold text-muted">Menu di carta</h3>
+              <h3 className="font-display text-base font-extrabold text-muted">{t.comparison.paperHeading}</h3>
               <ul className="mt-4 flex flex-col gap-3">
-                {COMPARISON.map((row) => (
+                {t.comparison.rows.map((row) => (
                   <li key={row.paper} className="flex items-start gap-2 text-sm text-ink/70">
                     <MinusIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
                     {row.paper}
@@ -556,9 +395,9 @@ export default function HomePage() {
               </ul>
             </div>
             <div className="rounded-card border border-brand/20 bg-brand/5 p-6 shadow-soft">
-              <h3 className="font-display text-base font-extrabold text-brand-dark">Menu QR mbQr</h3>
+              <h3 className="font-display text-base font-extrabold text-brand-dark">{t.comparison.qrHeading}</h3>
               <ul className="mt-4 flex flex-col gap-3">
-                {COMPARISON.map((row) => (
+                {t.comparison.rows.map((row) => (
                   <li key={row.qr} className="flex items-start gap-2 text-sm text-ink/80">
                     <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                     {row.qr}
@@ -573,29 +412,24 @@ export default function HomePage() {
       <section id="tarifs" className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-2xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Prezzi</span>
+            <span className="eyebrow">{t.pricing.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Un solo piano. <span className="bg-brand-gradient bg-clip-text text-transparent">Tutto incluso.</span>
+              {t.pricing.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.pricing.titleHighlight}</span>
             </h2>
-            <p className="mt-3 text-sm text-muted">
-              Nessuna offerta &laquo;&nbsp;Base&nbsp;&raquo; contro &laquo;&nbsp;Pro&nbsp;&raquo;: ogni ristorante
-              accede a tutta la piattaforma.
-            </p>
+            <p className="mt-3 text-sm text-muted">{t.pricing.subtitle}</p>
           </Reveal>
           <Reveal className="mt-8 flex justify-center">
-            <PricingToggle />
+            <PricingToggle locale={locale} />
           </Reveal>
           <Reveal>
             <div className="ticket mt-8 !pt-9 sm:p-8 sm:!pt-10">
               <div className="flex flex-wrap items-baseline justify-center gap-2">
-                <span className="font-mono text-4xl font-extrabold tabular-nums text-ink">~33 €</span>
-                <span className="text-sm text-muted">/ mese, fatturato ~400 € / anno</span>
+                <span className="font-mono text-4xl font-extrabold tabular-nums text-ink">{t.pricing.priceValue}</span>
+                <span className="text-sm text-muted">{t.pricing.priceSuffix}</span>
               </div>
-              <p className="mt-2 text-center text-sm text-muted">
-                14 giorni di prova gratuita, senza carta di credito.
-              </p>
+              <p className="mt-2 text-center text-sm text-muted">{t.pricing.trialNote}</p>
               <ul className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5">
-                {PLAN_FEATURES.map((item) => (
+                {t.pricing.features.map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-ink/80">
                     <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                     {item}
@@ -604,10 +438,10 @@ export default function HomePage() {
               </ul>
               <div className="mt-8 flex flex-col items-center gap-3">
                 <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                  Inizia la prova gratuita
+                  {t.pricing.ctaPrimary}
                 </Link>
                 <Link href="/prezzi" className="nav-link text-sm">
-                  Vedi tutti i dettagli →
+                  {t.pricing.ctaSecondary}
                 </Link>
               </div>
             </div>
@@ -618,13 +452,13 @@ export default function HomePage() {
       <section id="faq" className="bg-dot-grid py-16 sm:py-20">
         <div className="mx-auto max-w-2xl px-6">
           <Reveal className="text-center">
-            <span className="eyebrow">Domande frequenti</span>
+            <span className="eyebrow">{t.faq.eyebrow}</span>
             <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              Le domande più <span className="bg-brand-gradient bg-clip-text text-transparent">comuni</span>
+              {t.faq.titlePre} <span className="bg-brand-gradient bg-clip-text text-transparent">{t.faq.titleHighlight}</span>
             </h2>
           </Reveal>
           <Reveal className="mt-10">
-            <FaqAccordion items={FAQ_ITEMS} />
+            <FaqAccordion items={t.faq.items} />
           </Reveal>
         </div>
       </section>
@@ -635,16 +469,14 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-brand-gradient py-20 sm:py-24">
         <ArabesquePattern className="pointer-events-none absolute inset-0 h-full w-full" color="#FAF6EE" opacity={0.12} />
         <Reveal className="relative mx-auto max-w-2xl px-6 text-center">
-          <h2 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Pronto a digitalizzare i tuoi tavoli?
-          </h2>
-          <p className="mt-3 text-white/80">Crea il tuo ristorante in pochi minuti, senza impegno.</p>
+          <h2 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{t.finalCta.title}</h2>
+          <p className="mt-3 text-white/80">{t.finalCta.subtitle}</p>
           <div className="mt-8 flex justify-center">
             <Link
               href="/signup"
               className="rounded-full border-2 border-gold bg-white px-6 py-3 text-base font-semibold text-brand-dark shadow-gold transition duration-200 hover:-translate-y-0.5"
             >
-              Crea il tuo ristorante
+              {t.finalCta.button}
             </Link>
           </div>
         </Reveal>

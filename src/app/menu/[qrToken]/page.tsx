@@ -34,12 +34,19 @@ type MenuData = {
   items: Item[];
 };
 
-// Extra languages beyond it/en are menu-CONTENT-only (item names/
-// descriptions, see POST /api/menu/translate) -- the surrounding UI chrome
-// (cart, buttons, confirmation copy) has no FR/DE/ES/PT strings, so `t`
-// below always falls back to the English UI dictionary for those. Keep in
-// sync with LANGUAGE_OPTIONS in src/lib/translate.ts (not imported here:
-// that module pulls in next/server via src/lib/api.ts, server-only).
+// Extra languages beyond it/en are only ever offered here once the owner
+// has actually run a translation for them (see POST /api/menu/translate,
+// extraLanguages below) -- FR/DE/ES/PT, matching LANGUAGE_OPTIONS in
+// src/lib/translate.ts (not imported here: that module pulls in
+// next/server via src/lib/api.ts, server-only). The surrounding UI chrome
+// (cart, buttons, confirmation copy) has its own T[lang] dictionary for
+// each of those four so it matches the content language, not just item
+// names/descriptions. Deliberately NOT Arabic or any other DeepL-supported
+// language: src/lib/translate.ts's own comment explains why the menu-
+// content feature stops at these four ("not '70+'", to avoid overclaiming
+// what's actually been exercised) -- widening that is a product decision
+// for the menu-content feature, separate from the site-wide UI language
+// switcher this file's LanguagePills has nothing to do with.
 type Lang = string;
 const EXTRA_LANGUAGE_LABELS: Record<string, string> = { fr: "FR", de: "DE", es: "ES", pt: "PT" };
 
@@ -114,6 +121,114 @@ const T = {
     paySuccess: "Payment received, thank you!",
     payCancelled: "Payment cancelled — you can still pay in person.",
   },
+  fr: {
+    title: "Menu",
+    welcome: "Bienvenue ! Parcourez le menu et commandez directement d'ici.",
+    table: "Table",
+    counter: "Commander au comptoir",
+    pickup: "À emporter",
+    displayOnly: "Consultation uniquement",
+    yourName: "Votre nom",
+    yourNamePlaceholder: "Comment vous appelez-vous ?",
+    orderNumber: "Votre numéro",
+    cart: "Commande",
+    total: "Total",
+    order: "Commander",
+    empty: "Votre panier est vide.",
+    confirmed: "Commande envoyée !",
+    confirmedBody: "La cuisine l'a reçue.",
+    back: "Retour au menu",
+    loadError: "QR invalide ou table introuvable.",
+    rateLimited: "Trop de tentatives, réessayez dans quelques minutes.",
+    callWaiter: "Appeler le serveur",
+    called: "Appel envoyé",
+    payOnline: "Payer en ligne maintenant",
+    payAtTable: "Je paierai sur place",
+    paying: "Un instant…",
+    paySuccess: "Paiement reçu, merci !",
+    payCancelled: "Paiement annulé — vous pouvez toujours payer sur place.",
+  },
+  de: {
+    title: "Speisekarte",
+    welcome: "Willkommen! Stöbern Sie in der Karte und bestellen Sie direkt von hier.",
+    table: "Tisch",
+    counter: "An der Theke bestellen",
+    pickup: "Abholung",
+    displayOnly: "Nur zum Ansehen",
+    yourName: "Ihr Name",
+    yourNamePlaceholder: "Wie heißen Sie?",
+    orderNumber: "Ihre Nummer",
+    cart: "Bestellung",
+    total: "Gesamt",
+    order: "Bestellen",
+    empty: "Ihr Warenkorb ist leer.",
+    confirmed: "Bestellung gesendet!",
+    confirmedBody: "Die Küche hat sie erhalten.",
+    back: "Zurück zur Karte",
+    loadError: "Ungültiger QR-Code oder Tisch nicht gefunden.",
+    rateLimited: "Zu viele Versuche, bitte versuchen Sie es in ein paar Minuten erneut.",
+    callWaiter: "Kellner rufen",
+    called: "Anruf gesendet",
+    payOnline: "Jetzt online bezahlen",
+    payAtTable: "Ich zahle am Tisch",
+    paying: "Einen Moment…",
+    paySuccess: "Zahlung erhalten, danke!",
+    payCancelled: "Zahlung storniert — Sie können trotzdem vor Ort bezahlen.",
+  },
+  es: {
+    title: "Menú",
+    welcome: "¡Bienvenido! Explora el menú y pide directamente desde aquí.",
+    table: "Mesa",
+    counter: "Pedir en el mostrador",
+    pickup: "Recogida",
+    displayOnly: "Solo consulta",
+    yourName: "Tu nombre",
+    yourNamePlaceholder: "¿Cómo te llamas?",
+    orderNumber: "Tu número",
+    cart: "Pedido",
+    total: "Total",
+    order: "Pedir",
+    empty: "Tu carrito está vacío.",
+    confirmed: "¡Pedido enviado!",
+    confirmedBody: "La cocina lo ha recibido.",
+    back: "Volver al menú",
+    loadError: "Código QR no válido o mesa no encontrada.",
+    rateLimited: "Demasiados intentos, inténtalo de nuevo en unos minutos.",
+    callWaiter: "Llamar al camarero",
+    called: "Llamada enviada",
+    payOnline: "Pagar en línea ahora",
+    payAtTable: "Pagaré en la mesa",
+    paying: "Un momento…",
+    paySuccess: "¡Pago recibido, gracias!",
+    payCancelled: "Pago cancelado — todavía puedes pagar en persona.",
+  },
+  pt: {
+    title: "Menu",
+    welcome: "Bem-vindo! Navegue pelo menu e peça diretamente daqui.",
+    table: "Mesa",
+    counter: "Pedir ao balcão",
+    pickup: "Levantamento",
+    displayOnly: "Apenas consulta",
+    yourName: "O seu nome",
+    yourNamePlaceholder: "Como se chama?",
+    orderNumber: "O seu número",
+    cart: "Pedido",
+    total: "Total",
+    order: "Pedir",
+    empty: "O seu carrinho está vazio.",
+    confirmed: "Pedido enviado!",
+    confirmedBody: "A cozinha já o recebeu.",
+    back: "Voltar ao menu",
+    loadError: "Código QR inválido ou mesa não encontrada.",
+    rateLimited: "Demasiadas tentativas, tente novamente dentro de alguns minutos.",
+    callWaiter: "Chamar o empregado",
+    called: "Chamada enviada",
+    payOnline: "Pagar online agora",
+    payAtTable: "Vou pagar na mesa",
+    paying: "Um momento…",
+    paySuccess: "Pagamento recebido, obrigado!",
+    payCancelled: "Pagamento cancelado — ainda pode pagar no local.",
+  },
 };
 
 // Mirrors the server's per-table rate limit (2 min, see
@@ -140,7 +255,7 @@ function PublicMenuPageInner() {
   const [payError, setPayError] = useState<string | null>(null);
   const paymentResult = searchParams.get("payment");
 
-  const t = lang === "it" ? T.it : T.en;
+  const t = T[lang as keyof typeof T] ?? T.en;
 
   useEffect(() => {
     fetch(`/api/public/menu/${params.qrToken}`)

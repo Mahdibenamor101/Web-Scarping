@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import MockupFrame, { WindowChromeDots } from "@/components/mockup-frame";
 import PhoneFrame from "@/components/phone-frame";
+import { LANDING_DICT } from "@/lib/i18n/dictionaries/landing";
+import type { LanguageCode } from "@/lib/i18n/languages";
 
 type Tab = {
   id: string;
@@ -16,39 +18,38 @@ type Tab = {
   caption: string;
 };
 
-const TABS: Tab[] = [
-  {
-    id: "menu",
-    label: "Menu cliente",
-    icon: <PhoneIcon />,
-    src: "/screenshots/public-menu.png",
-    alt: "Menu digitale aperto su un telefono, con carrello e pulsante per ordinare",
-    frame: "phone",
-    caption: "Il cliente scansiona, sfoglia il menu IT/EN e ordina dal telefono — senza installare nulla.",
-  },
-  {
-    id: "orders",
-    label: "Ordini in diretta",
-    icon: <BoardIcon />,
-    src: "/screenshots/dashboard-orders.png",
-    alt: "Bacheca ordini in tre colonne: da fare, in corso, pronto",
-    frame: "browser",
-    caption: "Ogni ordine arriva in cucina in pochi secondi, aggiornato in diretta senza ricaricare la pagina.",
-  },
-  {
-    id: "tables",
-    label: "Tavoli & QR",
-    icon: <QrIcon />,
-    src: "/screenshots/dashboard-tables.png",
-    alt: "Elenco dei tavoli del ristorante con il loro QR code e il loro stato",
-    frame: "browser",
-    caption: "Un QR per tavolo, generato con un clic — da stampare o esporre, nessun dispositivo da acquistare.",
-  },
-];
-
-const FIRST_TAB = TABS[0]!;
-
-export default function ProductPreview() {
+export default function ProductPreview({ locale = "it" }: { locale?: LanguageCode }) {
+  const t = LANDING_DICT[locale].preview;
+  const TABS: Tab[] = [
+    {
+      id: "menu",
+      label: t.tabs.menu,
+      icon: <PhoneIcon />,
+      src: "/screenshots/public-menu.png",
+      alt: t.tabs.menu,
+      frame: "phone",
+      caption: t.captions.menu,
+    },
+    {
+      id: "orders",
+      label: t.tabs.orders,
+      icon: <BoardIcon />,
+      src: "/screenshots/dashboard-orders.png",
+      alt: t.tabs.orders,
+      frame: "browser",
+      caption: t.captions.orders,
+    },
+    {
+      id: "tables",
+      label: t.tabs.tables,
+      icon: <QrIcon />,
+      src: "/screenshots/dashboard-tables.png",
+      alt: t.tabs.tables,
+      frame: "browser",
+      caption: t.captions.tables,
+    },
+  ];
+  const FIRST_TAB = TABS[0]!;
   const [activeId, setActiveId] = useState(FIRST_TAB.id);
   const active = TABS.find((tab) => tab.id === activeId) ?? FIRST_TAB;
 

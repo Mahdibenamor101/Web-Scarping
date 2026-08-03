@@ -3,19 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/logo";
-
-// Homepage-relative ("/#demo") rather than bare "#demo": this nav is also
-// reused on the standalone /prezzi, /chi-siamo, /contatti pages (see
-// LandingFooter), where a bare hash would just no-op instead of jumping to
-// the homepage section. Shared between the desktop row and the mobile
-// drawer below so the two can't drift out of sync.
-const NAV_LINKS = [
-  { href: "/#demo", label: "Demo" },
-  { href: "/#apercu", label: "Panoramica" },
-  { href: "/#fonctionnalites", label: "Funzionalità" },
-  { href: "/prezzi", label: "Prezzi" },
-  { href: "/#faq", label: "FAQ" },
-];
+import LanguageSwitcher from "@/components/language-switcher";
+import { LANDING_DICT } from "@/lib/i18n/dictionaries/landing";
+import type { LanguageCode } from "@/lib/i18n/languages";
 
 /**
  * Sticky nav that stays transparent over the hero and picks up a
@@ -27,10 +17,28 @@ const NAV_LINKS = [
  * Below `sm`, the link row and "Accedi" both hide (no room) leaving only
  * "Iscriviti" -- a hamburger button opens a right-hand drawer with every
  * link plus both buttons instead.
+ *
+ * `locale` comes from the parent server component (cookie-backed, see
+ * src/lib/i18n/get-locale.ts) -- this component itself is client-side
+ * (scroll listener, drawer state) so it can't read the cookie directly.
+ * Reused on the standalone /prezzi, /chi-siamo, /contatti pages (see
+ * LandingFooter), each of which passes its own resolved locale.
  */
-export default function LandingNav() {
+export default function LandingNav({ locale }: { locale: LanguageCode }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = LANDING_DICT[locale].nav;
+
+  // Homepage-relative ("/#demo") rather than bare "#demo": a bare hash
+  // would no-op instead of jumping to the homepage section on the other
+  // landing-family pages this nav is reused on.
+  const NAV_LINKS = [
+    { href: "/#demo", label: t.demo },
+    { href: "/#apercu", label: t.overview },
+    { href: "/#fonctionnalites", label: t.features },
+    { href: "/prezzi", label: t.pricing },
+    { href: "/#faq", label: t.faq },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -78,16 +86,19 @@ export default function LandingNav() {
           {NAV_LINKS.map((link) => renderLink(link, "nav-link"))}
         </div>
         <div className="flex items-center gap-3">
+          <div className="hidden sm:inline-flex">
+            <LanguageSwitcher current={locale} />
+          </div>
           <Link href="/login" className="nav-link hidden text-sm font-medium sm:inline">
-            Accedi
+            {t.login}
           </Link>
           <Link href="/signup" className="btn-primary hidden px-4 py-2 text-sm sm:inline-block">
-            Iscriviti
+            {t.signup}
           </Link>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            aria-label="Apri il menu"
+            aria-label={t.openMenu}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/10 text-ink sm:hidden"
           >
             <MenuIcon />
@@ -111,14 +122,14 @@ export default function LandingNav() {
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Menu"
+        aria-label={t.menuLabel}
       >
         <div className="flex items-center justify-between">
           <Logo />
           <button
             type="button"
             onClick={() => setMenuOpen(false)}
-            aria-label="Chiudi il menu"
+            aria-label={t.closeMenu}
             className="flex h-9 w-9 items-center justify-center rounded-full text-ink"
           >
             <CloseIcon />
@@ -129,12 +140,15 @@ export default function LandingNav() {
             renderLink(link, "rounded-lg px-3 py-2.5 text-ink transition hover:bg-ink/5", () => setMenuOpen(false)),
           )}
         </div>
+        <div className="mt-4">
+          <LanguageSwitcher current={locale} />
+        </div>
         <div className="mt-auto flex flex-col gap-3 border-t border-ink/10 pt-6">
           <Link href="/login" onClick={() => setMenuOpen(false)} className="btn-secondary py-2.5 text-center text-sm">
-            Accedi
+            {t.login}
           </Link>
           <Link href="/signup" onClick={() => setMenuOpen(false)} className="btn-primary py-2.5 text-center text-sm">
-            Iscriviti
+            {t.signup}
           </Link>
         </div>
       </div>
