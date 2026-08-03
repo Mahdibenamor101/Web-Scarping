@@ -5,7 +5,7 @@ import ProductPreview from "@/components/product-preview";
 import HeroMockup from "@/components/hero-mockup";
 import DemoVideo from "@/components/demo-video";
 import StatCounter from "@/components/stat-counter";
-import PricingToggle from "@/components/pricing-toggle";
+import PricingCard from "@/components/pricing-card";
 import LandingNav from "@/components/landing-nav";
 import LandingFooter from "@/components/landing-footer";
 import FaqAccordion from "@/components/faq-accordion";
@@ -418,42 +418,8 @@ export default function HomePage() {
             </h2>
             <p className="mt-3 text-sm text-muted">{t.pricing.subtitle}</p>
           </Reveal>
-          <Reveal className="mt-8 flex justify-center">
-            <PricingToggle locale={locale} />
-          </Reveal>
-          <Reveal>
-            <div className="ticket mt-8 !pt-9 sm:p-8 sm:!pt-10">
-              <div className="flex flex-wrap items-baseline justify-center gap-2">
-                <span className="font-mono text-4xl font-extrabold tabular-nums text-ink">{t.pricing.priceValue}</span>
-                <span className="text-sm text-muted">{t.pricing.priceSuffix}</span>
-              </div>
-              <p className="mt-2 text-center text-sm text-muted">{t.pricing.trialNote}</p>
-              <ul className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5">
-                {t.pricing.features.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-ink/80">
-                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-col items-center gap-3">
-                <Link href="/signup" className="btn-primary px-6 py-3 text-base">
-                  {t.pricing.ctaPrimary}
-                </Link>
-                <Link href="/prezzi" className="nav-link text-sm">
-                  {t.pricing.ctaSecondary}
-                </Link>
-              </div>
-              <div className="mt-6 flex justify-center">
-                <Image
-                  src="/badges/powered-by-stripe.png"
-                  alt="Pagamenti protetti, Powered by Stripe — Visa, Mastercard, American Express"
-                  width={286}
-                  height={85}
-                  className="h-auto w-56"
-                />
-              </div>
-            </div>
+          <Reveal className="mt-8">
+            <PricingCard locale={locale} />
           </Reveal>
         </div>
       </section>

@@ -108,9 +108,13 @@ export interface LandingDict {
     titlePre: string;
     titleHighlight: string;
     subtitle: string;
-    periodLabels: { threeMonths: string; sixMonths: string; twelveMonths: string; soon: string };
-    priceValue: string;
-    priceSuffix: string;
+    periodLabels: { oneMonth: string; threeMonths: string; sixMonths: string; twelveMonths: string };
+    periods: {
+      monthly: { price: string; suffix: string };
+      quarterly: { price: string; suffix: string };
+      semiannual: { price: string; suffix: string };
+      annual: { price: string; suffix: string };
+    };
     trialNote: string;
     features: string[];
     ctaPrimary: string;
@@ -296,9 +300,13 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Un solo piano.",
       titleHighlight: "Tutto incluso.",
       subtitle: "Nessuna offerta «Base» contro «Pro»: ogni ristorante accede a tutta la piattaforma.",
-      periodLabels: { threeMonths: "3 mesi", sixMonths: "6 mesi", twelveMonths: "12 mesi", soon: "Presto" },
-      priceValue: "~33 €",
-      priceSuffix: "/ mese, fatturato ~400 € / anno",
+      periodLabels: { oneMonth: "1 mese", threeMonths: "3 mesi", sixMonths: "6 mesi", twelveMonths: "12 mesi" },
+      periods: {
+        monthly: { price: "50 €", suffix: "/ mese" },
+        quarterly: { price: "42 €", suffix: "/ mese, fatturato 126 € ogni 3 mesi" },
+        semiannual: { price: "36 €", suffix: "/ mese, fatturato 216 € ogni 6 mesi" },
+        annual: { price: "~33 €", suffix: "/ mese, fatturato ~400 € / anno" },
+      },
       trialNote: "14 giorni di prova gratuita, senza carta di credito.",
       features: [
         "QR code e tavoli illimitati",
@@ -521,9 +529,13 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "One plan.",
       titleHighlight: "Everything included.",
       subtitle: "No \"Basic\" vs \"Pro\" tiers: every restaurant gets the whole platform.",
-      periodLabels: { threeMonths: "3 months", sixMonths: "6 months", twelveMonths: "12 months", soon: "Soon" },
-      priceValue: "~€33",
-      priceSuffix: "/ month, billed ~€400 / year",
+      periodLabels: { oneMonth: "1 month", threeMonths: "3 months", sixMonths: "6 months", twelveMonths: "12 months" },
+      periods: {
+        monthly: { price: "€50", suffix: "/ month" },
+        quarterly: { price: "€42", suffix: "/ month, billed €126 every 3 months" },
+        semiannual: { price: "€36", suffix: "/ month, billed €216 every 6 months" },
+        annual: { price: "~€33", suffix: "/ month, billed ~€400 / year" },
+      },
       trialNote: "14-day free trial, no credit card required.",
       features: [
         "Unlimited QR codes and tables",
@@ -746,9 +758,13 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Un seul forfait.",
       titleHighlight: "Tout inclus.",
       subtitle: "Pas d'offre « Basique » contre « Pro » : chaque restaurant accède à toute la plateforme.",
-      periodLabels: { threeMonths: "3 mois", sixMonths: "6 mois", twelveMonths: "12 mois", soon: "Bientôt" },
-      priceValue: "~33 €",
-      priceSuffix: "/ mois, facturé ~400 € / an",
+      periodLabels: { oneMonth: "1 mois", threeMonths: "3 mois", sixMonths: "6 mois", twelveMonths: "12 mois" },
+      periods: {
+        monthly: { price: "50 €", suffix: "/ mois" },
+        quarterly: { price: "42 €", suffix: "/ mois, facturé 126 € tous les 3 mois" },
+        semiannual: { price: "36 €", suffix: "/ mois, facturé 216 € tous les 6 mois" },
+        annual: { price: "~33 €", suffix: "/ mois, facturé ~400 € / an" },
+      },
       trialNote: "14 jours d'essai gratuit, sans carte bancaire.",
       features: [
         "QR codes et tables illimités",
@@ -971,9 +987,13 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Un solo plan.",
       titleHighlight: "Todo incluido.",
       subtitle: "Sin oferta «Básico» frente a «Pro»: cada restaurante accede a toda la plataforma.",
-      periodLabels: { threeMonths: "3 meses", sixMonths: "6 meses", twelveMonths: "12 meses", soon: "Próximamente" },
-      priceValue: "~33 €",
-      priceSuffix: "/ mes, facturado ~400 € / año",
+      periodLabels: { oneMonth: "1 mes", threeMonths: "3 meses", sixMonths: "6 meses", twelveMonths: "12 meses" },
+      periods: {
+        monthly: { price: "50 €", suffix: "/ mes" },
+        quarterly: { price: "42 €", suffix: "/ mes, facturado 126 € cada 3 meses" },
+        semiannual: { price: "36 €", suffix: "/ mes, facturado 216 € cada 6 meses" },
+        annual: { price: "~33 €", suffix: "/ mes, facturado ~400 € / año" },
+      },
       trialNote: "14 días de prueba gratuita, sin tarjeta de crédito.",
       features: [
         "Códigos QR y mesas ilimitados",
@@ -1196,9 +1216,13 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "Nur ein Plan.",
       titleHighlight: "Alles inklusive.",
       subtitle: "Kein „Basic“ gegen „Pro“: Jedes Restaurant erhält die gesamte Plattform.",
-      periodLabels: { threeMonths: "3 Monate", sixMonths: "6 Monate", twelveMonths: "12 Monate", soon: "Bald" },
-      priceValue: "~33 €",
-      priceSuffix: "/ Monat, ~400 € / Jahr abgerechnet",
+      periodLabels: { oneMonth: "1 Monat", threeMonths: "3 Monate", sixMonths: "6 Monate", twelveMonths: "12 Monate" },
+      periods: {
+        monthly: { price: "50 €", suffix: "/ Monat" },
+        quarterly: { price: "42 €", suffix: "/ Monat, alle 3 Monate 126 € abgerechnet" },
+        semiannual: { price: "36 €", suffix: "/ Monat, alle 6 Monate 216 € abgerechnet" },
+        annual: { price: "~33 €", suffix: "/ Monat, ~400 € / Jahr abgerechnet" },
+      },
       trialNote: "14 Tage kostenlos testen, keine Kreditkarte nötig.",
       features: [
         "Unbegrenzte QR-Codes und Tische",
@@ -1421,9 +1445,13 @@ export const LANDING_DICT: Record<LanguageCode, LandingDict> = {
       titlePre: "خطة واحدة.",
       titleHighlight: "كل شيء مُدرَج.",
       subtitle: "لا عروض «أساسية» مقابل «احترافية»: كل مطعم يصل إلى المنصة كاملة.",
-      periodLabels: { threeMonths: "٣ أشهر", sixMonths: "٦ أشهر", twelveMonths: "١٢ شهرًا", soon: "قريبًا" },
-      priceValue: "~٣٣ €",
-      priceSuffix: "/ شهريًا، تُفوتَر بحوالي ٤٠٠ € / سنويًا",
+      periodLabels: { oneMonth: "شهر واحد", threeMonths: "٣ أشهر", sixMonths: "٦ أشهر", twelveMonths: "١٢ شهرًا" },
+      periods: {
+        monthly: { price: "٥٠ €", suffix: "/ شهريًا" },
+        quarterly: { price: "٤٢ €", suffix: "/ شهريًا، تُفوتَر ١٢٦ € كل ٣ أشهر" },
+        semiannual: { price: "٣٦ €", suffix: "/ شهريًا، تُفوتَر ٢١٦ € كل ٦ أشهر" },
+        annual: { price: "~٣٣ €", suffix: "/ شهريًا، تُفوتَر بحوالي ٤٠٠ € / سنويًا" },
+      },
       trialNote: "١٤ يومًا تجربة مجانية، دون بطاقة ائتمان.",
       features: [
         "رموز QR وطاولات غير محدودة",
