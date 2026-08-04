@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import IntroSplash from "@/components/intro-splash";
 import Reveal, { StaggerGroup, StaggerItem } from "@/components/reveal";
 import ProductPreview from "@/components/product-preview";
 import HeroMockup from "@/components/hero-mockup";
@@ -38,6 +39,7 @@ export default function HomePage() {
 
   return (
     <main lang={locale} dir={dir}>
+      <IntroSplash />
       <LandingNav locale={locale} />
 
       {/* Hero -- light steel-paper ground, dot texture + soft marigold halo

@@ -764,6 +764,18 @@ Les quatre points d'appel (`dashboard/layout.tsx`, `landing-footer.tsx`, `auth-s
 
 Vérifié : `tsc`/`eslint` au vert ; capture Playwright de la nav (fond clair) et du footer (fond vert foncé) confirmant la lisibilité dans les deux contextes.
 
+### 12.37 Splash d'ouverture plein écran sur le logo (4 août 2026)
+
+Demande du fondateur avant la fusion dans `main` : une animation qui "ouvre le logo en plein écran en visant le site". Nouveau composant `src/components/intro-splash.tsx`, monté uniquement dans `src/app/page.tsx` (la landing, `/`) -- ni le dashboard, ni les pages d'auth, ni le menu public ne le déclenchent, un splash y serait juste gênant à chaque rechargement pendant le travail.
+
+**Séquence** (framer-motion, déjà une dépendance du projet) : le wordmark "Tavolino" (même style que §12.36 -- Playfair Display 400, `text-gold-dark`) apparaît en fondu + léger zoom (scale 0.72→1, 0.8s) sur un plein écran `bg-paper`, tient ~0.55s, puis tout l'overlay s'estompe (opacity 1→0, 0.6s) pour révéler la page en dessous, déjà rendue derrière.
+
+**Une fois par onglet, pas une fois pour toujours** : gate via `sessionStorage` (`tavolino-intro-seen`), pas `localStorage` -- un premier visiteur le voit une fois, mais il ne rejoue pas à chaque clic interne ou rechargement pendant la même visite ; un nouvel onglet/une nouvelle session le revoit. Choix par défaut le plus proche de la demande ("en visant le site") sans être lassant à tester -- à ajuster si le fondateur préfère qu'il rejoue à chaque chargement.
+
+**Hydratation** : suit exactement le motif déjà établi par `useSafeReducedMotion` (`use-safe-reduced-motion.ts`) -- l'état `visible` démarre à `false` aussi bien côté serveur que lors du premier rendu client (aucun overlay dans le HTML envoyé), puis un `useLayoutEffect` (avant peinture) lit `sessionStorage` et `prefers-reduced-motion` pour décider de l'afficher. Sous `prefers-reduced-motion: reduce`, le composant ne rend jamais rien -- règle non négociable déjà documentée dans `reveal.tsx`.
+
+Vérifié par Playwright (contexte de navigateur neuf, capture à plusieurs instants de la séquence) : l'overlay apparaît plein écran, tient, puis s'efface proprement sur le hero ; un rechargement dans le même onglet ne le rejoue pas. `tsc`/`eslint` au vert.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Sélecteur de langue : les pages internes du dashboard et les corps de `/prezzi`/`/chi-siamo`/`/contatti` restent en français/italien quelle que soit la langue choisie** (voir §12.30). Seuls la coquille du dashboard (nav, rôle) et la nav/pied de page partagés sont traduits partout — un visiteur qui choisit l'espagnol depuis la landing puis se connecte verra un dashboard dont la barre latérale est en espagnol mais dont chaque page (menu, commandes, tables, staff, facturation, marque, analytics) reste en français. À compléter dans une passe dédiée, dictionnaire par dictionnaire comme fait pour la landing/l'authentification.
