@@ -27,7 +27,7 @@ export default function LandingFooter() {
       <ArabesquePattern className="pointer-events-none absolute inset-0 h-full w-full" color="#D4AF37" opacity={0.1} />
       <div className="relative mx-auto grid max-w-5xl gap-10 px-6 sm:grid-cols-[1.4fr_1fr_1fr]">
         <div className="flex flex-col gap-3">
-          <Logo wordmarkClassName="font-display text-xl font-extrabold tracking-tight text-paper" />
+          <Logo />
           <p className="max-w-xs text-sm text-paper/60">{t.footer.tagline}</p>
         </div>
 

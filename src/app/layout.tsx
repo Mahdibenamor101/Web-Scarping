@@ -10,7 +10,10 @@ import "./globals.css";
 // tailwind.config.ts's font-display/font-sans/font-mono.
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["600", "700", "800", "900"],
+  // 400 added for the Logo wordmark (CONTEXT.md §12.36): a light weight
+  // for its fine serifs, distinct from the bold 600-900 range used for
+  // headings everywhere else.
+  weight: ["400", "600", "700", "800", "900"],
   variable: "--font-playfair",
 });
 const poppins = Poppins({

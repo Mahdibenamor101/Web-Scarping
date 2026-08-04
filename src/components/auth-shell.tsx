@@ -18,7 +18,7 @@ export default function AuthShell({
     <main dir={isRtl(locale) ? "rtl" : "ltr"} className="flex min-h-screen flex-col items-center justify-center gap-6 bg-dot-grid px-6 py-12">
       <div className="flex w-full max-w-sm items-center justify-between">
         <Link href="/">
-          <Logo wordmarkClassName="font-display text-xl font-extrabold tracking-tight text-ink" />
+          <Logo />
         </Link>
         <LanguageSwitcher current={locale} />
       </div>

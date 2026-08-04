@@ -756,6 +756,14 @@ Le fondateur a fourni trois exports de logo déjà finalisés (`tavolino-wordmar
 
 Vérifié : `tsc` (racine + `mobile/`) et `eslint` au vert ; capture Playwright de la landing et de `/prezzi` confirmant le nouveau logo et le wordmark "Tavolino" partout, y compris dans le footer sombre (contraste or-sur-vert vérifié lisible) et le copyright bas de page (dérivé de `APP_NAME`, donc mis à jour automatiquement).
 
+### 12.36 Web : logo remplacé par un wordmark seul, tout doré (4 août 2026)
+
+Deuxième correction sur le logo web en suivant : le fondateur a montré une capture d'un moodboard ("3b — Wordmark seul, empattements fins, tout doré") et refusé explicitement toute icône -- juste le mot "Tavolino" en serif fin doré, sans carré/mark. `LogoMark` et l'image `public/branding/logo-mark.png` (§12.35) sont supprimés ; `Logo` (`src/components/logo.tsx`) ne rend plus qu'un `<span>` stylé. Police : Playfair Display, déjà chargée dans `layout.tsx` pour les titres mais seulement aux graisses 600-900 -- 400 ajouté spécifiquement pour ce wordmark (empattements fins = graisse légère, pas les titres en gras du reste du site). Couleur : `text-gold-dark` (`colors.goldDark`, déjà un token existant de `design-tokens.ts`) plutôt qu'une teinte devinée sur la capture.
+
+Les quatre points d'appel (`dashboard/layout.tsx`, `landing-footer.tsx`, `auth-shell.tsx`, `landing-nav.tsx`) passaient chacun un `wordmarkClassName` différent pour adapter la couleur à leur fond (blanc sur la sidebar sombre, crème sur le footer vert foncé, encre sur fond clair) -- ces overrides sont supprimés, le nouveau style est volontairement uniforme ("tout doré" partout, y compris sur fond sombre où le contraste or-sur-vert-très-sombre est déjà établi ailleurs sur le site). Le favicon (`src/app/icon.png`) n'est pas concerné : un favicon ne peut pas afficher un wordmark serif lisible à 16-32px, il garde l'icône carrée "T" du fondateur.
+
+Vérifié : `tsc`/`eslint` au vert ; capture Playwright de la nav (fond clair) et du footer (fond vert foncé) confirmant la lisibilité dans les deux contextes.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Sélecteur de langue : les pages internes du dashboard et les corps de `/prezzi`/`/chi-siamo`/`/contatti` restent en français/italien quelle que soit la langue choisie** (voir §12.30). Seuls la coquille du dashboard (nav, rôle) et la nav/pied de page partagés sont traduits partout — un visiteur qui choisit l'espagnol depuis la landing puis se connecte verra un dashboard dont la barre latérale est en espagnol mais dont chaque page (menu, commandes, tables, staff, facturation, marque, analytics) reste en français. À compléter dans une passe dédiée, dictionnaire par dictionnaire comme fait pour la landing/l'authentification.

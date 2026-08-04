@@ -35,7 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <aside className="flex w-60 shrink-0 flex-col justify-between border-r border-white/5 bg-dash-card px-4 py-6 text-white">
         <div>
           <div className="flex items-center justify-between px-2">
-            <Logo wordmarkClassName="font-display text-xl font-extrabold tracking-tight text-white" />
+            <Logo />
           </div>
           <div className="mt-4 px-2">
             <LanguageSwitcher current={locale} variant="dark" />
