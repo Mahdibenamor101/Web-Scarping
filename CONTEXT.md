@@ -776,6 +776,18 @@ Demande du fondateur avant la fusion dans `main` : une animation qui "ouvre le l
 
 Vérifié par Playwright (contexte de navigateur neuf, capture à plusieurs instants de la séquence) : l'overlay apparaît plein écran, tient, puis s'efface proprement sur le hero ; un rechargement dans le même onglet ne le rejoue pas. `tsc`/`eslint` au vert.
 
+### 12.38 Passage bug-fix + logo doré sur les e-mails (4 août 2026)
+
+Demande du fondateur ("améliorer" avant fusion) traitée en deux volets pendant que la traduction des sous-pages du dashboard (§12.39, tâche #108) tournait en parallèle dans un worktree isolé.
+
+**Bug trouvé et corrigé : `vitest.config.ts` faisait tourner chaque test deux fois.** Les excludes par défaut de Vitest ne couvrent pas `.claude/` -- dès qu'un worktree d'agent existe sous `.claude/worktrees/` (convention propre à cet environnement, invisible de Vitest), ses fichiers de test sont ramassés en plus de ceux du dépôt principal et s'exécutent deux fois. Ajouté `exclude: ["**/node_modules/**", "**/.claude/**"]`. `.claude/worktrees/` ajouté à `.gitignore` (n'y était pas, un worktree d'agent aurait pu finir commité par erreur).
+
+**Base Postgres locale trouvée arrêtée** (`service postgresql status` → down) après le redémarrage du conteneur -- relancée (`service postgresql start`), ce qui a fait passer `tests/isolation.test.ts` de 10 tests skippés/en échec de connexion à 16/16 verts. Pas un bug de code, mais la vraie raison pour laquelle la suite semblait rouge.
+
+**Vérifications complètes** : `tsc`/`eslint` (racine + `mobile/`) au vert, `npm run build` (production) au vert, `vitest run` 16/16 vert. Recherche de liens morts (tous les `href="/..."` internes pointent vers des routes qui existent), de restes anglais/italien perdus dans du texte français hors dashboard (aucun trouvé -- la seule occurrence italienne restante, `menu/[qrToken]/page.tsx`, appartient au dictionnaire du menu public qui est intentionnellement italien par défaut) et de mentions résiduelles de "mbQr"/"RanoumaQr" (aucune, en dehors de l'historique de ce fichier).
+
+**Logo doré étendu aux e-mails** : nouveau `src/lib/email-template.ts` (`wrapEmailHtml`), un en-tête de marque simple -- "Tavolino" en serif doré (`Georgia`, pas de police web chargée : peu fiable dans les clients mail), une règle fine, puis le corps -- appliqué aux deux e-mails existants (`sendVerificationEmail` dans `src/lib/verification.ts`, l'invitation staff dans `src/app/api/staff/invite/route.ts`). Le favicon (`src/app/icon.png`) reste l'icône carrée du fondateur, inchangée : un wordmark serif n'est pas lisible à 16-32px (déjà documenté §12.36). L'app mobile n'a pas été touchée : Playfair Display n'y est pas chargeable sans conflit de dépendances déjà documenté (`mobile/README.md`), et son thème "Comanda" (fond quasi noir, accent orange) est visuellement distinct du site -- y importer le style doré du site dépasserait la demande de polish.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - **Sélecteur de langue : les pages internes du dashboard et les corps de `/prezzi`/`/chi-siamo`/`/contatti` restent en français/italien quelle que soit la langue choisie** (voir §12.30). Seuls la coquille du dashboard (nav, rôle) et la nav/pied de page partagés sont traduits partout — un visiteur qui choisit l'espagnol depuis la landing puis se connecte verra un dashboard dont la barre latérale est en espagnol mais dont chaque page (menu, commandes, tables, staff, facturation, marque, analytics) reste en français. À compléter dans une passe dédiée, dictionnaire par dictionnaire comme fait pour la landing/l'authentification.

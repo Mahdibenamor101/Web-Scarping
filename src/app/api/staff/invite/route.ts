@@ -5,6 +5,7 @@ import { requireSession, requireRole, handleApiError, ApiError, requireRateLimit
 import { STAFF_MANAGEMENT_ROLES, canInviteRole } from "@/lib/rbac";
 import { inviteStaffSchema } from "@/lib/validation";
 import { sendEmail } from "@/lib/email";
+import { wrapEmailHtml } from "@/lib/email-template";
 import { getRequestOrigin } from "@/lib/rate-limit";
 
 const INVITATION_TTL_DAYS = 7;
@@ -66,11 +67,11 @@ export async function POST(req: NextRequest) {
     const { sent } = await sendEmail({
       to: body.email,
       subject: `Invitation à rejoindre ${organizationName} sur Tavolino`,
-      html: `
+      html: wrapEmailHtml(`
         <p>Vous avez été invité·e à rejoindre <strong>${organizationName}</strong> sur Tavolino, en tant que ${body.role}.</p>
         <p><a href="${inviteUrl}">Activer mon compte</a></p>
         <p>Ce lien expire le ${expiresAt.toLocaleDateString("fr-FR")}.</p>
-      `,
+      `),
     });
 
     return NextResponse.json({ inviteUrl, expiresAt: invitation.expiresAt, emailSent: sent }, { status: 201 });

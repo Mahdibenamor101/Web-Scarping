@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import type { Prisma } from "@prisma/client";
 import { sendEmail } from "./email";
+import { wrapEmailHtml } from "./email-template";
 
 const VERIFICATION_TTL_HOURS = 24;
 
@@ -31,10 +32,10 @@ export async function sendVerificationEmail(
   return sendEmail({
     to: opts.email,
     subject: "Confirmez votre adresse email — Tavolino",
-    html: `
+    html: wrapEmailHtml(`
       <p>Bienvenue sur Tavolino ! Confirmez votre adresse email pour activer pleinement votre compte.</p>
       <p><a href="${verifyUrl}">Confirmer mon email</a></p>
       <p>Ce lien expire dans ${VERIFICATION_TTL_HOURS}h. Si vous n'êtes pas à l'origine de cette création de compte, ignorez cet email.</p>
-    `,
+    `),
   });
 }
