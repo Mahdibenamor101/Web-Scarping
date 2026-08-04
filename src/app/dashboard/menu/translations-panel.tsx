@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import type { LanguageCode } from "@/lib/i18n/languages";
+import { MENU_DICT } from "@/lib/i18n/dictionaries/menu";
 
 const LANGUAGE_OPTIONS = [
   { code: "fr", label: "Français" },
@@ -15,7 +17,8 @@ const LANGUAGE_OPTIONS = [
  * dashboard/menu/page.tsx) since it owns a self-contained slice of state
  * (selection, in-flight, result) unrelated to category/item CRUD.
  */
-export default function TranslationsPanel() {
+export default function TranslationsPanel({ locale = "fr" }: { locale?: LanguageCode }) {
+  const t = MENU_DICT[locale].translations;
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -40,16 +43,12 @@ export default function TranslationsPanel() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setResult(
-          res.status === 501
-            ? "Traduction non configurée sur cet environnement."
-            : (body.error ?? "Échec de la traduction"),
-        );
+        setResult(res.status === 501 ? t.notConfigured : (body.error ?? t.failed));
         return;
       }
-      setResult(`Menu traduit vers ${selected.size} langue${selected.size > 1 ? "s" : ""}.`);
+      setResult(`${t.translatedPrefix}${selected.size} ${selected.size > 1 ? t.languagePlural : t.languageSingular}.`);
     } catch {
-      setResult("Erreur inconnue");
+      setResult(t.genericError);
     } finally {
       setRunning(false);
     }
@@ -57,11 +56,8 @@ export default function TranslationsPanel() {
 
   return (
     <section className="card-dash">
-      <h2 className="mb-1 text-base font-semibold text-white">Traduction automatique</h2>
-      <p className="mb-3 text-xs text-white/50">
-        Traduit le nom et la description de chaque plat depuis l&apos;italien. Relancer écrase la traduction
-        précédente -- utile après avoir modifié le menu.
-      </p>
+      <h2 className="mb-1 text-base font-semibold text-white">{t.heading}</h2>
+      <p className="mb-3 text-xs text-white/50">{t.description}</p>
       <div className="flex flex-wrap gap-2">
         {LANGUAGE_OPTIONS.map((lang) => (
           <button
@@ -79,7 +75,7 @@ export default function TranslationsPanel() {
         ))}
       </div>
       <button onClick={run} disabled={running || selected.size === 0} className="btn-primary mt-3">
-        {running ? "Traduction…" : "Traduire le menu"}
+        {running ? t.running : t.button}
       </button>
       {result && <p className="mt-2 text-sm text-white/70">{result}</p>}
     </section>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { ALL_ALLERGENS, ALLERGEN_LABELS } from "@/lib/allergens";
+import type { LanguageCode } from "@/lib/i18n/languages";
+import { MENU_DICT } from "@/lib/i18n/dictionaries/menu";
 
 export type ItemFormValues = {
   nameIt: string;
@@ -26,12 +28,16 @@ export default function ItemForm({
   onSubmit,
   onCancel,
   submitLabel,
+  locale = "fr",
 }: {
   initial?: Partial<ItemFormValues>;
   onSubmit: (values: ItemFormValues) => Promise<void>;
   onCancel?: () => void;
   submitLabel: string;
+  locale?: LanguageCode;
 }) {
+  const dict = MENU_DICT[locale];
+  const t = dict.form;
   const [values, setValues] = useState<ItemFormValues>({ ...EMPTY, ...initial });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,15 +57,11 @@ export default function ItemForm({
       const res = await fetch("/api/menu/photo-upload", { method: "POST", body: formData });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(
-          res.status === 501
-            ? "Upload non configuré sur cet environnement — collez une URL manuellement."
-            : (body.error ?? "Échec de l'envoi"),
-        );
+        throw new Error(res.status === 501 ? t.uploadNotConfigured : (body.error ?? t.uploadFailed));
       }
       setValues((v) => ({ ...v, photoUrl: body.url }));
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Échec de l'envoi");
+      setUploadError(err instanceof Error ? err.message : t.uploadFailed);
     } finally {
       setUploading(false);
     }
@@ -67,7 +69,7 @@ export default function ItemForm({
 
   async function handleGenerate() {
     if (!values.nameIt.trim()) {
-      setUploadError("Renseignez le nom du plat avant de générer une photo.");
+      setUploadError(t.generateNeedsName);
       return;
     }
     setGenerating(true);
@@ -80,15 +82,11 @@ export default function ItemForm({
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(
-          res.status === 501
-            ? "Génération IA non configurée sur cet environnement."
-            : (body.error ?? "Échec de la génération"),
-        );
+        throw new Error(res.status === 501 ? t.generateNotConfigured : (body.error ?? t.generateFailed));
       }
       setValues((v) => ({ ...v, photoUrl: body.url }));
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Échec de la génération");
+      setUploadError(err instanceof Error ? err.message : t.generateFailed);
     } finally {
       setGenerating(false);
     }
@@ -108,7 +106,7 @@ export default function ItemForm({
     try {
       await onSubmit(values);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : dict.genericError);
     } finally {
       setLoading(false);
     }
@@ -118,7 +116,7 @@ export default function ItemForm({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-white/60">Nom (IT)</span>
+          <span className="font-medium text-white/60">{t.nameIt}</span>
           <input
             required
             value={values.nameIt}
@@ -127,7 +125,7 @@ export default function ItemForm({
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-white/60">Nom (EN)</span>
+          <span className="font-medium text-white/60">{t.nameEn}</span>
           <input
             value={values.nameEn}
             onChange={(e) => setValues((v) => ({ ...v, nameEn: e.target.value }))}
@@ -136,7 +134,7 @@ export default function ItemForm({
         </label>
       </div>
       <label className="flex flex-col gap-1.5 text-sm">
-        <span className="font-medium text-white/60">Description (IT)</span>
+        <span className="font-medium text-white/60">{t.descriptionIt}</span>
         <textarea
           value={values.descriptionIt}
           onChange={(e) => setValues((v) => ({ ...v, descriptionIt: e.target.value }))}
@@ -146,7 +144,7 @@ export default function ItemForm({
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-white/60">Prix (€)</span>
+          <span className="font-medium text-white/60">{t.price}</span>
           <input
             required
             type="number"
@@ -158,7 +156,7 @@ export default function ItemForm({
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-white/60">Photo (URL, optionnel)</span>
+          <span className="font-medium text-white/60">{t.photo}</span>
           <div className="flex items-center gap-2">
             {values.photoUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- arbitrary external/uploaded URL, not a local asset
@@ -180,7 +178,7 @@ export default function ItemForm({
                 onChange={handleFileChange}
                 disabled={uploading}
               />
-              {uploading ? "Envoi…" : "ou importer une photo"}
+              {uploading ? t.uploading : t.orUploadPhoto}
             </label>
             <button
               type="button"
@@ -188,14 +186,14 @@ export default function ItemForm({
               disabled={generating}
               className="text-brand-light transition hover:underline disabled:pointer-events-none disabled:opacity-50"
             >
-              {generating ? "Génération…" : "ou générer avec l'IA"}
+              {generating ? t.generating : t.orGenerateAi}
             </button>
           </div>
           {uploadError && <span className="text-xs text-danger">{uploadError}</span>}
         </label>
       </div>
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-white/60">Allergènes (Règlement UE n°1169/2011)</legend>
+        <legend className="mb-2 text-sm font-medium text-white/60">{t.allergensLegend}</legend>
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {ALL_ALLERGENS.map((a) => (
             <label key={a} className="flex items-center gap-2 text-xs text-white/40">
@@ -217,7 +215,7 @@ export default function ItemForm({
         </button>
         {onCancel && (
           <button type="button" onClick={onCancel} className="btn-link-dash">
-            Annuler
+            {t.cancel}
           </button>
         )}
       </div>

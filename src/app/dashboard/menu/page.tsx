@@ -7,6 +7,9 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
 import TranslationsPanel from "./translations-panel";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { MENU_DICT } from "@/lib/i18n/dictionaries/menu";
 
 type Category = { id: string; nameIt: string; nameEn: string | null; sortOrder: number };
 type Item = {
@@ -22,6 +25,8 @@ type Item = {
 };
 
 export default function MenuPage() {
+  const locale = useLocale("fr");
+  const t = MENU_DICT[locale];
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +58,7 @@ export default function MenuPage() {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Erreur inconnue");
+      setError(body.error ?? t.genericError);
       return;
     }
     setNewCategoryName("");
@@ -74,7 +79,7 @@ export default function MenuPage() {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error ?? "Erreur inconnue");
+      throw new Error(body.error ?? t.genericError);
     }
     setAddingItemFor(null);
     load();
@@ -88,7 +93,7 @@ export default function MenuPage() {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error ?? "Erreur inconnue");
+      throw new Error(body.error ?? t.genericError);
     }
     setEditingItem(null);
     load();
@@ -110,31 +115,30 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="flex max-w-3xl flex-col gap-8">
+    <div dir={isRtl(locale) ? "rtl" : "ltr"} className="flex max-w-3xl flex-col gap-8">
       <div className="flex items-center gap-2">
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Menu</h1>
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">{t.title}</h1>
         <HelpTip>
-          Organisez vos plats par <strong className="text-white">catégories</strong> (Antipasti, Primi…), dans
-          l&apos;ordre où elles doivent apparaître au client. Chaque plat peut avoir une photo, un prix, des
-          allergènes et un interrupteur &laquo;&nbsp;disponible&nbsp;&raquo; pour le retirer temporairement sans le
-          supprimer (rupture de stock, plat du jour épuisé…).
+          {t.help.before}
+          <strong className="text-white">{t.help.bold}</strong>
+          {t.help.after}
         </HelpTip>
       </div>
 
-      <TranslationsPanel />
+      <TranslationsPanel locale={locale} />
 
       <section className="card-dash">
-        <h2 className="mb-3 text-base font-semibold text-white">Nouvelle catégorie</h2>
+        <h2 className="mb-3 text-base font-semibold text-white">{t.newCategory.heading}</h2>
         <form onSubmit={addCategory} className="flex max-w-md gap-2">
           <input
             required
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
-            placeholder="Antipasti, Primi, Dolci…"
+            placeholder={t.newCategory.placeholder}
             className="input-dash flex-1"
           />
           <button type="submit" className="btn-primary shrink-0">
-            Ajouter
+            {t.newCategory.add}
           </button>
         </form>
         {error && <p className="mt-2 text-sm text-danger">{error}</p>}
@@ -150,7 +154,7 @@ export default function MenuPage() {
         ))}
 
       {!loading && categories.length === 0 && (
-        <p className="text-sm text-white/40">Aucune catégorie pour l&apos;instant — commencez par en créer une.</p>
+        <p className="text-sm text-white/40">{t.noCategoriesYet}</p>
       )}
 
       {!loading && categories.map((category) => {
@@ -166,10 +170,10 @@ export default function MenuPage() {
                   onClick={() => setAddingItemFor(addingItemFor === category.id ? null : category.id)}
                   className="btn-link-dash"
                 >
-                  + Ajouter un plat
+                  {t.addItem}
                 </button>
                 <button onClick={() => setConfirmDeleteCategory(category.id)} className="btn-link-dash-danger">
-                  Supprimer la catégorie
+                  {t.deleteCategory}
                 </button>
               </div>
             </div>
@@ -179,7 +183,8 @@ export default function MenuPage() {
                 editingItem === item.id ? (
                   <li key={item.id}>
                     <ItemForm
-                      submitLabel="Enregistrer"
+                      locale={locale}
+                      submitLabel={t.form.save}
                       initial={{
                         nameIt: item.nameIt,
                         nameEn: item.nameEn ?? "",
@@ -200,38 +205,40 @@ export default function MenuPage() {
                     <div>
                       <p className="font-medium text-white">
                         {item.nameIt} <span className="text-white/40">—</span> {item.price.toFixed(2)} €{" "}
-                        {!item.isAvailable && <span className="badge-pill bg-danger/10 text-danger">indisponible</span>}
+                        {!item.isAvailable && <span className="badge-pill bg-danger/10 text-danger">{t.unavailableBadge}</span>}
                       </p>
                       {item.descriptionIt && <p className="text-white/40">{item.descriptionIt}</p>}
                       {item.allergens.length > 0 && (
                         <p className="mt-1 text-xs text-white/40">
-                          Allergènes : {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
+                          {t.allergensPrefix}
+                          {item.allergens.map((a) => ALLERGEN_LABELS[a as keyof typeof ALLERGEN_LABELS]).join(", ")}
                         </p>
                       )}
                     </div>
                     <div className="flex shrink-0 gap-3">
                       <button onClick={() => toggleAvailable(item)} className="btn-link-dash">
-                        {item.isAvailable ? "Marquer indisponible" : "Marquer disponible"}
+                        {item.isAvailable ? t.markUnavailable : t.markAvailable}
                       </button>
                       <button onClick={() => setEditingItem(item.id)} className="btn-link-dash">
-                        Modifier
+                        {t.edit}
                       </button>
                       <button onClick={() => setConfirmDeleteItem(item.id)} className="btn-link-dash-danger">
-                        Supprimer
+                        {t.delete}
                       </button>
                     </div>
                   </li>
                 ),
               )}
               {categoryItems.length === 0 && addingItemFor !== category.id && (
-                <p className="text-sm text-white/40">Aucun plat dans cette catégorie.</p>
+                <p className="text-sm text-white/40">{t.noItemsInCategory}</p>
               )}
             </ul>
 
             {addingItemFor === category.id && (
               <div className="mt-3">
                 <ItemForm
-                  submitLabel="Ajouter le plat"
+                  locale={locale}
+                  submitLabel={t.form.addDish}
                   onSubmit={(values) => createItem(category.id, values)}
                   onCancel={() => setAddingItemFor(null)}
                 />
@@ -243,18 +250,18 @@ export default function MenuPage() {
 
       <ConfirmDialog
         open={confirmDeleteCategory !== null}
-        title="Supprimer cette catégorie ?"
-        body="Tous les plats qu'elle contient seront supprimés avec elle."
-        confirmLabel="Supprimer"
+        title={t.confirmDeleteCategory.title}
+        body={t.confirmDeleteCategory.body}
+        confirmLabel={t.confirmDeleteCategory.confirm}
         danger
         onConfirm={() => confirmDeleteCategory && deleteCategory(confirmDeleteCategory)}
         onCancel={() => setConfirmDeleteCategory(null)}
       />
       <ConfirmDialog
         open={confirmDeleteItem !== null}
-        title="Supprimer ce plat ?"
-        body="Cette action est définitive."
-        confirmLabel="Supprimer"
+        title={t.confirmDeleteItem.title}
+        body={t.confirmDeleteItem.body}
+        confirmLabel={t.confirmDeleteItem.confirm}
         danger
         onConfirm={() => confirmDeleteItem && deleteItem(confirmDeleteItem)}
         onCancel={() => setConfirmDeleteItem(null)}

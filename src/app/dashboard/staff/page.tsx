@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { STAFF_DICT } from "@/lib/i18n/dictionaries/staff";
+import { AUTH_DICT } from "@/lib/i18n/dictionaries/auth";
+import { toIntlLocale } from "@/lib/i18n/intl-locale";
 
 type StaffMember = {
   id: string;
@@ -23,6 +28,10 @@ type PendingInvitation = {
 const ROLES = ["OWNER", "MANAGER", "SERVER", "KITCHEN"] as const;
 
 export default function StaffPage() {
+  const locale = useLocale("fr");
+  const t = STAFF_DICT[locale];
+  const roleLabel = AUTH_DICT[locale].roles;
+  const intlLocale = toIntlLocale(locale);
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +66,7 @@ export default function StaffPage() {
     });
     const body = await res.json();
     if (!res.ok) {
-      setError(body.error ?? "Erreur inconnue");
+      setError(body.error ?? t.genericError);
       return;
     }
     setLastInviteUrl(body.inviteUrl);
@@ -76,14 +85,13 @@ export default function StaffPage() {
   }
 
   return (
-    <div className="flex max-w-3xl flex-col gap-8">
+    <div dir={isRtl(locale) ? "rtl" : "ltr"} className="flex max-w-3xl flex-col gap-8">
       <div className="flex items-center gap-2">
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Équipe</h1>
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">{t.title}</h1>
         <HelpTip>
-          Invitez vos collègues par e-mail avec un <strong className="text-white">rôle</strong> : Manager
-          (accès complet sauf facturation), Serveur (commandes et appels de table) ou Cuisine (commandes
-          uniquement). Chaque invitation envoie un lien à usage unique, valable quelques jours, pour créer leur
-          propre compte.
+          {t.help.before}
+          <strong className="text-white">{t.help.bold}</strong>
+          {t.help.after}
         </HelpTip>
       </div>
 
@@ -100,10 +108,10 @@ export default function StaffPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/5 bg-white/[0.03] text-left text-xs font-medium uppercase tracking-wide text-white/40">
-              <th className="px-4 py-3">Nom</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Rôle</th>
-              <th className="px-4 py-3">Statut</th>
+              <th className="px-4 py-3">{t.table.name}</th>
+              <th className="px-4 py-3">{t.table.email}</th>
+              <th className="px-4 py-3">{t.table.role}</th>
+              <th className="px-4 py-3">{t.table.status}</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -113,12 +121,14 @@ export default function StaffPage() {
                 <td className="px-4 py-3 font-medium text-white">{m.name}</td>
                 <td className="px-4 py-3 text-white/40">{m.email}</td>
                 <td className="px-4 py-3">
-                  <span className="badge-pill bg-brand-light/15 text-brand-light">{m.role}</span>
+                  <span className="badge-pill bg-brand-light/15 text-brand-light">
+                    {roleLabel[m.role as keyof typeof roleLabel] ?? m.role}
+                  </span>
                 </td>
-                <td className="px-4 py-3 text-white/40">{m.isActive ? "Actif" : "Désactivé"}</td>
+                <td className="px-4 py-3 text-white/40">{m.isActive ? t.active : t.inactive}</td>
                 <td className="px-4 py-3 text-right">
                   <button onClick={() => toggleActive(m)} className="btn-link-dash">
-                    {m.isActive ? "Désactiver" : "Réactiver"}
+                    {m.isActive ? t.deactivate : t.reactivate}
                   </button>
                 </td>
               </tr>
@@ -130,15 +140,21 @@ export default function StaffPage() {
 
       {!loading && (
       <section>
-        <h2 className="mb-3 text-base font-semibold text-white">Invitations en attente</h2>
-        {invitations.length === 0 && <p className="text-sm text-white/40">Aucune invitation en attente.</p>}
+        <h2 className="mb-3 text-base font-semibold text-white">{t.pendingInvitations}</h2>
+        {invitations.length === 0 && <p className="text-sm text-white/40">{t.noInvitations}</p>}
         <ul className="flex flex-col gap-2 text-sm">
           {invitations.map((inv) => (
             <li key={inv.id} className="card-dash-static flex justify-between px-4 py-3">
               <span className="text-white/60">
-                {inv.email} — <span className="badge-pill bg-brand-light/15 text-brand-light">{inv.role}</span>
+                {inv.email} —{" "}
+                <span className="badge-pill bg-brand-light/15 text-brand-light">
+                  {roleLabel[inv.role as keyof typeof roleLabel] ?? inv.role}
+                </span>
               </span>
-              <span className="text-white/40">expire le {new Date(inv.expiresAt).toLocaleDateString("it-IT")}</span>
+              <span className="text-white/40">
+                {t.expiresOn}
+                {new Date(inv.expiresAt).toLocaleDateString(intlLocale)}
+              </span>
             </li>
           ))}
         </ul>
@@ -146,10 +162,10 @@ export default function StaffPage() {
       )}
 
       <section className="card-dash">
-        <h2 className="mb-4 text-base font-semibold text-white">Inviter un membre</h2>
+        <h2 className="mb-4 text-base font-semibold text-white">{t.inviteMember}</h2>
         <form onSubmit={onInvite} className="flex max-w-md flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-white/60">Email</span>
+            <span className="font-medium text-white/60">{t.fieldEmail}</span>
             <input
               required
               type="email"
@@ -159,7 +175,7 @@ export default function StaffPage() {
             />
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-white/60">Rôle</span>
+            <span className="font-medium text-white/60">{t.fieldRole}</span>
             <select
               value={inviteRole}
               onChange={(e) => setInviteRole(e.target.value as (typeof ROLES)[number])}
@@ -167,7 +183,7 @@ export default function StaffPage() {
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
-                  {r}
+                  {roleLabel[r]}
                 </option>
               ))}
             </select>
@@ -175,14 +191,12 @@ export default function StaffPage() {
           {error && <p className="text-sm text-danger">{error}</p>}
           {lastInviteUrl && (
             <p className="animate-bump-in break-all rounded-xl border border-brand/20 bg-brand/10 px-3 py-2 text-sm text-brand-light">
-              {lastInviteEmailSent
-                ? "Email envoyé. Lien d'invitation (au cas où) : "
-                : "Aucun envoi d'email configuré pour cet environnement — transmettez ce lien manuellement : "}
+              {lastInviteEmailSent ? t.emailSentPrefix : t.emailNotConfiguredPrefix}
               {lastInviteUrl}
             </p>
           )}
           <button type="submit" className="btn-primary w-fit">
-            Envoyer l&apos;invitation
+            {t.sendInvite}
           </button>
         </form>
       </section>
