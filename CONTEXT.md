@@ -802,6 +802,16 @@ Dernière grosse zone non traduite listée en §13 : les sept pages internes du 
 
 Vérifié : `tsc`/`eslint`/`vitest` au vert sur tous les fichiers touchés. Connexion Playwright avec le compte de démo (`owner@demo.local`), capture des sept pages en français, anglais, allemand et arabe (changement de langue via le sélecteur de la sidebar, déjà câblé depuis §12.30) -- aucun débordement ni chevauchement de texte constaté, y compris en allemand (chaînes les plus longues) et en arabe (mise en page RTL confirmée : sidebar à droite, grille des tables et colonnes de commandes inversées, bordures colorées des tickets toujours du bon côté visuel).
 
+### 12.40 Domaine réel : tavolino.com (4 août 2026)
+
+Le fondateur branche un vrai domaine (`tavolino.com`) sur le déploiement Railway. Rien à changer côté requêtes/liens internes : `getRequestOrigin()` (`src/lib/rate-limit.ts`) dérive déjà l'origine de chaque lien (invitations, callbacks OAuth, etc.) depuis la requête entrante au runtime plutôt que d'un env var fixe -- documenté depuis `.env.example` (§ OAuth), donc aucune modification de code n'était nécessaire pour le branchement DNS lui-même.
+
+Seuls les placeholders `.app` mis en place lors du renommage (§12.34, avant qu'un vrai domaine soit choisi) sont passés à `.com` pour rester cohérents : `CONTACT_EMAIL` (`src/lib/brand.ts`, `hello@tavolino.app` → `hello@tavolino.com`), et dans `.env.example` les exemples `EMAIL_FROM` et `S3_PUBLIC_URL_BASE`. `APPLE_CLIENT_ID="com.tavolino.web"` n'a pas eu besoin de changer : la convention reverse-DNS d'Apple utilise déjà un préfixe `com.` par défaut, indépendant du TLD réel. `S3_BUCKET="tavolino-menu-photos"` non plus : un nom de bucket, pas un domaine.
+
+Toujours des placeholders (`CONTACT_EMAIL` en particulier -- voir §2/§10) : aucune boîte mail réelle n'est configurée derrière `hello@tavolino.com` à ce stade, et la connexion Google/Apple (si utilisée) nécessite d'ajouter séparément les nouvelles URLs de callback (`https://tavolino.com/api/auth/{google,apple}/callback`) dans leurs consoles respectives -- hors du contrôle de ce dépôt.
+
+Vérifié : `tsc`/`eslint` au vert.
+
 ## 13. Ce qui reste fragile ou à surveiller (issu de la revue des étapes 1 à 5, du durcissement post-Phase 0, et du passage nom + design)
 
 - ~~Sélecteur de langue : les pages internes du dashboard restent en français quelle que soit la langue choisie~~ → traduites en FR/IT/EN/ES/DE/AR, voir §12.39. **Reste vrai pour `/prezzi`/`/chi-siamo`/`/contatti`** (voir §12.30) : seuls la nav et le pied de page partagés y respectent la langue choisie, le corps de ces trois pages reste en italien.

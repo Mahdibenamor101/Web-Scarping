@@ -6,4 +6,4 @@ export const APP_NAME = "Tavolino";
 // Placeholder contact address -- no real domain or mailbox has been secured
 // yet (CONTEXT.md §2/§10). Swap this for the real one before this goes live;
 // until then it's a plausible-looking address, not a working inbox.
-export const CONTACT_EMAIL = "hello@tavolino.app";
+export const CONTACT_EMAIL = "hello@tavolino.com";
