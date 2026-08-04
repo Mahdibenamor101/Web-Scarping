@@ -6,25 +6,31 @@ import Badge from "@/components/badge";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { TABLES_DICT } from "@/lib/i18n/dictionaries/tables";
 
 type OrderingMode = "TABLE" | "COUNTER" | "PICKUP" | "DISPLAY_ONLY";
 type Table = { id: string; label: string; qrToken: string; status: "FREE" | "OCCUPIED"; orderingMode: OrderingMode };
 
-const MODE_LABEL: Record<OrderingMode, string> = {
-  TABLE: "Table",
-  COUNTER: "Comptoir",
-  PICKUP: "Retrait",
-  DISPLAY_ONLY: "Affichage seul",
-};
-
-const MODE_OPTIONS: { value: OrderingMode; label: string; hint: string }[] = [
-  { value: "TABLE", label: "Table", hint: "Une table physique, service à table classique." },
-  { value: "COUNTER", label: "Comptoir", hint: "Un seul QR pour tout le comptoir, numéro de commande." },
-  { value: "PICKUP", label: "Retrait", hint: "Le client indique son nom, pas de table." },
-  { value: "DISPLAY_ONLY", label: "Affichage seul", hint: "Menu consultable, pas de commande possible." },
-];
-
 export default function TablesPage() {
+  const locale = useLocale("fr");
+  const t = TABLES_DICT[locale];
+
+  const MODE_LABEL: Record<OrderingMode, string> = {
+    TABLE: t.modes.table.label,
+    COUNTER: t.modes.counter.label,
+    PICKUP: t.modes.pickup.label,
+    DISPLAY_ONLY: t.modes.displayOnly.label,
+  };
+
+  const MODE_OPTIONS: { value: OrderingMode; label: string; hint: string }[] = [
+    { value: "TABLE", label: t.modes.table.label, hint: t.modes.table.hint },
+    { value: "COUNTER", label: t.modes.counter.label, hint: t.modes.counter.hint },
+    { value: "PICKUP", label: t.modes.pickup.label, hint: t.modes.pickup.hint },
+    { value: "DISPLAY_ONLY", label: t.modes.displayOnly.label, hint: t.modes.displayOnly.hint },
+  ];
+
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
   const [label, setLabel] = useState("");
@@ -55,7 +61,7 @@ export default function TablesPage() {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Erreur inconnue");
+      setError(body.error ?? t.genericError);
       return;
     }
     setLabel("");
@@ -69,40 +75,44 @@ export default function TablesPage() {
     setConfirmDeleteId(null);
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setDeleteError(
-        body.error === "referenced_by_other_records" ? "Cette table a déjà des commandes, suppression impossible." : "Erreur",
-      );
+      setDeleteError(body.error === "referenced_by_other_records" ? t.deleteHasOrders : t.deleteGenericError);
       return;
     }
     load();
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div dir={isRtl(locale) ? "rtl" : "ltr"} className="flex flex-col gap-8">
       <div className="flex items-center gap-2">
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Tables</h1>
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">{t.title}</h1>
         <HelpTip>
-          Chaque lien a son propre <strong className="text-white">QR code unique</strong>. <strong className="text-white">Table</strong>{" "}
-          identifie une table précise ; <strong className="text-white">Comptoir</strong> donne un numéro de
-          commande au lieu d&apos;une table ; <strong className="text-white">Retrait</strong> demande le nom du
-          client ; <strong className="text-white">Affichage seul</strong> montre le menu sans permettre de
-          commander (vitrine, réseaux sociaux).
+          {t.help.intro}
+          <strong className="text-white">{t.help.qrUnique}</strong>
+          {t.help.afterQr}
+          <strong className="text-white">{t.modes.table.label}</strong>
+          {t.help.tableSuffix}
+          <strong className="text-white">{t.modes.counter.label}</strong>
+          {t.help.counterSuffix}
+          <strong className="text-white">{t.modes.pickup.label}</strong>
+          {t.help.pickupSuffix}
+          <strong className="text-white">{t.modes.displayOnly.label}</strong>
+          {t.help.displayOnlySuffix}
         </HelpTip>
       </div>
 
       <section className="card-dash max-w-3xl">
-        <h2 className="mb-3 text-base font-semibold text-white">Nouveau lien de commande</h2>
+        <h2 className="mb-3 text-base font-semibold text-white">{t.newLink.heading}</h2>
         <form onSubmit={addTable} className="flex flex-col gap-3">
           <div className="flex max-w-md gap-2">
             <input
               required
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="Table 1, Comptoir, Retrait…"
+              placeholder={`${t.modes.table.label} 1, ${t.modes.counter.label}, ${t.modes.pickup.label}…`}
               className="input-dash flex-1"
             />
             <button type="submit" className="btn-primary shrink-0">
-              Ajouter
+              {t.newLink.add}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -145,7 +155,7 @@ export default function TablesPage() {
       )}
 
       {!loading && tables.length === 0 && (
-        <p className="text-sm text-white/40">Aucune table pour l&apos;instant — ajoutez-en une pour obtenir un QR.</p>
+        <p className="text-sm text-white/40">{t.noTablesYet}</p>
       )}
 
       {!loading && tables.length > 0 && (
@@ -158,7 +168,7 @@ export default function TablesPage() {
                   <p className="text-sm font-semibold text-white">{table.label}</p>
                   {table.orderingMode === "TABLE" ? (
                     <Badge variant={table.status === "OCCUPIED" ? "todo" : "ready"} dash>
-                      {table.status === "OCCUPIED" ? "Occupée" : "Libre"}
+                      {table.status === "OCCUPIED" ? t.occupied : t.free}
                     </Badge>
                   ) : (
                     <Badge variant="progress" dash>
@@ -173,7 +183,7 @@ export default function TablesPage() {
                 )}
                 <p className="break-all text-xs text-white/40">{url}</p>
                 <button onClick={() => setConfirmDeleteId(table.id)} className="btn-link-dash-danger">
-                  Supprimer
+                  {t.delete}
                 </button>
               </div>
             );
@@ -183,9 +193,9 @@ export default function TablesPage() {
 
       <ConfirmDialog
         open={confirmDeleteId !== null}
-        title="Supprimer cette table ?"
-        body="Le QR associé cessera de fonctionner immédiatement."
-        confirmLabel="Supprimer"
+        title={t.confirmDelete.title}
+        body={t.confirmDelete.body}
+        confirmLabel={t.confirmDelete.confirm}
         danger
         onConfirm={() => confirmDeleteId && removeTable(confirmDeleteId)}
         onCancel={() => setConfirmDeleteId(null)}

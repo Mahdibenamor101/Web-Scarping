@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
 import StatCounter from "@/components/stat-counter";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { ANALYTICS_DICT } from "@/lib/i18n/dictionaries/analytics";
+import { toIntlLocale } from "@/lib/i18n/intl-locale";
 
 type DayCount = { date: string; count: number };
 type DaySales = { date: string; total: number; orders: number };
@@ -15,9 +19,10 @@ type Analytics = {
   totals: { views: number; orders: number; revenue: number };
 };
 
-const DAY_LABEL = new Intl.DateTimeFormat("it-IT", { day: "2-digit", month: "2-digit" });
-
 export default function AnalyticsPage() {
+  const locale = useLocale("fr");
+  const t = ANALYTICS_DICT[locale];
+  const dayLabel = new Intl.DateTimeFormat(toIntlLocale(locale), { day: "2-digit", month: "2-digit" });
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,13 +33,10 @@ export default function AnalyticsPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div dir={isRtl(locale) ? "rtl" : "ltr"} className="flex flex-col gap-8">
       <div className="flex items-center gap-2">
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Analytics</h1>
-        <HelpTip>
-          Chiffres des 14 derniers jours (30 pour les plats populaires). Une vue est comptée à chaque ouverture du
-          menu public — un même client qui recharge la page en compte plusieurs.
-        </HelpTip>
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">{t.title}</h1>
+        <HelpTip>{t.helpTip}</HelpTip>
       </div>
 
       {loading && (
@@ -48,32 +50,34 @@ export default function AnalyticsPage() {
       {!loading && data && (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <KpiTile label="Vues du menu" value={data.totals.views} />
-            <KpiTile label="Commandes" value={data.totals.orders} />
-            <KpiTile label="Chiffre d'affaires" value={data.totals.revenue} suffix=" €" decimals />
+            <KpiTile label={t.kpis.views} value={data.totals.views} />
+            <KpiTile label={t.kpis.orders} value={data.totals.orders} />
+            <KpiTile label={t.kpis.revenue} value={data.totals.revenue} suffix=" €" decimals />
           </div>
 
           <section className="card-dash-static">
-            <h2 className="mb-4 text-sm font-semibold text-white/70">Ventes par jour (14 jours)</h2>
+            <h2 className="mb-4 text-sm font-semibold text-white/70">{t.salesByDay}</h2>
             <DayBarChart
               points={data.salesByDay.map((d) => ({ date: d.date, value: d.total }))}
               colorClass="bg-brand-gradient"
               formatValue={(v) => `${v.toFixed(2)} €`}
+              dayLabel={dayLabel}
             />
           </section>
 
           <section className="card-dash-static">
-            <h2 className="mb-4 text-sm font-semibold text-white/70">Vues du menu par jour (14 jours)</h2>
+            <h2 className="mb-4 text-sm font-semibold text-white/70">{t.viewsByDay}</h2>
             <DayBarChart
               points={data.viewsByDay.map((d) => ({ date: d.date, value: d.count }))}
               colorClass="bg-progress"
-              formatValue={(v) => `${v} vue${v === 1 ? "" : "s"}`}
+              formatValue={(v) => `${v} ${v === 1 ? t.viewSingular : t.viewPlural}`}
+              dayLabel={dayLabel}
             />
           </section>
 
           <section className="card-dash-static max-w-xl">
-            <h2 className="mb-4 text-sm font-semibold text-white/70">Plats les plus commandés (30 jours)</h2>
-            {data.popularItems.length === 0 && <p className="text-sm text-white/40">Pas encore de commandes.</p>}
+            <h2 className="mb-4 text-sm font-semibold text-white/70">{t.popularItems}</h2>
+            {data.popularItems.length === 0 && <p className="text-sm text-white/40">{t.noOrdersYet}</p>}
             {data.popularItems.length > 0 && (
               <ul className="flex flex-col gap-3">
                 {(() => {
@@ -127,10 +131,12 @@ function DayBarChart({
   points,
   colorClass,
   formatValue,
+  dayLabel,
 }: {
   points: { date: string; value: number }[];
   colorClass: string;
   formatValue: (v: number) => string;
+  dayLabel: Intl.DateTimeFormat;
 }) {
   const max = Math.max(1, ...points.map((p) => p.value));
   const trackHeight = 140;
@@ -147,12 +153,12 @@ function DayBarChart({
                 percentage height resolving against nothing. */}
             <div className="flex w-full items-end" style={{ height: trackHeight }}>
               <div
-                title={`${DAY_LABEL.format(new Date(p.date))} — ${formatValue(p.value)}`}
+                title={`${dayLabel.format(new Date(p.date))} — ${formatValue(p.value)}`}
                 className={`w-full rounded-t-[3px] transition-opacity hover:opacity-80 ${colorClass}`}
                 style={{ height: `${heightPct}%` }}
               />
             </div>
-            <span className="font-mono text-[10px] text-white/30">{showLabel ? DAY_LABEL.format(new Date(p.date)) : ""}</span>
+            <span className="font-mono text-[10px] text-white/30">{showLabel ? dayLabel.format(new Date(p.date)) : ""}</span>
           </div>
         );
       })}

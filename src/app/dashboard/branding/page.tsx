@@ -3,10 +3,15 @@
 import { useEffect, useState } from "react";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { BRANDING_DICT } from "@/lib/i18n/dictionaries/branding";
 
 type Branding = { logoUrl: string | null; backgroundUrl: string | null };
 
 export default function BrandingPage() {
+  const locale = useLocale("fr");
+  const t = BRANDING_DICT[locale];
   const [branding, setBranding] = useState<Branding | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<"logo" | "background" | null>(null);
@@ -31,11 +36,7 @@ export default function BrandingPage() {
       const uploadRes = await fetch("/api/branding/upload", { method: "POST", body: formData });
       const uploadBody = await uploadRes.json().catch(() => ({}));
       if (!uploadRes.ok) {
-        throw new Error(
-          uploadRes.status === 501
-            ? "Upload non configuré sur cet environnement."
-            : (uploadBody.error ?? "Échec de l'envoi"),
-        );
+        throw new Error(uploadRes.status === 501 ? t.uploadNotConfigured : (uploadBody.error ?? t.uploadFailed));
       }
       const field = kind === "logo" ? "logoUrl" : "backgroundUrl";
       const patchRes = await fetch("/api/branding", {
@@ -43,10 +44,10 @@ export default function BrandingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: uploadBody.url }),
       });
-      if (!patchRes.ok) throw new Error("Échec de l'enregistrement");
+      if (!patchRes.ok) throw new Error(t.saveFailed);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : t.genericError);
     } finally {
       setUploading(null);
     }
@@ -63,20 +64,16 @@ export default function BrandingPage() {
   }
 
   return (
-    <div className="flex max-w-3xl flex-col gap-8">
+    <div dir={isRtl(locale) ? "rtl" : "ltr"} className="flex max-w-3xl flex-col gap-8">
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Marque</h1>
-          <HelpTip>
-            Formats acceptés : JPG, PNG, WebP. Un logo carré (ex. 512×512) et une image de fond au format
-            portrait rendent le mieux sur le téléphone du client. Laissez un champ vide pour revenir à
-            l&apos;habillage mbQr par défaut.
-          </HelpTip>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">{t.title}</h1>
+          <HelpTip>{t.helpTip}</HelpTip>
         </div>
         <p className="mt-1 text-sm text-white/50">
-          Logo et image de fond affichés sur le menu public de vos clients (<code className="font-mono">/menu/...</code>).
-          Le tableau de bord reste toujours mbQr — cette personnalisation ne concerne que ce que vos clients voient
-          après avoir scanné le QR.
+          {t.subtitleBeforeCode}
+          <code className="font-mono">/menu/...</code>
+          {t.subtitleAfterCode}
         </p>
       </div>
 
@@ -90,16 +87,26 @@ export default function BrandingPage() {
       {!loading && (
         <div className="grid gap-4 sm:grid-cols-2">
           <BrandingSlot
-            title="Logo"
-            body="Remplace le logo mbQr en haut du menu du client."
+            title={t.logoTitle}
+            body={t.logoBody}
+            noImageLabel={t.noImage}
+            uploadingLabel={t.uploading}
+            replaceLabel={t.replace}
+            importLabel={t.import}
+            removeLabel={t.remove}
             imageUrl={branding?.logoUrl ?? null}
             uploading={uploading === "logo"}
             onUpload={(file) => upload("logo", file)}
             onClear={() => clear("logo")}
           />
           <BrandingSlot
-            title="Image de fond"
-            body="Une photo du local, des plats, ou une couleur — visible derrière le menu."
+            title={t.backgroundTitle}
+            body={t.backgroundBody}
+            noImageLabel={t.noImage}
+            uploadingLabel={t.uploading}
+            replaceLabel={t.replace}
+            importLabel={t.import}
+            removeLabel={t.remove}
             imageUrl={branding?.backgroundUrl ?? null}
             uploading={uploading === "background"}
             onUpload={(file) => upload("background", file)}
@@ -116,6 +123,11 @@ export default function BrandingPage() {
 function BrandingSlot({
   title,
   body,
+  noImageLabel,
+  uploadingLabel,
+  replaceLabel,
+  importLabel,
+  removeLabel,
   imageUrl,
   uploading,
   onUpload,
@@ -123,6 +135,11 @@ function BrandingSlot({
 }: {
   title: string;
   body: string;
+  noImageLabel: string;
+  uploadingLabel: string;
+  replaceLabel: string;
+  importLabel: string;
+  removeLabel: string;
   imageUrl: string | null;
   uploading: boolean;
   onUpload: (file: File) => void;
@@ -139,7 +156,7 @@ function BrandingSlot({
           // eslint-disable-next-line @next/next/no-img-element -- arbitrary uploaded/external URL
           <img src={imageUrl} alt="" className="h-full w-full object-cover" />
         ) : (
-          <span className="font-mono text-xs text-white/30">Nessuna immagine</span>
+          <span className="font-mono text-xs text-white/30">{noImageLabel}</span>
         )}
       </div>
       <div className="flex items-center gap-4">
@@ -155,11 +172,11 @@ function BrandingSlot({
               if (file) onUpload(file);
             }}
           />
-          {uploading ? "Envoi…" : imageUrl ? "Remplacer" : "Importer"}
+          {uploading ? uploadingLabel : imageUrl ? replaceLabel : importLabel}
         </label>
         {imageUrl && (
           <button onClick={onClear} className="btn-link-dash-danger text-xs">
-            Retirer
+            {removeLabel}
           </button>
         )}
       </div>

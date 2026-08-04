@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Badge from "@/components/badge";
 import Skeleton from "@/components/skeleton";
 import HelpTip from "@/components/help-tip";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { isRtl } from "@/lib/i18n/languages";
+import { ORDERS_DICT } from "@/lib/i18n/dictionaries/orders";
+import { toIntlLocale } from "@/lib/i18n/intl-locale";
 
 type OrderStatus = "PENDING" | "IN_PROGRESS" | "READY" | "SERVED" | "CANCELLED";
 
@@ -23,19 +27,23 @@ type Order = {
 
 type StaffCall = { id: string; createdAt: string; table: { label: string } };
 
-const COLUMNS: {
-  status: OrderStatus;
-  title: string;
-  next?: OrderStatus;
-  badge: "todo" | "progress" | "ready";
-  borderClass: string;
-}[] = [
-  { status: "PENDING", title: "À faire", next: "IN_PROGRESS", badge: "todo", borderClass: "border-l-brand" },
-  { status: "IN_PROGRESS", title: "En cours", next: "READY", badge: "progress", borderClass: "border-l-progress" },
-  { status: "READY", title: "Prêt", next: "SERVED", badge: "ready", borderClass: "border-l-ready" },
-];
-
 export default function OrdersPage() {
+  const locale = useLocale("fr");
+  const t = ORDERS_DICT[locale];
+  const intlLocale = toIntlLocale(locale);
+
+  const COLUMNS: {
+    status: OrderStatus;
+    title: string;
+    next?: OrderStatus;
+    badge: "todo" | "progress" | "ready";
+    borderClass: string;
+  }[] = [
+    { status: "PENDING", title: t.columns.todo, next: "IN_PROGRESS", badge: "todo", borderClass: "border-l-brand" },
+    { status: "IN_PROGRESS", title: t.columns.progress, next: "READY", badge: "progress", borderClass: "border-l-progress" },
+    { status: "READY", title: t.columns.ready, next: "SERVED", badge: "ready", borderClass: "border-l-ready" },
+  ];
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [staffCalls, setStaffCalls] = useState<StaffCall[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,24 +91,26 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div dir={isRtl(locale) ? "rtl" : "ltr"} className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">Comande</h1>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">{t.title}</h1>
           <HelpTip>
-            Chaque commande passe par trois colonnes : <strong className="text-white">À faire</strong> dès qu&apos;un
-            client valide sa commande, <strong className="text-white">En cours</strong> une fois que la cuisine a
-            démarré, <strong className="text-white">Prêt</strong> quand elle peut être servie. Cliquez sur le bouton
-            d&apos;une carte pour la faire avancer. La page se met à jour toute seule (badge &laquo;&nbsp;EN
-            DIRECT&nbsp;&raquo;) — aucun rafraîchissement nécessaire.
+            {t.help.intro}
+            <strong className="text-white">{t.columns.todo}</strong>
+            {t.help.todoSuffix}
+            <strong className="text-white">{t.columns.progress}</strong>
+            {t.help.progressSuffix}
+            <strong className="text-white">{t.columns.ready}</strong>
+            {t.help.readySuffix}
           </HelpTip>
         </div>
         {connected ? (
           <Badge variant="ready" pulse dash>
-            EN DIRECT
+            {t.live}
           </Badge>
         ) : (
-          <span className="font-mono text-xs font-medium text-white/40">Connexion…</span>
+          <span className="font-mono text-xs font-medium text-white/40">{t.connecting}</span>
         )}
       </div>
 
@@ -112,13 +122,13 @@ export default function OrdersPage() {
                 <Badge variant="todo" dash>
                   {call.table.label}
                 </Badge>
-                <span className="text-white">chiama il cameriere</span>
+                <span className="text-white">{t.staffCallLabel}</span>
                 <span className="font-mono text-xs text-white/40">
-                  {new Date(call.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(call.createdAt).toLocaleTimeString(intlLocale, { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
               <button onClick={() => acknowledgeCall(call.id)} className="btn-link-dash text-xs">
-                Segna come vista
+                {t.acknowledge}
               </button>
             </div>
           ))}
@@ -151,7 +161,7 @@ export default function OrdersPage() {
                   </Badge>
                   <span className="font-mono text-xs font-medium text-white/40">{columnOrders.length}</span>
                 </div>
-                {columnOrders.length === 0 && <p className="px-1 text-xs text-white/40">Rien pour l&apos;instant.</p>}
+                {columnOrders.length === 0 && <p className="px-1 text-xs text-white/40">{t.emptyColumn}</p>}
                 {columnOrders.map((order) => (
                   <div
                     key={order.id}
@@ -166,7 +176,7 @@ export default function OrdersPage() {
                       </Badge>
                     </div>
                     <span className="font-mono text-xs text-white/40">
-                      {new Date(order.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(order.createdAt).toLocaleTimeString(intlLocale, { hour: "2-digit", minute: "2-digit" })}
                       {order.pickupName && <> · {order.pickupName}</>}
                     </span>
                     <ul className="flex flex-col gap-1 border-t border-dashed border-white/10 pt-2">
@@ -182,7 +192,7 @@ export default function OrdersPage() {
                         {order.totalAmount.toFixed(2)} €
                         {order.paymentStatus === "PAID" && (
                           <span className="rounded-[3px] border border-ready/40 bg-ready/10 px-1 py-0.5 text-[9px] uppercase text-ready">
-                            Payé
+                            {t.paid}
                           </span>
                         )}
                       </span>
@@ -192,13 +202,13 @@ export default function OrdersPage() {
                             onClick={() => setStatus(order.id, column.next as OrderStatus)}
                             className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-bold text-white shadow-soft transition duration-200 hover:-translate-y-0.5"
                           >
-                            {column.next === "IN_PROGRESS" && "Démarrer"}
-                            {column.next === "READY" && "Prêt"}
-                            {column.next === "SERVED" && "Servi"}
+                            {column.next === "IN_PROGRESS" && t.actions.start}
+                            {column.next === "READY" && t.actions.ready}
+                            {column.next === "SERVED" && t.actions.served}
                           </button>
                         )}
                         <button onClick={() => setStatus(order.id, "CANCELLED")} className="btn-link-dash-danger text-xs">
-                          Annuler
+                          {t.actions.cancel}
                         </button>
                       </div>
                     </div>
